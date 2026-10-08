@@ -6,11 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App"/>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RecycleSmartBE\RecycleSmartBE.csproj" />
   </ItemGroup>
 
 </Project>
