@@ -1,3 +1,7 @@
 <Solution>
+  <Project Path="../RecycleSmartBE/RecycleSmartBE.csproj" />
+  <Project Path="../RecycleSmartBLL/RecycleSmartBLL.csproj" />
+  <Project Path="../RecycleSmartDAL/RecycleSmartDAL.csproj" />
+  <Project Path="../Servicio/Servicio.csproj" />
   <Project Path="RecycleSmart.csproj" />
 </Solution>

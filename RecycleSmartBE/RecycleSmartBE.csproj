@@ -1,14 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RecycleSmartBE\RecycleSmartBE.csproj" />
-    <ProjectReference Include="..\RecycleSmartBLL\RecycleSmartBLL.csproj" />
     <ProjectReference Include="..\Servicio\Servicio.csproj" />
   </ItemGroup>
 
