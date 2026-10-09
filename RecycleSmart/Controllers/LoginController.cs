@@ -14,7 +14,7 @@ namespace RecycleSmart.Controllers
             _loginBL = new LoginBLL(conexion);
         }
 
-        public IActionResult Index(string returnUrl)
+        public IActionResult Index(string? returnUrl)
         {
             if (User.Identity?.IsAuthenticated == true)
             {
