@@ -18,7 +18,7 @@ namespace RecycleSmartBLL
             _usuarioRecycleSmart= new UsuarioRecycleSmartDAL(conectar);
         }
 
-        public Login? Verificar(string correo,string clave)
+        public Login? Autenticar(string correo,string clave)
         {
             if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(clave))
             {
@@ -30,15 +30,25 @@ namespace RecycleSmartBLL
             var admin = _usuarioRecycleSmart.BuscarXCorreo(correo);
             if(admin!=null && Encriptacion.Verificar(clave, admin.Clave))
             {
+                VerificarEstado(admin.Estados);
                 return new Login { usuarioRecycleSmart = admin };
             }
             var usuario = _usuarioEmpresaLogistica.BuscarXCorreo(correo);
             if(usuario!=null && Encriptacion.Verificar(clave,usuario.Clave))
             {
+                VerificarEstado(usuario.Estados);
                 return new Login { usuarioEmpresaLogistica = usuario };
             }
 
             return null;
+        }
+
+        private void VerificarEstado(TipoEstado.Estados estado)
+        {
+            if(estado!=TipoEstado.Estados.Activo)
+            {
+                throw new Exception("Cuenta Suspendida");
+            }
         }
     }
 }
