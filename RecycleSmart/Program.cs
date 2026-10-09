@@ -1,9 +1,22 @@
+using Servicio;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
+
+builder.Services.AddAuthentication(ManejosSesiones.esquema).AddCookie(ManejosSesiones.esquema,
+    options =>
+    {
+        options.LoginPath = "/Login";
+        options.LogoutPath = "/Login/Salir";
+        options.AccessDeniedPath = "/Login/AccesoDenegado";
+        options.Cookie.Name = "RecycleSmart.Auth";
+        options.Cookie.HttpOnly = true;
+    });
+
+var app=builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -16,6 +29,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
