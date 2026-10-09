@@ -7,7 +7,7 @@ namespace RecycleSmartBE
 {
     public class UsuarioEmpresaLogistica:UsuarioRecycleSmart
     {
-        public int EmpresaLogisticaId { get; set;  }
         public string Rol { get;set;  }=string.Empty;
+        public int EmpresaLogisticaId { get; set;  }
     }
 }

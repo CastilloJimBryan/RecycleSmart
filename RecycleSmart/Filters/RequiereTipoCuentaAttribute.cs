@@ -16,7 +16,7 @@ namespace RecycleSmart.Filters
         {
             var user = context.HttpContext.User;
 
-            if (user.Identity?.IsAuthenticated == true)
+            if (user.Identity?.IsAuthenticated != true)
             {
                 context.Result = new ChallengeResult(); return;
             }

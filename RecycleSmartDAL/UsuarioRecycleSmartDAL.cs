@@ -16,7 +16,7 @@ namespace RecycleSmartDAL
         public UsuarioRecycleSmart? BuscarXCorreo(string correo)
         {
             using (var conect = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand(" SELECT Id,Nombre,Apellido,Correo,Rol,Clave,Estados,EmpresaLogisticaId" +
+            using (var cmd = new SqlCommand(" SELECT Id,Nombre,Apellido,Correo,Clave,Estado" +
                 " FROM UsuarioRecycleSmart " +
                 " WHERE Correo=@Correo ", conect))
             {

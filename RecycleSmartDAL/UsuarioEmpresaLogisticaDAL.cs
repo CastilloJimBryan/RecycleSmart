@@ -18,7 +18,7 @@ namespace RecycleSmartDAL
         public UsuarioEmpresaLogistica? BuscarXCorreo(string correo)
         {
             using(var conect=new SqlConnection(_conectar))
-            using(var cmd=new  SqlCommand(" SELECT Id,Nombre,Apellido,Correo,Rol,Clave,Estados,EmpresaLogisticaId" +
+            using(var cmd=new  SqlCommand(" SELECT Id,Nombre,Apellido,Correo,Clave,Rol,Estado,EmpresaLogisticaId" +
                 " FROM UsuarioEmpresaLogistica " +
                 " WHERE Correo=@Correo ",conect))
             {
@@ -35,8 +35,8 @@ namespace RecycleSmartDAL
                             Nombre = leer.GetString(1),
                             Apellido = leer.GetString(2),
                             Correo = leer.GetString(3),
-                            Rol = leer.GetString(4),
-                            Clave = leer.GetString(5),
+                            Clave = leer.GetString(4),
+                            Rol = leer.GetString(5),
                             Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(6), true),
                             EmpresaLogisticaId = leer.GetInt32(7),
                         };

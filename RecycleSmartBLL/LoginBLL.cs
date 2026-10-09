@@ -18,7 +18,7 @@ namespace RecycleSmartBLL
             _usuarioRecycleSmart= new UsuarioRecycleSmartDAL(conectar);
         }
 
-        public Login? Autenticar(string correo,string clave)
+        public Login? Autenticar(string? correo,string? clave)
         {
             if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(clave))
             {

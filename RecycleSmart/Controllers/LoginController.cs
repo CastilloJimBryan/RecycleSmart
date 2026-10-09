@@ -32,7 +32,7 @@ namespace RecycleSmart.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Index(string correo,string clave,string? returnUrl)
+        public async Task<IActionResult> Index(string? correo,string? clave,string? returnUrl)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace RecycleSmart.Controllers
 
         private IActionResult Volver(string? returnUrl, string panel)
         {
-            if(string.IsNullOrEmpty(returnUrl)&& Url.IsLocalUrl(returnUrl))
+            if(!string.IsNullOrEmpty(returnUrl)&& Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
