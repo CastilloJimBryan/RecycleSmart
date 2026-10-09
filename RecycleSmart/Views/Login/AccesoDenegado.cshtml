@@ -1,0 +1,12 @@
+﻿<div>
+    <h2>Acceso Denegado</h2>
+    <p>No tiene Permiso para acceder a este sector</p>
+    @if (ManejosSesiones.ObtenerTipoCuenta(User)==TipoDeCuenta.EmpresaLogistica)
+    {
+        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-dark">Volver al Dashboard</a>
+    }
+    else
+    {
+        <a asp-controller="PanelCentral" asp-action="Index" class="btn-outline-dark">Volver al Panel Central</a>
+    }
+</div>

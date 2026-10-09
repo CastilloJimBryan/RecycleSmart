@@ -1,0 +1,49 @@
+﻿@{
+    Layout=null;
+}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width , initial-scale=1.0"/>
+        <title>Iniciar Sesion - RecycleSmart</title>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    </head>
+    <body style="margin:0;">
+    <div class="login">
+        <div class="text-center">
+            <img src="~/imagenes/logo-recyclesmart.png" alt="recyclesmart" class="mb-4" style="max-width:420px;width:90%;"/>
+            <div class="card shadow p-4 login-card mx-auto">
+                @if(!string.IsNullOrEmpty(ViewBag.MensajeAcceso as string))
+                {
+                  <div class=" alert alert-warning">@ViewBag.MensajeAcceso</div>
+                }
+                @if(!ViewData.ModelState.IsValid)
+                {
+                  <div class="alert alert-danger">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <p class="mb-0">@error.ErrorMessage</p>
+                            }
+                  </div>
+                }
+
+                <h2 class="text-center text-success mb-4">Iniciar Sesion</h2>
+                <form asp-controller="Login" asp-action="Index" method="post">
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Correo</label>
+                        <input type="email" class="form-control" placeholder="Ingrese Correo"/>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" placeholder="Ingrese Contraseña"/>
+                    </div>
+                    <button type="submit" class="btn btn-outline-success w-100">Iniciar Sesion</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>
