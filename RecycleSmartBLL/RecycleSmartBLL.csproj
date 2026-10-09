@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RecycleSmartBE\RecycleSmartBE.csproj" />
     <ProjectReference Include="..\RecycleSmartDAL\RecycleSmartDAL.csproj" />
+    <ProjectReference Include="..\Servicio\Servicio.csproj" />
   </ItemGroup>
 
 </Project>
