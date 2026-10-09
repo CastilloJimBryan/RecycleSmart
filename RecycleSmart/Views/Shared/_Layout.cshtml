@@ -1,47 +1,221 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - RecycleSmart</title>
-    <script type="importmap"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
     <link rel="stylesheet" href="~/RecycleSmart.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - RecycleSmart</title>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RecycleSmart</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    @{
+        var tipoCuenta = Servicio.ManejosSesiones.ObtenerTipoCuenta(User);
+        var controllerActual = ViewContext.RouteData.Values["Controller"]?.ToString();
+        string Activo(string c) => controllerActual == c ? "activo" : "";
+    }
+    <div class="wrapper">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <aside id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
+                        <a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica)" asp-action="Index">RecycleSmart</a>
+                        <p style="color: #85BC38;">IoT Compliance</p>
+                    </div>
+                    <button class="toggle-btn border-0" type="button">
+                        <i id="icon" class='bx bx-chevrons-right'></i>
+                    </button>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+                <ul class="sidebar-nav">
+                    @if (tipoCuenta==TipoDeCuenta.EmpresaLogistica)
+                    {
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - RecycleSmart - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="sidebar-item">
+                            <a asp-controller="Dashboard" asp-action="Index" class="sidebar-link @Activo("Dashboard")">
+                                <i class='bx bxs-dashboard'></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#miempresa" aria-expanded="false" aria-controls="miempresa">
+                                <i class='bx bx-building-house'></i>
+                                <span>Mi Empresa</span>
+                            </a>
+                        </li>
+                        <ul id="miempresa" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li class="sidebar-item">
+                                <a asp-controller="UsuarioEmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("UsuarioEmpresaLogistica")">
+                                    <i class='bx bx-user'></i>
+                                    Usuario y Roles
+                                </a>
+                            </li>
+
+                            <li class="sidebar-item">
+                                <a asp-controller="Suscripcion" asp-action="Index" class="sidebar-link @Activo("Suscripcion")">
+                                    <i class='bx bx-wallet-alt'></i>Suscripción / Plan
+                                </a>
+                            </li>
+                        </ul>
+
+                        <li class="sidebar-item">
+                            <a asp-controller="Institucion" asp-action="Index" class="sidebar-link @Activo("Institucion")">
+                                <i class='bx bxs-institution'></i>
+                                <span>Instituciones Cliente</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a asp-controller="Contenedor" asp-action="Index" class="sidebar-link @Activo("Contenedor")">
+                                <i class='bx bx-box'></i>
+                                <span>Contenedores</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="mapa.html" class="sidebar-link">
+                                <i class='bx bx-map-alt'></i>
+                                <span>Mapa IoT</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="alertas.html" class="sidebar-link">
+                                <i class='bx bx-bell'></i>
+                                <span>Alertas</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#rfid" aria-expanded="false" aria-controls="rfid">
+                                <i class='bx bx-rfid'></i>
+                                <span>RFID</span>
+                            </a>
+                            <ul id="rfid" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <li class="sidebar-item">
+                                    <a asp-controller="UsuarioInstitucion" asp-action="Index" class="sidebar-link @Activo("UsuarioInstitucion")">
+                                        <i class='bx bx-id-card'></i>
+                                        Tarjetas
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a asp-controller="Evento" asp-action="Index" class="sidebar-link @Activo("Evento")">
+                                        <i class='bx bx-log-in-circle'></i>
+                                        Log de Accesos
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <i class='bx bx-line-chart'></i>
+                                <span>Trazabilidad</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#reporte" aria-expanded="false" aria-controls="reporte">
+                                <i class='bx bxs-report'></i>
+                                <span>Reportes</span>
+                            </a>
+                            <ul id="reporte" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <li class="sidebar-item">
+                                    <a href="#" class="sidebar-link">
+                                        <i class='bx bx-task'></i>
+                                        Auditoria
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a href="#" class="sidebar-link">
+                                        <i class='bx bx-file'></i>
+                                        Historial de Eventos
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a href="#" class="sidebar-link">
+                                        <i class='bx bx-clipboard'></i>
+                                        Mensual
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link">
+                                <i class='bx bx-bar-chart-square'></i>
+                                <span>Compliance</span>
+                            </a>
+                        </li>
+
+                    }
+                    else
+                    {
+                        <li class="sidebar-item">
+                            <a asp-controller="PanelCentral" asp-action="Index" class="sidebar-link @Activo("PanelCentral")">
+                                <i class='bx bxs-dashboard'>
+                                    <span>Panel Central</span>
+                                </i>
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="EmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("EmpresaLogistica")">
+                                <i class='bx bxs-truck'>
+                                    <span>Empresas Logisticas</span>
+                                </i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+                <div class="sidebar-footer">
+                    <a asp-controller="Login" asp-action="Salir" class="sidebar-link">
+                        <i class='bx bx-log-out'></i>
+                        <span>LogOut</span>
+                    </a>
+                </div>
+
+            </aside>
+
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        }
+        <div class="app-contenido">
+            <header class="topbar">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <button class="btn-menu-movil" type="button" id="btn-menu-movil" aria-label="Abrir Menu">
+                        <i class="bx bx-menu"></i>
+                    </button>
+                }
+
+            </header>
+
+            <main class="app-main">
+                @RenderBody()
+            </main>
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row text-body-secondary">
+                        <div class="col-6 text-start">
+                            <a href="#" class="text-body-secondary">
+                                <strong>Empresa Cliente</strong>
+                            </a>
+                        </div>
+                        <div class="col-6 text-end text-body-secondary d-none d-md-block">
+                            <ul class="list-inline mb-0">
+                                <li class="list-inline-item">
+                                    <a href="#" class="text-body-secondary">_Contact</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="#" class="text-body-secondary">_Contact</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="#" class="text-body-secondary">_Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-    </footer>
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
