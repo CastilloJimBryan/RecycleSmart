@@ -12,7 +12,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace RecycleSmart.Controllers
 {
     [Authorize]
-    [RequiereTipoCuenta(TipoDeCuenta.EmpresaLogistica)]
+    [RequiereTipoCuenta(TipoDeCuenta.RecycleSmart)]
     public class EmpresaLogisticaController : Controller
     {
         private readonly EmpresaLogisticaBLL _empresaLogisticaBLL;

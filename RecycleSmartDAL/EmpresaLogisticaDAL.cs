@@ -36,9 +36,9 @@ namespace RecycleSmartDAL
                             Cuit = leer.GetString(2),
                             Direccion = leer.GetString(3),
                             FechaRegistro = leer.GetDateTime(4),
-                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(4), true),
-                            PlanId = leer.GetInt32(5),
-                            PlanNombre = leer.GetString(6),
+                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(5), true),
+                            PlanId = leer.GetInt32(6),
+                            PlanNombre = leer.GetString(7),
                         });
                     }
                 }
@@ -67,9 +67,9 @@ namespace RecycleSmartDAL
                             Cuit = leer.GetString(2),
                             Direccion = leer.GetString(3),
                             FechaRegistro = leer.GetDateTime(4),
-                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(4), true),
-                            PlanId = leer.GetInt32(5),
-                            PlanNombre = leer.GetString(6),
+                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(5), true),
+                            PlanId = leer.GetInt32(6),
+                            PlanNombre = leer.GetString(7),
                         };
                     }
                 }
