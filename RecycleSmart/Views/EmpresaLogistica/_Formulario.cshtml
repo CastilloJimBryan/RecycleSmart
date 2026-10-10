@@ -28,7 +28,7 @@
         @foreach (var item in planes)
         {
             <option value="@item.Id" selected="@(item.Id==Model.PlanId)">
-                @item.Nombre -> (USD @item.PrecioMensual / mes)
+                @item.Nombre - (USD @item.PrecioMensual / mes)
             </option>
         }
     </select>

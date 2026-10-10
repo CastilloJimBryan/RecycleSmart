@@ -4,14 +4,16 @@
     ViewData["Title"] = "Registrar Empresa";
 }
 
-<h2 class="mb-4">Registrar Empresa Logistica</h2>
+<h2>Registrar Empresa Logistica</h2>
 
-<div class="card shadow-sm" style="max-width:600px">
+<div class="card">
     <div class="card-body">
         <form asp-action="Registrar" method="post">
             <partial name="_Formulario" model="Model"/>
-            <button type="submit" class="btn btn-outline-success">Registrar</button>
-            <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-success">Registrar Empresa</button>
+                <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
+            </div>
         </form>
     </div>
 </div>
