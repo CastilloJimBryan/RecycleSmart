@@ -1,5 +1,6 @@
 ﻿using RecycleSmartBE;
 using RecycleSmartDAL;
+using Servicio;
 
 namespace RecycleSmartBLL
 {
@@ -17,7 +18,7 @@ namespace RecycleSmartBLL
         {
             e.Nombre = e.Nombre?.Trim() ?? "";
             e.Direccion = e.Direccion?.Trim() ?? "";
-            e.Cuit = e.Cuit?.Trim() ?? "";
+            e.Cuit =Validaciones.NormalizarCUIT(e.Cuit);
 
             if (e.Nombre == "") throw new Exception("El Nombre es Obligatorio");
             if (e.Direccion == "") throw new Exception("La Direccion es Obligatorio");
@@ -25,15 +26,7 @@ namespace RecycleSmartBLL
             if(!_planDAL.ListarPlanes().Any(p=>p.Id==e.PlanId)) throw new Exception("Seleccione un  plan Valido"); 
 
         }
-        private static string NormalizarCUIT(string? cuit)
-        {
-            var limpio = new string((cuit ?? "").Where(char.IsDigit).ToArray());
-            if(limpio.Length != 11)
-            {
-                throw new Exception("El CUIT debe tener 11 digitos");
-            }
-            return limpio;
-        }
+        
         public List<EmpresaLogistica> ListarEmpresa()
         {
           return  _empresaLogisticaDAL.Listar();

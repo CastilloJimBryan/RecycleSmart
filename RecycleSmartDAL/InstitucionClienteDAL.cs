@@ -150,7 +150,7 @@ namespace RecycleSmartDAL
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT COUNT (*) FROM InstitucionCliente " +
-                " WHERE EmpresaLogisticaId=@EmpresaLogisticaId AND EmpresaLogisticaId <> @EmpresaLogisticaId", con))
+                " WHERE EmpresaLogisticaId=@EmpresaLogisticaId AND EStado <> 'Baja'", con))
             {
                 cmd.Parameters.AddWithValue("@EmpresaLogisticaId", empresaId);
                 con.Open();

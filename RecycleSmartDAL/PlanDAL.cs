@@ -42,5 +42,36 @@ namespace RecycleSmartDAL
             }
             return listar;
         }
+
+        public Plan? BuscarPlanxId(int id)
+        {
+            using (var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand("SELECT Id,Nombre,MaxInstituciones,MaxContenedores,PrecioMensual,CostoInstalacion,Estado" +
+                " FROM Planes " +
+                " WHERE Id=@Id ", con))
+            {
+                cmd.Parameters.AddWithValue("@Id", id);
+
+                con.Open();
+
+                using (var leer = cmd.ExecuteReader())
+                {
+                    if (leer.Read())
+                    {
+                        return new Plan
+                        {
+                            Id = leer.GetInt32(0),
+                            Nombre = leer.GetString(1),
+                            MaxInstituciones= leer.GetInt32(2),
+                            MaxContenedores= leer.GetInt32(3),
+                            PrecioMensual= leer.GetDecimal(4),
+                            CostoInstalacion= leer.GetDecimal(5),
+                            Estado=Enum.Parse<TipoEstado.Estados>(leer.GetString(6)),
+                        };
+                    }
+                }
+            }
+            return null;
+        }
     }
 }
