@@ -12,6 +12,6 @@ namespace RecycleSmartBE
         public int MaxContenedores { get; set; }
         public decimal PrecioMensual { get; set; }
         public decimal CostoInstalacion { get; set; }
-        public TipoEstado.Estados TipoEstado {  get; set; }
+        public TipoEstado.Estados Estado {  get; set; }
     }
 }
