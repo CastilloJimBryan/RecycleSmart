@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
     <link rel="stylesheet" href="~/RecycleSmart.styles.css" asp-append-version="true" />
+    <script src="~/js/sidebar.js" asp-append-version="true"></script>
     <title>@ViewData["Title"] - RecycleSmart</title>
 </head>
 <body>
@@ -23,7 +23,7 @@
             <aside id="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-logo">
-                        <a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica)" asp-action="Index">RecycleSmart</a>
+                        <a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica?"Dashboard":"PanelCentral")" asp-action="Index">RecycleSmart</a>
                         <p style="color: #85BC38;">IoT Compliance</p>
                     </div>
                     <button class="toggle-btn border-0" type="button">
@@ -45,21 +45,22 @@
                                 <i class='bx bx-building-house'></i>
                                 <span>Mi Empresa</span>
                             </a>
-                        </li>
                         <ul id="miempresa" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li class="sidebar-item">
                                 <a asp-controller="UsuarioEmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("UsuarioEmpresaLogistica")">
                                     <i class='bx bx-user'></i>
-                                    Usuario y Roles
+                                        <span>Usuario y Roles</span>
                                 </a>
                             </li>
 
                             <li class="sidebar-item">
                                 <a asp-controller="Suscripcion" asp-action="Index" class="sidebar-link @Activo("Suscripcion")">
-                                    <i class='bx bx-wallet-alt'></i>Suscripción / Plan
+                                    <i class='bx bx-wallet-alt'></i>
+                                        <span>Suscripción / Plan</span>
                                 </a>
                             </li>
                         </ul>
+                         </li>
 
                         <li class="sidebar-item">
                             <a asp-controller="Institucion" asp-action="Index" class="sidebar-link @Activo("Institucion")">
@@ -94,13 +95,13 @@
                                 <li class="sidebar-item">
                                     <a asp-controller="UsuarioInstitucion" asp-action="Index" class="sidebar-link @Activo("UsuarioInstitucion")">
                                         <i class='bx bx-id-card'></i>
-                                        Tarjetas
+                                        <span>Tarjetas</span>
                                     </a>
                                 </li>
                                 <li class="sidebar-item">
                                     <a asp-controller="Evento" asp-action="Index" class="sidebar-link @Activo("Evento")">
                                         <i class='bx bx-log-in-circle'></i>
-                                        Log de Accesos
+                                        <span>Log de Accesos</span>
                                     </a>
                                 </li>
                             </ul>
@@ -120,7 +121,7 @@
                                 <li class="sidebar-item">
                                     <a href="#" class="sidebar-link">
                                         <i class='bx bx-task'></i>
-                                        Auditoria
+                                        <span>Auditoria</span>
                                     </a>
                                 </li>
                                 <li class="sidebar-item">
@@ -150,15 +151,14 @@
                         <li class="sidebar-item">
                             <a asp-controller="PanelCentral" asp-action="Index" class="sidebar-link @Activo("PanelCentral")">
                                 <i class='bx bxs-dashboard'>
-                                    <span>Panel Central</span>
-                                </i>
+                                </i><span>Panel Central</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="sidebar-item">
                             <a asp-controller="EmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("EmpresaLogistica")">
                                 <i class='bx bxs-truck'>
-                                    <span>Empresas Logisticas</span>
                                 </i>
+                                <span>Empresas Logisticas</span>
                             </a>
                         </li>
                     }

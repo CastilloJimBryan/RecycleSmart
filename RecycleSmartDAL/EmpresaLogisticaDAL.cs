@@ -80,8 +80,8 @@ namespace RecycleSmartDAL
         public int AgregarEmpresaLogistica(EmpresaLogistica el)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("INSERT INTO (Nombre,CUIT,Direccion,FechaRegistro,Estado,PlanId)" +
-                " OUTPUT INSERTED.Id" +
+            using (var cmd = new SqlCommand("INSERT INTO EmpresaLogistica (Nombre,CUIT,Direccion,FechaRegistro,Estado,PlanId)" +
+                " OUTPUT INSERTED.Id " +
                 " VALUES (@Nombre,@CUIT,@Direccion,@FechaRegistro,@Estado,@PlanId) ", con))
             {
                 cmd.Parameters.AddWithValue("@Nombre", el.Nombre);

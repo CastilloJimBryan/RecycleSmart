@@ -37,14 +37,14 @@ namespace RecycleSmart.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Registrar(string? nombre, string? cuit, string? direccion, int plan)
+        public IActionResult Registrar(string? nombre, string? cuit, string? direccion, int planId)
         {
             var empresa = new EmpresaLogistica
             {
                 Nombre = nombre ?? "",
                 Cuit = cuit ?? "",
                 Direccion = direccion ?? "",
-                PlanId = plan,
+                PlanId = planId,
             };
 
             try
@@ -61,9 +61,9 @@ namespace RecycleSmart.Controllers
             }
         }
 
-        public IActionResult Editar(int id)
+        public IActionResult Editar(int Id)
         {
-            if (_empresaLogisticaBLL.BuscarXId(id) is not EmpresaLogistica empresa)
+            if (_empresaLogisticaBLL.BuscarXId(Id) is not EmpresaLogistica empresa)
             {
                 return NotFound();
             }
@@ -73,14 +73,14 @@ namespace RecycleSmart.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Editar(string? nombre, string? cuit, string? direccion, int plan)
+        public IActionResult Editar(string? nombre, string? cuit, string? direccion, int planId)
         {
             var empresa = new EmpresaLogistica
             {
                 Nombre = nombre ?? "",
                 Cuit = cuit ?? "",
                 Direccion = direccion ?? "",
-                PlanId = plan,
+                PlanId = planId,
             };
 
             try
@@ -103,7 +103,8 @@ namespace RecycleSmart.Controllers
 
         public IActionResult CambiarEstado(int id,string? estado)
         {
-            try
+            return Content($"DEBUG: id={id} estado='{estado}'");
+           /* try
             {
                 if(!Enum.TryParse<TipoEstado.Estados>(estado, true, out var nuevo))
                 {
@@ -116,7 +117,7 @@ namespace RecycleSmart.Controllers
             {
                 TempData["Error"] = ex.Message;
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index");*/
         }
 
     }
