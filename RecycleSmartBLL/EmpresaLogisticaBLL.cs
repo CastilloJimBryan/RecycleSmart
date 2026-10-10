@@ -42,6 +42,8 @@ namespace RecycleSmartBLL
         public int AgregarEmpresa(EmpresaLogistica el)
         {
             Validar(el);
+            el.Estados = TipoEstado.Estados.Activo;
+            el.FechaRegistro =DateTime.Today.Date;
             return _empresaLogisticaDAL.AgregarEmpresaLogistica(el);
         }
         public void ModificarEmpresa(EmpresaLogistica e)

@@ -1,0 +1,87 @@
+﻿@model List<RecycleSmartBE.EmpresaLogistica>
+
+@{
+    ViewData["Title"] = "Empresas Logisticas";
+}
+<div>
+    <h2>Listado de Empresas Logisticas</h2>
+    <a asp-action="Registrar" class="btn btn-outline-success">
+        <i class='bx bx-plus'>Registrar Nueva Empresa</i>
+    </a>
+</div>
+
+@if(TempData["Mensaje"] is string mensaje)
+{
+    <div class="alert alert-success alert-dismissible fade show" >
+        @mensaje
+        <button type="button" class="btn-close " data-bs-dismiss="alert"></button>
+    </div>
+}
+@if(Model.Count==0)
+{
+    <div class="alert alert-info">Todavia no hay empresas registradas</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover ">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>CUIT</th>
+                        <th>Direccion</th>
+                        <th>Fecha Registro</th>
+                        <th>Plan</th>
+                        <th>Estado</th>
+                        <th class="text-end">Accion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var estado = item.Estados.ToString();
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@($"{item.Cuit[..2]}-{item.Cuit[2..10]}-{item.Cuit[10]}")</td>
+                            <td>@item.Direccion</td>
+                            <td>@item.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                            <td>@item.PlanNombre</td>
+                            <td>
+                                <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+                            </td>
+                            <td class="text-end">
+                                @if(estado!= "Baja")
+                                {
+                                    <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-outline-secondary">Editar</a>
+                                    <form>
+
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        @if(estado=="Activo")
+                                            {
+                                               <button name="estado" value="Suspendido"
+                                                    class="btn btn-sm btn-outline-warning">Suspender</button> 
+                                            }
+                                            else
+                                            {
+                                                <button name="estado" value="Activo"
+                                                    class="btn btn-sm btn-outline-success">Reactivar</button>
+                                            }
+                                        <button name="estado" value="Baja" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('¿Dar de baja a @item.Nombre? Esta acción no se puede deshacer.');">
+                                            Dar de baja
+                                        </button>
+                                        </form>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">Sin acciones</small>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

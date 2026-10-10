@@ -1,0 +1,19 @@
+﻿@model EmpresaLogistica
+
+@{
+    ViewData["Title"] = "Editar Empresa";
+}
+
+<h2 class=" mb-4">Editar Empresa : @Model.Nombre </h2>
+<div class="shadow-sm " style="max-width:600px;">
+    <div class="card-body">
+
+        <form asp-action="Editar" method="post">
+            <input  type="hidden" name="Id" value="@Model.Id"/>
+            <partial name="_Formulario" model="Model"/>
+            <button type="submit" class="btn btn-outline-success">Guardar Cambios</button>
+            <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
+        </form>
+
+    </div>
+</div>

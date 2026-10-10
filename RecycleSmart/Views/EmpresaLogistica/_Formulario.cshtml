@@ -1,0 +1,35 @@
+﻿@model EmpresaLogistica
+@{
+    var planes = ViewBag.Planes as List<Plan> ?? new List<Plan>();
+}
+
+@if(!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+}
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input name="nombre" value="@Model.Nombre" class="form-control" maxlength="100" required placeholder="Escribir Nombre Empresa" />
+</div>
+<div class="mb-3">
+    <label class="form-label">CUIT</label>
+    <input name="cuit" value="@Model.Cuit" class="form-control" maxlength="13" placeholder="12-34567892-1" required/>
+    <div class="form-text">11 digitos , con o sin guiones</div>
+</div>
+<div class="mb-3">
+    <label class="form-label">Direccion</label>
+    <input name="direccion" value="@Model.Direccion" class="form-control" maxlength="150" required />
+</div>
+<div class="mb-3">
+    <label class="form-label">Plan</label>
+    <select class="form-select" name="planid">
+        <option value="">Seleccione un Plan</option>
+        @foreach (var item in planes)
+        {
+            <option value="@item.Id" selected="@(item.Id==Model.PlanId)">
+                @item.Nombre -> (USD @item.PrecioMensual / mes)
+            </option>
+        }
+    </select>
+</div>
