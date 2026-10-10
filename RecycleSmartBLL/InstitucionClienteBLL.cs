@@ -83,6 +83,7 @@ namespace RecycleSmartBLL
         {
             Validar(ic);
             VerificarLimitePlan(ic.EmpresaLogisticaId);
+            ic.Estados = TipoEstado.Estados.Activo;
             return _institucionClienteDAL.AgregarInstitucion(ic);
         }
         public void ModificarInstitucion(InstitucionCliente ic)
