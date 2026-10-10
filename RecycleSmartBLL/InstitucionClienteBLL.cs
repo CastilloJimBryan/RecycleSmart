@@ -19,7 +19,8 @@ namespace RecycleSmartBLL
             _empresaLogisticaDAL=new EmpresaLogisticaDAL(conexion);
             _planDAL=new PlanDAL(conexion);
         }
-
+        public static readonly string[] Tipos =
+            { "Hospital", "Clínica", "Laboratorio", "Centro de Salud", "Consultorio", "Otro" };
         public List<InstitucionCliente> ListadoInstitucioneXEmpresa(int empresaid)
         {
             return _institucionClienteDAL.ListarInstucionXEmpresa(empresaid);
