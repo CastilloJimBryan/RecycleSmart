@@ -48,16 +48,17 @@
 }
 else
 {
-    <div class="card shadow-sm">
+    <div class="card shadow">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-bordered table-striped">
                 <thead class="table-light">
                     <tr>
                         <th>Nombre</th>
+                        <th>Direccion</th>
                         <th>Tipo</th>
                         <th>CUIT</th>
                         <th>Estado</th>
-                        <th class="text-end"></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,11 +66,12 @@ else
                     {
                         var estado = i.Estados.ToString();
                         <tr>
-                            <td>@i.Nombre<br /><small class="text-muted">@i.Direccion</small></td>
+                            <td>@i.Nombre</td>
+                            <td>@i.Direccion</td>
                             <td>@i.Tipo</td>
                             <td>@FormatoEtiqueta.CUIT(i.Cuit)</td>
                             <td><span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span></td>
-                            <td class="text-end">
+                            <td class="text-center">
                                 <a asp-action="Detalle" asp-route-id="@i.Id" class="btn btn-sm btn-outline-secondary">
                                     <i class='bx bx-show'></i> Ver detalle
                                 </a>

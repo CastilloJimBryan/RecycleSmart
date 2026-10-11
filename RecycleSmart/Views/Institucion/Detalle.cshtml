@@ -28,7 +28,7 @@
         </dl>
     </div>
 
-    <div class="card-footer d-flex flex-wrap gap-2">
+    <div class="card-footer d-flex justify-content-between">
         @if (estado == "Baja")
         {
             <span class="text-muted">Institución dada de baja. No admite cambios.</span>
@@ -55,11 +55,12 @@
                     </button>
                 }
 
+            </form>
                 <button name="estado" value="Baja" class="btn btn-outline-danger"
                         onclick="return confirm('¿Dar de baja a @Model.Nombre? Esta acción no se puede deshacer.');">
                     <i class='bx bx-trash'></i> Dar de baja
                 </button>
-            </form>
+           
         }
     </div>
 </div>
