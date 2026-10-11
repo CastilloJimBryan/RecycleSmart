@@ -15,7 +15,7 @@ namespace RecycleSmart.Controllers
 
 
         private int empresaid => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
-        private int usuarioActual => Servicio.ManejosSesiones.ObtenerUsuarioId(User);
+        private int usuarioActualId => Servicio.ManejosSesiones.ObtenerUsuarioId(User);
         public UsuarioEmpresaLogisticaController(IConfiguration configuracion)
         {
             string conect = configuracion.GetConnectionString("BDTFI")!;
@@ -24,7 +24,7 @@ namespace RecycleSmart.Controllers
 
         public IActionResult Index()
         {
-            ViewBag.UsuarioActual = usuarioActual;
+            ViewBag.UsuarioActual = usuarioActualId;
             return View(_usuarioEmpresaLogisticaBL.ListarUsuarioxEmpresa(empresaid));
         }
 
@@ -42,7 +42,7 @@ namespace RecycleSmart.Controllers
             var usuario = new UsuarioEmpresaLogistica
             {
                 EmpresaLogisticaId = empresaid,
-                Id = usuarioActual,
+                Id = usuarioActualId,
                 Nombre = nombre ?? "",
                 Apellido = apellido ?? "",
                 Correo = Correo ?? "",
@@ -68,7 +68,7 @@ namespace RecycleSmart.Controllers
             {
                 return NotFound();
             }
-            ViewBag.EsUsuarioActual = id == usuarioActual;
+            ViewBag.EsUsuarioActual = id == usuarioActualId;
             return View(usuario);
         }
         public IActionResult Editar(int id)
@@ -78,7 +78,7 @@ namespace RecycleSmart.Controllers
                 return NotFound();
             }
             ///falta roles
-            ViewBag.EsUsuarioActual = id == usuarioActual;
+            ViewBag.EsUsuarioActual = id == usuarioActualId;
             return View(usuario);
         }
 
@@ -99,14 +99,14 @@ namespace RecycleSmart.Controllers
 
             try
             {
-                _usuarioEmpresaLogisticaBL.ModificarUsuarioEmpresa(usuario, usuarioActual);
+                _usuarioEmpresaLogisticaBL.ModificarUsuarioEmpresa(usuario, usuarioActualId);
                 TempData["Mensaje"] = "Cambios Guadados";
                 return RedirectToAction("Detalle", new { id });
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", ex.Message);
-                ViewBag.EsUsuarioActual = id == usuarioActual;
+                ViewBag.EsUsuarioActual = id == usuarioActualId;
                 //falta roles
                 return View(usuario);
             }
@@ -141,7 +141,7 @@ namespace RecycleSmart.Controllers
                 {
                     throw new Exception("Estado no Valido");
                 }
-                _usuarioEmpresaLogisticaBL.CambiarEstado(id,empresaid, tipoEstado,usuarioActual);
+                _usuarioEmpresaLogisticaBL.CambiarEstado(id,empresaid, tipoEstado,usuarioActualId);
                 TempData["Mensaje"] = "Se Actualizo el Estado";
             }
             catch(Exception ex)

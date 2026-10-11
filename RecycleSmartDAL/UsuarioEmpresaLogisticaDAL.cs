@@ -18,7 +18,7 @@ namespace RecycleSmartDAL
         {
             List<UsuarioEmpresaLogistica> listar = new List<UsuarioEmpresaLogistica>();
             using (var cone = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("SELECT UsuarioEmpresaLogistica.Nombre,UsuarioEmpresaLogistica.Apellido,UsuarioEmpresaLogistica.Correo,UsuarioEmpresaLogistica.Rol,UsuarioEmpresaLogistica.Estado,EmpresaLogisticaId " +
+            using (var cmd = new SqlCommand("SELECT UsuarioEmpresaLogistica.Id,UsuarioEmpresaLogistica.Nombre,UsuarioEmpresaLogistica.Apellido,UsuarioEmpresaLogistica.Correo,UsuarioEmpresaLogistica.Rol,UsuarioEmpresaLogistica.Estado,EmpresaLogisticaId " +
                 " FROM UsuarioEmpresaLogistica " +
                 " INNER JOIN EmpresaLogistica ON EmpresaLogistica.Id=UsuarioEmpresaLogistica.EmpresaLogisticaId " +
                 " WHERE EmpresaLogisticaId=@EmpresaId", cone))
@@ -31,12 +31,13 @@ namespace RecycleSmartDAL
                     {
                         listar.Add(new UsuarioEmpresaLogistica
                         {
-                            Nombre = leer.GetString(0),
-                            Apellido = leer.GetString(1),
-                            Correo = leer.GetString(2),
-                            Rol = leer.GetString(3),
-                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(4)),
-                            EmpresaLogisticaId = leer.GetInt32(5),
+                            Id=leer.GetInt32(0),
+                            Nombre = leer.GetString(1),
+                            Apellido = leer.GetString(2),
+                            Correo = leer.GetString(3),
+                            Rol = leer.GetString(4),
+                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(5)),
+                            EmpresaLogisticaId = leer.GetInt32(6),
                         });
                     }
                 }

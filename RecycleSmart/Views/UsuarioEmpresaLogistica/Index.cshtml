@@ -1,0 +1,53 @@
+﻿@model List<UsuarioEmpresaLogistica>
+@{
+    ViewData["Title"] = "Usuarios y Roles";
+    int usuarioActual = ViewBag.UsuarioActual ?? 0;
+}
+
+<partial name="_Mensajes"/>
+<h2>Usuarios y Roles</h2>
+<div class="card shadow">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table table-success">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var estado = item.Estados.ToString();
+                    <tr>
+                        <td>
+                            @if (item.Id == usuarioActual)
+                            {
+                                <smal class="text-muted">(Usted)</smal>
+                            }
+                            @item.Nombre
+                        </td>
+                        <td>@item.Apellido</td>
+                        <td>@item.Correo</td>
+                        <td>@item.Rol</td>
+                        <td>
+                            <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-outline-secondary">
+                                <i class="bx bx-show"></i>Ver Detalle
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="mt-3">
+   <a asp-action="Registrar" class="btn btn-success" >Agregar Nuevo Usuario</a>
+</div>

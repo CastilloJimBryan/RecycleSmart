@@ -1,0 +1,34 @@
+﻿@model UsuarioEmpresaLogistica
+
+@{
+    ViewData["Title"] = "Detalle Usuario Empresa";
+    var estado=ViewBag.Estados.ToString();
+
+    bool esUsuarioActual = ViewBag.EsUsuarioActual ?? false;
+    bool esBaja = estado = "Baja";
+
+}
+
+<div>
+    <a asp-action="Index">
+        <i class="bx bx-arrow-back"></i>Volver al Listado
+    </a>
+</div>
+
+<partial name="_Mensajes"/>
+
+<div>
+    <div>
+        <h4>
+            @Model.Nombre, @Model.Apellido
+            @if (esUsuarioActual)
+            {
+                <small class="text-muted">(Usted)</small>
+            }
+        </h4>
+        <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+    </div>
+    <div>
+
+    </div>
+</div>
