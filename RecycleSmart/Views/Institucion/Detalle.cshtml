@@ -19,17 +19,20 @@
         <h4 class="mb-0">@Model.Nombre</h4>
         <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
     </div>
-
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-sm-4">Tipo</dt>
-            <dd class="col-sm-8">@Model.Tipo</dd>
-
-            <dt class="col-sm-4">CUIT</dt>
-            <dd class="col-sm-8">@FormatoEtiqueta.CUIT(Model.Cuit)</dd>
-
-            <dt class="col-sm-4">Dirección</dt>
-            <dd class="col-sm-8">@Model.Direccion</dd>
+            <div class="col-sm-4">
+                <dt>Tipo</dt>
+                <dd>@Model.Tipo</dd>
+            </div>
+            <div class="col-sm-4">
+                <dt>CUIT</dt>
+                <dd>@FormatoEtiqueta.CUIT(Model.Cuit)</dd>
+            </div>
+            <div class="col-sm-4">
+                <dt>Dirección</dt>
+                <dd>@Model.Direccion</dd>
+            </div>
         </dl>
     </div>
 
@@ -65,7 +68,6 @@
                         onclick="return confirm('¿Dar de baja a @Model.Nombre? Esta acción no se puede deshacer.');">
                     <i class='bx bx-trash'></i> Dar de baja
                 </button>
-           
         }
     </div>
 </div>
