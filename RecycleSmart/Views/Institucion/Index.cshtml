@@ -41,6 +41,8 @@ else
                         <th>Direccion</th>
                         <th>Tipo</th>
                         <th>CUIT</th>
+                        <th>Contenedores</th>
+                        <th>Tarjetas</th>
                         <th>Estado</th>
                         <th></th>
                     </tr>
@@ -54,6 +56,16 @@ else
                             <td>@i.Direccion</td>
                             <td>@i.Tipo</td>
                             <td>@FormatoEtiqueta.CUIT(i.Cuit)</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-secondary">
+                                    Ver Contenedores
+                                </a>
+                            </td>
+                            <td>
+                                <a class ="btn btn-sm btn-outline-secondary">
+                                    Ver Tarjetas
+                                </a> 
+                            </td>
                             <td><span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span></td>
                             <td class="text-center">
                                 <a asp-action="Detalle" asp-route-id="@i.Id" class="btn btn-sm btn-outline-secondary">

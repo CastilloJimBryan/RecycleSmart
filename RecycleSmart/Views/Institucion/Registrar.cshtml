@@ -15,18 +15,17 @@
         Volver al Listado
     </a>
 </div>
-
 <h2>Registrar Institucion</h2>
-<div >
+<div class="card shadow">
     <div class="card-body">
         <form asp-action="Registrar" method="post">
             <div class="mb-3">
                 <label class="form-label">Nombre</label>
-                <input name="nombre" value="@Model.Nombre" class="form-control" maxlength="100" required placeholder="Nombre de la Institucion" />
+                <input name="nombre" value="@Model.Nombre" class="form-control" maxlength="100" required placeholder="Nombre de la Institucion" autocomplete="off"/>
             </div>
             <div class="mb-3">
                 <label class="form-label">CUIT</label>
-                <input name="cuit" value="@Model.Cuit" class="form-control" required maxlength="13" placeholder="12-34567890-1" />
+                <input name="cuit" value="@Model.Cuit" class="form-control" required maxlength="13" placeholder="12-34567890-1" autocomplete="off"/>
             </div>
             <div class="mb-3">
                 <label class="form-label">Direccion</label>

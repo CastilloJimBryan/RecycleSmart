@@ -16,18 +16,18 @@
     Volver al Detalle</a>
 </div>
 <h2>Editar Institucion</h2>
-<div>
-    <div>
+<div class="card shadow-lg">
+    <div class="card-body">
         <form asp-action="Editar" method="post">
             <input type="hidden" name="id" value="@Model.Id" />
             
             <div class="mb-3">
                 <label class="form-label">Nombre</label>
-                <input name="nombre" value="@Model.Nombre" class="form-control" maxlength="100" required  />
+                <input name="nombre" value="@Model.Nombre" class="form-control" maxlength="100" required  autocomplete="off"/>
             </div>
             <div class="mb-3">
                 <label class="form-label">CUIT</label>
-                <input name="cuit" value="@Model.Cuit" class="form-control" required maxlength="13" />
+                <input name="cuit" value="@Model.Cuit" class="form-control" required maxlength="13" autocomplete="off" />
             </div>
             <div class="mb-3">
                 <label class="form-label">Direccion</label>
