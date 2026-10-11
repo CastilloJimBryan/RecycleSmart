@@ -106,7 +106,6 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@Nombre", el.Nombre);
                 cmd.Parameters.AddWithValue("@CUIT", el.Cuit);
                 cmd.Parameters.AddWithValue("@Direccion", el.Direccion);
-                cmd.Parameters.AddWithValue("@FechaRegistro", el.FechaRegistro);
                 cmd.Parameters.AddWithValue("@Estado", el.Estados);
                 cmd.Parameters.AddWithValue("@PlanId", el.PlanId);
 
@@ -133,7 +132,7 @@ namespace RecycleSmartDAL
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT COUNT(*)" +
                 " FROM EmpresaLogistica " +
-                " WHERE CUIT=@CUIT AND ID <> @Id", con))
+                " WHERE CUIT=@CUIT AND Id <> @Id", con))
             {
                 cmd.Parameters.AddWithValue("@CUIT", cuit);
                 cmd.Parameters.AddWithValue("@Id", IdExcluir);

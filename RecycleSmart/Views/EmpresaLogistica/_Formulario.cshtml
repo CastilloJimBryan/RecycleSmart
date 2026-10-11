@@ -25,7 +25,7 @@
     <label class="form-label">Plan</label>
     <select class="form-select" name="planId">
         <option value="">Seleccione un Plan</option>
-        @foreach (var item in planes)
+        @foreach (var item in planes) 
         {
             <option value="@item.Id" selected="@(item.Id==Model.PlanId)">
                 @item.Nombre - (USD @item.PrecioMensual / mes)

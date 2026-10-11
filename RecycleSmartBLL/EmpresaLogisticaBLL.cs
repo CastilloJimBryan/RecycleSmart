@@ -23,7 +23,7 @@ namespace RecycleSmartBLL
             if (e.Nombre == "") throw new Exception("El Nombre es Obligatorio");
             if (e.Direccion == "") throw new Exception("La Direccion es Obligatorio");
             if (_empresaLogisticaDAL.ExisteCuit(e.Cuit, e.Id)) throw new Exception("Ya Existe una Empresa con ese CUIT");
-            if(!_planDAL.ListarPlanes().Any(p=>p.Id==e.PlanId)) throw new Exception("Seleccione un  plan Valido"); 
+            if(!_planDAL.ListarPlanes().Any(p=>p.Id==e.PlanId)) throw new Exception("Seleccione un  Plan Valido"); 
 
         }
         

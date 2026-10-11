@@ -71,12 +71,13 @@ namespace RecycleSmart.Controllers
             return View(empresa);
         }
 
-        [HttpPost]
+        [HttpPost] 
         [ValidateAntiForgeryToken]
-        public IActionResult Editar(string? nombre, string? cuit, string? direccion, int planId)
+        public IActionResult Editar(int id,string? nombre, string? cuit, string? direccion, int planId)
         {
             var empresa = new EmpresaLogistica
             {
+                Id = id,
                 Nombre = nombre ?? "",
                 Cuit = cuit ?? "",
                 Direccion = direccion ?? "",
