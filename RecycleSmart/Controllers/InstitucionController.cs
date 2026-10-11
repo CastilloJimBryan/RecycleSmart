@@ -27,12 +27,6 @@ namespace RecycleSmart.Controllers
 
             return View(_institucionClienteBL.ListadoInstitucioneXEmpresa(empresaId));
         }
-
-        public IActionResult Registrar()
-        {
-            ViewBag.Planes = InstitucionClienteBLL.Tipos;
-            return View(new InstitucionCliente());
-        }
         public IActionResult Detalle(int id)
         {
             if (_institucionClienteBL.BuscarInstitucionXId(id,empresaId) is not InstitucionCliente institucion)
@@ -41,6 +35,12 @@ namespace RecycleSmart.Controllers
             }
             return View(institucion);
         }
+        public IActionResult Registrar()
+        {
+            ViewBag.Tipos = InstitucionClienteBLL.Tipos;
+            return View(new InstitucionCliente());
+        }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
 
@@ -86,8 +86,8 @@ namespace RecycleSmart.Controllers
         {
             var insti = new InstitucionCliente
             {
-                EmpresaLogisticaId = empresaId,
                 Id = id,
+                EmpresaLogisticaId = empresaId,
                 Nombre = nombre ??"",
                 Cuit = cuit??"",
                 Direccion = direccion??"",
@@ -103,7 +103,7 @@ namespace RecycleSmart.Controllers
             {
                 ModelState.AddModelError("", ex.Message);
                 ViewBag.Tipos = InstitucionClienteBLL.Tipos;
-                return View();
+                return View(insti);
             }
         }
 

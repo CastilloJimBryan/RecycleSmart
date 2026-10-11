@@ -38,12 +38,13 @@ namespace RecycleSmartBLL
         {
             i.Nombre = i.Nombre?.Trim() ?? "";
             i.Direccion = i.Direccion?.Trim() ?? "";
+            i.Tipo = i.Tipo?.Trim() ?? "";
             i.Cuit = Validaciones.NormalizarCUIT(i.Cuit);
 
             if (i.Nombre == "") throw new Exception("El Nombre es Obligatorio");
             if (i.Direccion == "") throw new Exception("La Direccion es Obligatorio");
-            if (_empresaLogisticaDAL.ExisteCuit(i.Cuit, i.Id)) throw new Exception("Ya Existe una Empresa con ese CUIT");
-            if (!_planDAL.ListarPlanes().Any(p => p.Id == i.PlanId)) throw new Exception("Seleccione un  plan Valido");
+            if (_institucionClienteDAL.ExisteCuit(i.Cuit, i.Id)) throw new Exception("Ya Existe una Institucion con ese CUIT");
+            if (!Tipos.Contains(i.Tipo)) throw new Exception("Seleccione un Tipo Valido");
         }
         private Plan ObtenerPlan(int empresaId)
         {

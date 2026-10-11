@@ -52,7 +52,7 @@ namespace RecycleSmartDAL
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT Id,Nombre,CUIT,Tipo,Direccion,Estado,EmpresaLogisticaId" +
-                " FROM Institucion " +
+                " FROM InstitucionCliente " +
                 " WHERE Id=@InstitucionId AND EmpresaLogisticaId=@EmpresaLogisticaId ", con))
             {
                 cmd.Parameters.AddWithValue("@InstitucionId", institucionId);
@@ -82,7 +82,7 @@ namespace RecycleSmartDAL
         public int AgregarInstitucion(InstitucionCliente Ic)
         {
             using(var con=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand("INSERT INTO InstitucionCliente (Nombre,CUIT,Tipo,Direccion,Estado,EmpresaLogistica) " +
+            using(var cmd=new SqlCommand("INSERT INTO InstitucionCliente (Nombre,CUIT,Tipo,Direccion,Estado,EmpresaLogisticaId) " +
                 " OUTPUT INSERTED.Id " +
                 " VALUES (@Nombre,@CUIT,@Tipo,@Direccion,@Estado,@EmpresaLogisticaId)",con))
             {
@@ -110,7 +110,7 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@CUIT", ic.Cuit);
                 cmd.Parameters.AddWithValue("@Tipo", ic.Tipo);
                 cmd.Parameters.AddWithValue("@Direccion", ic.Direccion);
-                cmd.Parameters.AddWithValue("@EmpresaLogistica", ic.EmpresaLogisticaId);
+                cmd.Parameters.AddWithValue("@EmpresaLogisticaId", ic.EmpresaLogisticaId);
 
                 con.Open();
 
@@ -132,7 +132,7 @@ namespace RecycleSmartDAL
                 cmd.ExecuteNonQuery();
             }
         }
-        public bool ExisteCuit(int cuit,int idExcluir=0)
+        public bool ExisteCuit(string cuit,int idExcluir=0)
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT COUNT (*) FROM InstitucionCliente " +

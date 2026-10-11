@@ -11,7 +11,7 @@
 
     <div class="mb-3">
     <label class="form-label">Nombre</label>
-    <input name="nombre " value="@Model.Nombre" class="form-control"  maxlength="100" required placeholder="Nombre de la Institucion"/>
+    <input name="nombre" value="@Model.Nombre" class="form-control"  maxlength="100" required placeholder="Nombre de la Institucion"/>
     </div>
     <div class="mb-3">
     <label class="form-label">CUIT</label>
@@ -27,7 +27,7 @@
         <option value=""> Seleccione un Tipo</option>
         @foreach (var item in tipos)
         {
-            <option value="@item">"@(item==Model.Tipo)"</option>
+            <option value="@item" selected="@(item==Model.Tipo)">@item</option>
         }
     </select>
     </div>

@@ -14,7 +14,7 @@
             <partial name="_Formulario" model="Model"/>
 
             <button type="submit" class="btn btn-outline-success">Guardar Caambios</button>
-            <a asp-action="Detalle" class="btn btn-outline-danger">Cancelar</a>
+            <a asp-action="Detalle" asp-route-id="@Model.Id" class="btn btn-outline-danger">Cancelar</a>
         </form>
     </div>
 </div>
