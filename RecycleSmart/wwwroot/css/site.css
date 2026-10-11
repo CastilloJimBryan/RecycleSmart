@@ -1,7 +1,17 @@
 html {
     font-size: 14px;
 }
+.btn-theme-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #198754;
+}
 
+    .btn-theme-success:hover {
+        background-color: #badbcc;
+        color: #0f5132;
+        border-color: #146c43;
+    }
 :root {
     --color-fondo: #eef7f0;
     --color-sidebar-hover: #2e5a30;

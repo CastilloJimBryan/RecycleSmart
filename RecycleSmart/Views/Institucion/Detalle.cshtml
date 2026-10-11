@@ -4,9 +4,14 @@
     ViewData["Title"] = "Detalle Institucion";
     var estado = Model.Estados.ToString();
 }
+<div class="mb-3">
+<a asp-action="Index" class="btn btn-theme-success">
+        <i class="bx bx-arrow-back"></i>
+        Volver Al Listado
+    </a>
+</div>
 
-<a asp-action="Index">Volver Al Listado</a>
-
+<h2>Detalle de Institucion</h2>
 <partial name="_Mensajes"/>
 
 <div class="card shadow-sm" style="max-width: 700px;">
@@ -35,7 +40,7 @@
         }
         else
         {
-            <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+            <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-outline-dark">
                 <i class='bx bx-edit'></i> Editar
             </a>
 
