@@ -1,0 +1,23 @@
+﻿@model InstitucionCliente
+
+@{
+    ViewData["Title"] = "Registrar Institucion";
+}
+
+<a asp-action="Index">
+    <i class='bx bx-arrow-back'></i>
+    Volver al Listado
+</a>
+
+<h2>Registrar Institucion</h2>
+<div >
+    <div class="card-body">
+        <form asp-action="Registrar" method="post">
+            <partial name="_Formulario" model="Model"/>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-success">Registrar</button>
+                <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -9,16 +9,25 @@
     <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
 }
 
-<div>
-
-</div>
-<div>
-
-
-</div>
-<div>
-
-</div>
-<div>
-
-</div>
+    <div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input name="nombre " value="@Model.Nombre" class="form-control"  maxlength="100" required placeholder="Nombre de la Institucion"/>
+    </div>
+    <div class="mb-3">
+    <label class="form-label">CUIT</label>
+    <input name="cuit" value="@Model.Cuit" class="form-control" required maxlength="13" placeholder="12-34567890-1" />
+    </div>
+    <div class="mb-3">
+    <label class="form-label">Direccion</label>
+    <input name="direccion" class="form-control" value="@Model.Direccion" maxlength="100" required autocomplete="off" />
+    </div>
+    <div class ="mb-3">
+    <label class ="form-label">Tipo</label>
+    <select name="tipo" class="form-select">
+        <option value=""> Seleccione un Tipo</option>
+        @foreach (var item in tipos)
+        {
+            <option value="@item">"@(item==Model.Tipo)"</option>
+        }
+    </select>
+    </div>

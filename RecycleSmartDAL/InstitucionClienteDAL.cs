@@ -23,7 +23,7 @@ namespace RecycleSmartDAL
             using(var con=new SqlConnection(_conectar))
             using(var cmd=new SqlCommand("SELECT Id,Nombre,CUIT,Tipo,Direccion,Estado,EmpresaLogisticaId" +
                 " FROM InstitucionCliente " +
-                " WHERE EmpresaLogistica=@EmpresaLogistica " +
+                " WHERE EmpresaLogisticaId=@EmpresaLogisticaId " +
                 " ORDER BY Nombre",con))
             {
                 cmd.Parameters.AddWithValue("@EmpresaLogisticaId", empresaId);

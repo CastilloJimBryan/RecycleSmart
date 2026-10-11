@@ -1,3 +1,84 @@
 ﻿@model List<RecycleSmartBE.InstitucionCliente>
 
+@{
+    ViewData["Title"] = "Instituciones cliente";
+    int usadas = ViewBag.Usadas ?? 0;
+    int maximo = ViewBag.Maximo ?? 0;
+    bool ilimitado = maximo == 0;
+    bool limiteAlcanzado = !ilimitado && usadas >= maximo;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Instituciones cliente</h2>
+
+    @if (limiteAlcanzado)
+    {
+        <button class="btn btn-success" disabled title="Alcanzó el límite de su plan">
+            <i class='bx bx-plus'></i> Registrar institución
+        </button>
+    }
+    else
+    {
+        <a asp-action="Registrar" class="btn btn-success">
+            <i class='bx bx-plus'></i> Registrar institución
+        </a>
+    }
+</div>
+
+<p class="text-muted mb-3">
+    @if (ilimitado)
+    {
+        <span>@usadas instituciones · plan ilimitado</span>
+    }
+    else
+    {
+        <span>@usadas de @maximo instituciones de su plan</span>
+        @if (limiteAlcanzado)
+        {
+            <span class="text-danger fw-semibold"> · Límite alcanzado</span>
+        }
+    }
+</p>
+
+<partial name="_Mensajes" />
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">Todavía no hay instituciones registradas.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>CUIT</th>
+                        <th>Estado</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in Model)
+                    {
+                        var estado = i.Estados.ToString();
+                        <tr>
+                            <td>@i.Nombre<br /><small class="text-muted">@i.Direccion</small></td>
+                            <td>@i.Tipo</td>
+                            <td>@FormatoEtiqueta.CUIT(i.Cuit)</td>
+                            <td><span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span></td>
+                            <td class="text-end">
+                                <a asp-action="Detalle" asp-route-id="@i.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class='bx bx-show'></i> Ver detalle
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 

@@ -1,0 +1,66 @@
+﻿@model InstitucionCliente
+
+@{
+    ViewData["Title"] = "Detalle Institucion";
+    var estado = Model.Estados.ToString();
+}
+
+<a asp-action="Index">Volver Al Listado</a>
+
+<partial name="_Mensajes"/>
+
+<div class="card shadow-sm" style="max-width: 700px;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">@Model.Nombre</h4>
+        <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+    </div>
+
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Tipo</dt>
+            <dd class="col-sm-8">@Model.Tipo</dd>
+
+            <dt class="col-sm-4">CUIT</dt>
+            <dd class="col-sm-8">@FormatoEtiqueta.CUIT(Model.Cuit)</dd>
+
+            <dt class="col-sm-4">Dirección</dt>
+            <dd class="col-sm-8">@Model.Direccion</dd>
+        </dl>
+    </div>
+
+    <div class="card-footer d-flex flex-wrap gap-2">
+        @if (estado == "Baja")
+        {
+            <span class="text-muted">Institución dada de baja. No admite cambios.</span>
+        }
+        else
+        {
+            <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+                <i class='bx bx-edit'></i> Editar
+            </a>
+
+            <form asp-action="CambiarEstado" method="post" class="d-flex gap-2">
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                @if (estado == "Activo")
+                {
+                    <button name="estado" value="Suspendido" class="btn btn-outline-warning">
+                        <i class='bx bx-pause-circle'></i> Suspender
+                    </button>
+                }
+                else
+                {
+                    <button name="estado" value="Activo" class="btn btn-outline-success">
+                        <i class='bx bx-play-circle'></i> Reactivar
+                    </button>
+                }
+
+                <button name="estado" value="Baja" class="btn btn-outline-danger"
+                        onclick="return confirm('¿Dar de baja a @Model.Nombre? Esta acción no se puede deshacer.');">
+                    <i class='bx bx-trash'></i> Dar de baja
+                </button>
+            </form>
+        }
+    </div>
+</div>
+
