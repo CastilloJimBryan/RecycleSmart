@@ -65,9 +65,9 @@ namespace RecycleSmartDAL
                             Nombre = leer.GetString(1),
                             Apellido = leer.GetString(2),
                             Correo = leer.GetString(3),
-                            Rol = leer.GetString(5),
-                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(6), true),
-                            EmpresaLogisticaId = leer.GetInt32(7),
+                            Rol = leer.GetString(4),
+                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(5), true),
+                            EmpresaLogisticaId = leer.GetInt32(6),
                         };
                     }
                 }

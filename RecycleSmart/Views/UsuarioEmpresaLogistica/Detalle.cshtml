@@ -2,23 +2,24 @@
 
 @{
     ViewData["Title"] = "Detalle Usuario Empresa";
-    var estado=ViewBag.Estados.ToString();
+    var estado=Model.Estados.ToString();
 
     bool esUsuarioActual = ViewBag.EsUsuarioActual ?? false;
-    bool esBaja = estado = "Baja";
+    bool esBaja = estado == "Baja";
 
 }
 
 <div>
-    <a asp-action="Index">
-        <i class="bx bx-arrow-back"></i>Volver al Listado
+    <a asp-action="Index" class="btn btn-theme-success mb-3">
+        <i class="bx bx-arrow-back "></i>
+        Volver al Listado
     </a>
 </div>
 
 <partial name="_Mensajes"/>
 
-<div>
-    <div>
+<div class="card shadow-sm"  style="max-width:700px">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h4>
             @Model.Nombre, @Model.Apellido
             @if (esUsuarioActual)
@@ -28,7 +29,16 @@
         </h4>
         <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
     </div>
-    <div>
-
+    <div class="card-body">
+            <dl class="row">
+            <div class="col-sm-4">
+                <dt>Correo</dt>
+                <dd>@Model.Correo</dd>
+            </div>
+            <div class="col-sm-4">
+                <dt>Rol</dt>
+                <dd>@Model.Rol</dd>
+            </div>
+            </dl>
     </div>
 </div>
