@@ -2,6 +2,12 @@
 
 @{
     ViewData["Title"] = "Registrar Institucion";
+    var tipos = ViewBag.Tipos as string[] ?? Array.Empty< string >();
+}
+
+@if(!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
 }
 <div class="mb-4">
     <a asp-action="Index" class="btn btn-theme-success">
@@ -14,7 +20,28 @@
 <div >
     <div class="card-body">
         <form asp-action="Registrar" method="post">
-            <partial name="_Formulario" model="Model"/>
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input name="nombre" value="@Model.Nombre" class="form-control" maxlength="100" required placeholder="Nombre de la Institucion" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">CUIT</label>
+                <input name="cuit" value="@Model.Cuit" class="form-control" required maxlength="13" placeholder="12-34567890-1" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Direccion</label>
+                <input name="direccion" class="form-control" value="@Model.Direccion" maxlength="100" placeholder="Av corrientes 258 " required autocomplete="off" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tipo</label>
+                <select name="tipo" class="form-select">
+                    <option value=""> Seleccione un Tipo</option>
+                    @foreach (var item in tipos)
+                    {
+                        <option value="@item" selected="@(item == Model.Tipo)">@item</option>
+                    }
+                </select>
+            </div>
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-outline-success">Registrar</button>
                 <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
