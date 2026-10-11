@@ -61,5 +61,10 @@ namespace Servicio
             var claim = user.FindFirst(ClaimTypes.NameIdentifier);
             return claim != null ? int.Parse(claim.Value) : 0;
         }
+        public static int ObtenerUsuarioId(ClaimsPrincipal user)
+        {
+            var valor = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(valor, out var id) ? id : 0;
+        }
     }
 }

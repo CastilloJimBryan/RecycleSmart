@@ -47,6 +47,7 @@ namespace RecycleSmartBLL
             ValidarCampos(ue);
             if (string.IsNullOrEmpty(clave)) throw new Exception("La Clave es Obligatoria");
             ue.Clave = Servicio.Encriptacion.Hash(clave!);
+            ue.Estados = TipoEstado.Estados.Activo;
             return _usuarioEmpresaLogisticaDAL.AgregarUsuarioEmpresa(ue);
         }
 
