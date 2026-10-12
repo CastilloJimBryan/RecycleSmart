@@ -1,5 +1,6 @@
 ﻿using RecycleSmartBE;
 using RecycleSmartDAL;
+using Servicio;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -63,11 +64,11 @@ namespace RecycleSmartBLL
 
         public void ModificarUsuarioEmpresa(UsuarioEmpresaLogistica ue, int actualId)
         {
-            var actual = ObtenerNoDadodeBaja(ue.Id, actualId);
+            var actual = ObtenerNoDadodeBaja(ue.Id, ue.EmpresaLogisticaId);
 
             if (ue.Id == actualId && ue.Rol != actual.Rol) throw new Exception("No se Puede Cambiar su propio rol");
 
-            if (actual.Rol == "Administrador" && ue.Rol != "Administrador" && _usuarioEmpresaLogisticaDAL.AdministradoresActivos(ue.EmpresaLogisticaId, ue.Id) == 0)
+            if (actual.Rol == Roles.Administrador && ue.Rol != Roles.Administrador && _usuarioEmpresaLogisticaDAL.AdministradoresActivos(ue.EmpresaLogisticaId, ue.Id) == 0)
             {
                 throw new Exception("La Empresa debe tener al menos un administrador");
             }
@@ -93,7 +94,7 @@ namespace RecycleSmartBLL
                 throw new Exception($"El usuario ya está en estado {nuevo}.");
 
             // Suspender o dar de baja al último administrador activo dejaría la empresa sin acceso
-            if (actual.Rol == "Administrado" && nuevo != TipoEstado.Estados.Activo
+            if (actual.Rol == Roles.Administrador && nuevo != TipoEstado.Estados.Activo
                 && _usuarioEmpresaLogisticaDAL.AdministradoresActivos(empresaId, id) == 0)
                 throw new Exception("No se puede: es el único administrador activo de la empresa.");
 

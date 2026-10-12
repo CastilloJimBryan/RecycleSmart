@@ -14,7 +14,7 @@ namespace RecycleSmartDAL
             _conectar = conectar;
         }
 
-        public List<UsuarioEmpresaLogistica> ListarInstitucionXEmpresa(int empresaId)
+        public List<UsuarioEmpresaLogistica> ListarUsuariosIntitucionesXEmpresa(int empresaId)
         {
             List<UsuarioEmpresaLogistica> listar = new List<UsuarioEmpresaLogistica>();
             using (var cone = new SqlConnection(_conectar))
@@ -36,7 +36,7 @@ namespace RecycleSmartDAL
                             Apellido = leer.GetString(2),
                             Correo = leer.GetString(3),
                             Rol = leer.GetString(4),
-                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(5)),
+                            Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(5),true),
                             EmpresaLogisticaId = leer.GetInt32(6),
                         });
                     }
@@ -110,7 +110,7 @@ namespace RecycleSmartDAL
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT COUNT(*) FROM UsuarioEmpresaLogistica " +
                 " WHERE Correo=@Correo AND Id <> @Id " +
-                " SELECT COUNT(*) FROM UsuarioRecycleSmart " +
+                " + SELECT COUNT(*) FROM UsuarioRecycleSmart " +
                 " WHERE Correo=@Correo ", con))
             {
                 cmd.Parameters.AddWithValue("@Correo", correo);
@@ -124,7 +124,7 @@ namespace RecycleSmartDAL
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT COUNT(*) FROM UsuarioEmpresaLogistica " +
-                " WHERE EmpresaLogistica=@EmpresaId AND Rol='Administrador' AND Estado='Activo' AND Id <> @Id", con))
+                " WHERE EmpresaLogisticaId=@EmpresaId AND Rol='Administrador' AND Estado='Activo' AND Id <> @Id", con))
             {
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
                 cmd.Parameters.AddWithValue("@Id", idExcluir);
@@ -178,7 +178,7 @@ namespace RecycleSmartDAL
             using (var cmd = new SqlCommand("UPDATE UsuarioEmpresaLogistica SET Estado=@Estado " +
                 " WHERE Id=@Id AND EmpresaLogisticaId=@EmpresaLogisticaId", con))
             {
-                cmd.Parameters.AddWithValue("@ID", id);
+                cmd.Parameters.AddWithValue("@Id", id);
                 cmd.Parameters.AddWithValue("@EmpresaLogisticaId", empresaid);
                 cmd.Parameters.AddWithValue("@Estado",estado);
 
@@ -192,7 +192,7 @@ namespace RecycleSmartDAL
             using (var cmd = new SqlCommand("UPDATE UsuarioEmpresaLogistica SET Clave=@Clave " +
                 " WHERE Id=@Id AND EmpresaLogisticaId=@EmpresaLogisticaId", con))
             {
-                cmd.Parameters.AddWithValue("@ID", id);
+                cmd.Parameters.AddWithValue("@Id", id);
                 cmd.Parameters.AddWithValue("@EmpresaLogisticaId", empresaid);
                 cmd.Parameters.AddWithValue("@Clave",Clave);
 
