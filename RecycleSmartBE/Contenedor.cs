@@ -12,8 +12,8 @@ namespace RecycleSmartBE
         public float CapacidadLitros {  get; set; }
         public int? Piso {  get; set; }
         public string? Sector { get; set; } = string.Empty;
-        public double? PosisionX {  get; set; }
-        public double? PosisionY {  get; set; }
+        public double? PosicionX {  get; set; }
+        public double? PosicionY {  get; set; }
         public TipoEstado.Estados Estado {  get; set; }
         public int InstitucionId {  get; set; }
     }
