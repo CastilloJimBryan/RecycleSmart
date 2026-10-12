@@ -19,8 +19,7 @@ namespace RecycleSmartBLL
             _institucionClienteDAL=new InstitucionClienteDAL(conectar);
             _planDAL=new PlanDAL(conectar);
         }
-        public static readonly string[] TiposResiduo =
-            { "Patogénico", "Cortopunzante", "Anatomopatológico", "Farmacéutico", "Químico" };
+        public static readonly string[] TiposResiduo ={ "Patogénico", "Cortopunzante", "Anatomopatológico", "Farmacéutico", "Químico" };
 
         public List<Contenedor> ListadoContenedorXInstitucion(int institucionId, int empresaid)
         {
