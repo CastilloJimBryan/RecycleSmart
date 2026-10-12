@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RecycleSmartDAL
 {
-    internal class ContenedorDAL
+    public class ContenedorDAL
     {
     }
 }
