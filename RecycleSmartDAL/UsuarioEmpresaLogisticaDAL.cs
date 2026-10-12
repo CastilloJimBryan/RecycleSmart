@@ -146,7 +146,7 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@Correo", ue.Correo);
                 cmd.Parameters.AddWithValue("@Clave", ue.Clave);
                 cmd.Parameters.AddWithValue("@Rol", ue.Rol);
-                cmd.Parameters.AddWithValue("@Estado", ue.Estados);
+                cmd.Parameters.AddWithValue("@Estado", ue.Estados.ToString());
                 cmd.Parameters.AddWithValue("@EmpresaLogisticaId", ue.EmpresaLogisticaId);
 
                 con.Open();

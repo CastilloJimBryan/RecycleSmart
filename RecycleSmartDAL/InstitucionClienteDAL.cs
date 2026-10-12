@@ -90,7 +90,7 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@CUIT", Ic.Cuit);
                 cmd.Parameters.AddWithValue("@Tipo", Ic.Tipo);
                 cmd.Parameters.AddWithValue("@Direccion", Ic.Direccion);
-                cmd.Parameters.AddWithValue("@Estado", Ic.Estados);
+                cmd.Parameters.AddWithValue("@Estado", Ic.Estados.ToString());
                 cmd.Parameters.AddWithValue("@EmpresaLogisticaId", Ic.EmpresaLogisticaId);
 
                 con.Open();

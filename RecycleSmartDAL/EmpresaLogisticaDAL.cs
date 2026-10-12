@@ -88,7 +88,7 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@CUIT", el.Cuit);
                 cmd.Parameters.AddWithValue("@Direccion", el.Direccion);
                 cmd.Parameters.AddWithValue("@FechaRegistro", el.FechaRegistro);
-                cmd.Parameters.AddWithValue("@Estado", el.Estados);
+                cmd.Parameters.AddWithValue("@Estado", el.Estados.ToString());
                 cmd.Parameters.AddWithValue("@PlanId", el.PlanId);
                 con.Open();
                 
@@ -106,7 +106,6 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@Nombre", el.Nombre);
                 cmd.Parameters.AddWithValue("@CUIT", el.Cuit);
                 cmd.Parameters.AddWithValue("@Direccion", el.Direccion);
-                cmd.Parameters.AddWithValue("@Estado", el.Estados);
                 cmd.Parameters.AddWithValue("@PlanId", el.PlanId);
 
                 con.Open();
