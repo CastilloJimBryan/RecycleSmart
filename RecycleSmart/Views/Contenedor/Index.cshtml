@@ -1,0 +1,92 @@
+﻿@model List<RecycleSmartBE.Contenedor>
+
+@{
+    ViewData["Title"] = "Listado de Contenedores";
+    var insti = ViewBag.Instituciones as List<InstitucionCliente> ?? new();
+    int instiId = ViewBag.InstitucionId ?? 0;
+    int usada = ViewBag.Usadas ?? 0;
+    int maximo = ViewBag.Maximo ?? 0;
+
+    bool limiteAlcanzado = maximo != 0 && usada >= maximo;
+    bool PuedeGestionaar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
+}
+
+<div>
+    <h2>Contenedores</h2>
+    @if (PuedeGestionaar && instiId != 0)
+    {
+        @if (limiteAlcanzado)
+        {
+            <button class="btn btn-success" disabled title="Alcanzo el Limite del Plan">Registrar Contenedor</button>
+        }
+        else
+        {
+            <a asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
+        }
+    }
+</div>
+<p class="text-muted">
+    @(maximo == 0 ? $"{usada} contenedores · plan ilimitado" : $"{usada} de {maximo} contenedores de su plan")
+    @if (limiteAlcanzado)
+    {
+        <span class="text-danger fw-semibold"> · Límite alcanzado</span>
+    }
+</p>
+
+<partial name="_Mensajes" />
+
+<form method="get" asp-action="Index">
+    <label class="form-label">Instituciones</label>
+    <select name="institucionId" class="form-select" onchange="this.form.submit()">
+        <option value="0">Seleccione una Institucion</option>
+        @foreach (var item in insti)
+            {
+                <option value="@item.Id" selected="@(item.Id==instiId)">@item.Nombre</option>
+            }
+        </select>
+
+    </form> 
+    @if (instiId == 0)
+{
+    <div>Seleccione una Institucion Para ver los contenedores</div>
+}
+else if (Model.Count == 0)
+{
+    <div>Todavia no tiene contenedores</div>
+}
+else
+{
+    <div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo Residuo</th>
+                        <th>Capacidad</th>
+                        <th>Piso</th>
+                        <th>Sector</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var estado = item.Estado.ToString();
+                        var piso = item.Piso switch { null => "", 0 => "PB", < 0 => $"Subsuelo {-item.Piso}", _ => $"Piso {item.Piso}" };
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.TipoResiduo</td>
+                            <td>@item.CapacidadLitros</td>
+                            <td>@item.Piso</td>
+                            <td>@item.Sector</td>
+                            <td>
+                                <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

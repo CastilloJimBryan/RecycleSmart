@@ -8,6 +8,7 @@ namespace RecycleSmartBE
     {
         public string Tipo { get; set; } = string.Empty;
         public int EmpresaLogisticaId {  get; set; }
+        public int CantidadContenedores {  get; set; }
 
     }
 }

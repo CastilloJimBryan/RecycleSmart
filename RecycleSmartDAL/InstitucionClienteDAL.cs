@@ -21,10 +21,10 @@ namespace RecycleSmartDAL
         {
             List<InstitucionCliente> Listar=new List<InstitucionCliente>();
             using(var con=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand("SELECT Id,Nombre,CUIT,Tipo,Direccion,Estado,EmpresaLogisticaId" +
+            using(var cmd=new SqlCommand("SELECT Id,Nombre,CUIT,Tipo,Direccion,Estado,EmpresaLogisticaId, " +
+                " (SELECT COUNT(*) FROM Contenedor WHERE Contenedor.InstitucionId=InstitucionCliente.Id AND Contenedor.Estado<>'Baja') AS Contenedores " +
                 " FROM InstitucionCliente " +
-                " WHERE EmpresaLogisticaId=@EmpresaLogisticaId " +
-                " ORDER BY Nombre",con))
+                " WHERE EmpresaLogisticaId=@EmpresaLogisticaId ",con))
             {
                 cmd.Parameters.AddWithValue("@EmpresaLogisticaId", empresaId);
                 con.Open();
@@ -40,7 +40,8 @@ namespace RecycleSmartDAL
                             Tipo=leer.GetString(3),
                             Direccion=leer.GetString(4),
                             Estados=Enum.Parse<TipoEstado.Estados>(leer.GetString(5)),
-                            EmpresaLogisticaId=leer.GetInt32(6),
+                            CantidadContenedores=leer.GetInt32(6),
+                            EmpresaLogisticaId=leer.GetInt32(7),
                         });
                     }
                 }
