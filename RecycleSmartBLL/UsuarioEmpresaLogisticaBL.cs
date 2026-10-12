@@ -18,7 +18,7 @@ namespace RecycleSmartBLL
 
         public List<UsuarioEmpresaLogistica> ListarUsuarioxEmpresa(int empresaId)
         {
-            return _usuarioEmpresaLogisticaDAL.ListarInstitucionXEmpresa(empresaId);
+            return _usuarioEmpresaLogisticaDAL.ListarUsuariosXEmpresa(empresaId);
         }
 
         public UsuarioEmpresaLogistica? BuscarUsuarioxId(int id, int empresid)

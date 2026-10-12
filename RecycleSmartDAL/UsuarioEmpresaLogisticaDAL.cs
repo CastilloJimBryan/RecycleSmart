@@ -14,7 +14,7 @@ namespace RecycleSmartDAL
             _conectar = conectar;
         }
 
-        public List<UsuarioEmpresaLogistica> ListarUsuariosIntitucionesXEmpresa(int empresaId)
+        public List<UsuarioEmpresaLogistica> ListarUsuariosXEmpresa(int empresaId)
         {
             List<UsuarioEmpresaLogistica> listar = new List<UsuarioEmpresaLogistica>();
             using (var cone = new SqlConnection(_conectar))
@@ -108,10 +108,10 @@ namespace RecycleSmartDAL
         public bool ExisteCorreo(string correo, int idExcluir = 0)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("SELECT COUNT(*) FROM UsuarioEmpresaLogistica " +
-                " WHERE Correo=@Correo AND Id <> @Id " +
-                " + SELECT COUNT(*) FROM UsuarioRecycleSmart " +
-                " WHERE Correo=@Correo ", con))
+            using (var cmd = new SqlCommand("SELECT (SELECT COUNT(*) FROM UsuarioEmpresaLogistica " +
+                " WHERE Correo=@Correo AND Id <> @Id) " +
+                " + (SELECT COUNT(*) FROM UsuarioRecycleSmart " +
+                " WHERE Correo=@Correo )", con))
             {
                 cmd.Parameters.AddWithValue("@Correo", correo);
                 cmd.Parameters.AddWithValue("@Id", idExcluir);

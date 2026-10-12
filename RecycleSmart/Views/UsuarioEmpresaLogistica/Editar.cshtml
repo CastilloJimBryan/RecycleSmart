@@ -2,14 +2,14 @@
 
 @{
     var roles = ViewBag.Roles as string[] ?? Array.Empty<string>();
-    TempData["Title"] = "Editar Usuario";
+    ViewData["Title"] = "Editar Usuario";
 
     bool esUsuarioActual = ViewBag.EsUsuarioActual ?? false;
 }
 
 @if(!ViewData.ModelState.IsValid)
 {
-    <div class="alert alert-danger"></div>
+    <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
 }
 
 <div>
