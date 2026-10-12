@@ -36,14 +36,13 @@ namespace RecycleSmart.Controllers
         }
 
         [HttpPost]
-        [AutoValidateAntiforgeryToken]
+        [ValidateAntiForgeryToken]
 
         public IActionResult Registrar(string? nombre, string? apellido, string? Correo, string? rol, string? clave)
         {
             var usuario = new UsuarioEmpresaLogistica
             {
                 EmpresaLogisticaId = empresaid,
-                Id = usuarioActualId,
                 Nombre = nombre ?? "",
                 Apellido = apellido ?? "",
                 Correo = Correo ?? "",
@@ -102,7 +101,7 @@ namespace RecycleSmart.Controllers
             try
             {
                 _usuarioEmpresaLogisticaBL.ModificarUsuarioEmpresa(usuario, usuarioActualId);
-                TempData["Mensaje"] = "Cambios Guadados";
+                TempData["Mensaje"] = "Cambios Guardados";
                 return RedirectToAction("Detalle", new { id });
             }
             catch (Exception ex)
@@ -135,11 +134,11 @@ namespace RecycleSmart.Controllers
         [HttpPost]
         [AutoValidateAntiforgeryToken]
 
-        public IActionResult CambiarEstado(int id, string? estadonuevo)
+        public IActionResult CambiarEstado(int id, string? estado)
         {
             try
             {
-                if(Enum.TryParse<TipoEstado.Estados>(estadonuevo,true,out var tipoEstado))
+                if(!Enum.TryParse<TipoEstado.Estados>(estado,true,out var tipoEstado))
                 {
                     throw new Exception("Estado no Valido");
                 }

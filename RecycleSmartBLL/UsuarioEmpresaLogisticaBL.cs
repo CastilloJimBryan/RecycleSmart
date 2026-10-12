@@ -96,6 +96,8 @@ namespace RecycleSmartBLL
             if (actual.Rol == "Administrado" && nuevo != TipoEstado.Estados.Activo
                 && _usuarioEmpresaLogisticaDAL.AdministradoresActivos(empresaId, id) == 0)
                 throw new Exception("No se puede: es el único administrador activo de la empresa.");
+
+            _usuarioEmpresaLogisticaDAL.CambiarEstado(id, empresaId, nuevo.ToString());
         }
     }
 }

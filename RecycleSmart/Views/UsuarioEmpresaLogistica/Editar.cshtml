@@ -1,0 +1,67 @@
+﻿@model UsuarioEmpresaLogistica
+
+@{
+    var roles = ViewBag.Roles as string[] ?? Array.Empty<string>();
+    TempData["Title"] = "Editar Usuario";
+
+    bool esUsuarioActual = ViewBag.EsUsuarioActual ?? false;
+}
+
+@if(!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger"></div>
+}
+
+<div>
+    <a asp-action="Detalle" asp-route-id="@Model.Id" class="btn btn-theme-success" >
+        <i class="bx bx-arrow-black"></i> Volver al Detalle
+    </a>
+</div>
+
+<h2>Edicion de Usuario</h2>
+<div class="card shadow">
+    <div class="card-body">
+        <form asp-action="Editar" method="post"  autocomplete="off">
+            <input  type="hidden" name="id" value="@Model.Id"/>
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input name="nombre" type="text" value="@Model.Nombre" class="form-control" required maxlength="20" autocomplete="off" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Apellido</label>
+                <input name="apellido" type="text" value="@Model.Apellido" class="form-control" required maxlength="20" autocomplete="off" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Correo</label>
+                <input name="correo" type="email" value="@Model.Correo" class="form-control" required maxlength="100" autocomplete="off" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Rol</label>
+                    @if (esUsuarioActual)
+                    {
+                        <select class="form-select" disabled>
+                            <option>@Model.Rol</option>
+                        </select>
+                        <input type="hidden" name="rol" value="@Model.Rol"/>
+                        <div class="form-text">No se Puede Cambiar su propio rol</div>
+                    }
+                    else
+                    {
+
+                        <select name="rol" class="form-select">
+                            <option value="">Seleccionar un Rol</option>
+                            @foreach (var item in roles)
+                            {
+                                <option value="@item" selected="@(item==Model.Rol)" >@item</option>
+                            }
+                        </select>
+                    } 
+            </div>
+
+            <div>
+                <button type="submit">Guardar Cambios</button>
+                <a asp-action="Detalle" asp-route-id="@Model.Id">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

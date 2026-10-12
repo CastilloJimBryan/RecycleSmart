@@ -25,7 +25,7 @@
             @if (esUsuarioActual)
             {
                 <small class="text-muted">(Usted)</small>
-            }
+            } 
         </h4>
         <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
     </div>
@@ -33,7 +33,7 @@
             <dl class="row">
             <div class="col-sm-4">
                 <dt>Correo</dt>
-                <dd>@Model.Correo</dd>
+                <dd>@Model.Correo</dd> 
             </div>
             <div class="col-sm-4">
                 <dt>Rol</dt>
@@ -41,4 +41,56 @@
             </div>
             </dl>
     </div>
+    <div class="card-footer">
+        @if(esBaja)
+        {
+            <span class="text-muted">Usuario de baja no se puede Editar</span>
+        }
+        else
+        {
+            <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-outline-dark">
+                <i class="bx bx-edit"></i>  
+                Editar
+            </a>
+            @if(!esUsuarioActual)
+            {
+                <form asp-action="CambiarEstado" method="post">
+                    <input  type="hidden" name="id" value="@Model.Id"/>
+                        @if (estado == "Activo")
+                        {
+                            <button name="estado" value="Suspendido" class="btn btn-outline-warning">Suspender</button>
+                        }
+                        else
+                        {
+                            <button name="estado" value="Activo" class="btn btn-outline-success">ReActivar</button>
+                        }
+                </form>
+                    <button name="estado" value="Baja" class="btn btn-outline-danger">
+                        <i></i> Dar de Baja
+                    </button>
+            }
+        }
+    </div>
 </div>
+@if (!esBaja)
+{
+    <div class="card shadow-sm" style="max-width: 700px;">
+        <div class="card-header"><strong>Restablecer clave</strong></div>
+        <div class="card-body">
+            <form asp-action="RestablecerClave" method="post" autocomplete="off" class="row g-2 align-items-end">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="col-sm-8">
+                    <label class="form-label">Nueva clave</label>
+                    <input type="password" name="claveNueva" class="form-control"
+                           autocomplete="new-password" required />
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-outline-dark w-100"
+                            onclick="return confirm('¿Reemplazar la clave de este usuario?');">
+                        <i class='bx bx-key'></i> Restablecer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

@@ -39,7 +39,7 @@
                     <label class="form-label">Rol</label>
                     @if(esUsuarioActual)
                     {
-                        <select class="form-select">
+                        <select class="form-select" disabled>
                         <option>@Model.Rol</option>
                         </select>
                         <input type="hidden" name="rol" value="@Model.Rol"/>
