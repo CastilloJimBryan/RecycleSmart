@@ -7,7 +7,8 @@ using Servicio;
 
 namespace RecycleSmart.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize]
+    //[Authorize(Roles=Roles.Administrador)]
     [RequiereTipoCuenta(TipoDeCuenta.EmpresaLogistica)]
     public class UsuarioEmpresaLogisticaController : Controller
     {
@@ -30,7 +31,7 @@ namespace RecycleSmart.Controllers
 
         public IActionResult Registrar()
         {
-            ViewBag.Roles = "Administrador";
+            ViewBag.Roles = Roles.Todos;
             return View(new UsuarioEmpresaLogistica());
         }
 
@@ -58,6 +59,7 @@ namespace RecycleSmart.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", ex.Message);
+                ViewBag.Roles=Roles.Todos;
                 return View(usuario);
             }
         }
@@ -77,7 +79,7 @@ namespace RecycleSmart.Controllers
             {
                 return NotFound();
             }
-            ///falta roles
+            ViewBag.Roles = Roles.Todos;
             ViewBag.EsUsuarioActual = id == usuarioActualId;
             return View(usuario);
         }
@@ -107,7 +109,7 @@ namespace RecycleSmart.Controllers
             {
                 ModelState.AddModelError("", ex.Message);
                 ViewBag.EsUsuarioActual = id == usuarioActualId;
-                //falta roles
+                ViewBag.Roles = Roles.Todos;
                 return View(usuario);
             }
         }

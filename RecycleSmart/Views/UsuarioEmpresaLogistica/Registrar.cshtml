@@ -1,0 +1,66 @@
+﻿@model UsuarioEmpresaLogistica
+
+@{
+    var roles = ViewBag.Roles as string[] ?? Array.Empty<string>();
+    ViewData["Title"] = "Registrar Usuario";
+    bool esUsuarioActual = ViewBag.EsUsuarioActual ?? false;
+}
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+}
+<div class="mb-4">
+    <a asp-action="Index" class="btn btn-theme-success">
+        <i class="bx bx-arrow-back"></i>
+        Volver al Listado
+    </a>
+</div>
+<h2>ALta de Nuevo Usuario</h2>
+<div class="card shadow">
+    <div class="card body">
+        <form asp-action="Registrar" method="post" autocomplete="off">
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" name="nombre" value="@Model.Nombre" class="form-control" placeholder="Nombre Usuario" required maxlength="50"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Apellido</label>
+                    <input type="text" name="apellido" value="@Model.Apellido" class="form-control" placeholder="Apellido Usuario" required maxlength="50"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Correo</label>
+                    <input name="correo" type="email" value="@Model.Correo" class="form-control" placeholder="Example@example.com" required maxlength="100"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input name="clave" type="password" class="form-control" placeholder="*******" required autocomplete="new-password"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Rol</label>
+                    @if(esUsuarioActual)
+                    {
+                        <select class="form-select">
+                        <option>@Model.Rol</option>
+                        </select>
+                        <input type="hidden" name="rol" value="@Model.Rol"/>
+                        <div class="form-text">No se puede cambiar su propio rol</div>
+                    }
+                    else
+                    {
+                        <select class="form-select" name="rol">
+                        <option value="">Seleccione un Rol</option>
+                            @foreach (var item in roles)
+                            {
+                                <option value="@item" selected="@(item==Model.Rol)">@item</option>
+                            }
+                        </select>
+                    }
+                </div>
+                
+            <div class="d-flex justify-content-between mt-3">
+                <button type="submit" class="btn btn-outline-success">Registrar</button>
+                <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

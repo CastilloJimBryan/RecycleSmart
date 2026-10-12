@@ -109,7 +109,8 @@ namespace RecycleSmartDAL
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT COUNT(*) FROM UsuarioEmpresaLogistica " +
-                " WHERE Correo=@Correo AND Id <> @Id + SELECT COUNT(*) FROM UsuarioRecycleSmart " +
+                " WHERE Correo=@Correo AND Id <> @Id " +
+                " SELECT COUNT(*) FROM UsuarioRecycleSmart " +
                 " WHERE Correo=@Correo ", con))
             {
                 cmd.Parameters.AddWithValue("@Correo", correo);
@@ -136,7 +137,8 @@ namespace RecycleSmartDAL
         public int AgregarUsuarioEmpresa(UsuarioEmpresaLogistica ue)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("INSERT INTO UsuarioEmpresaLogistica (Nombre,Apellido,Correo,Clave,Rol,Estado,EmpresaLogisticaId) " +
+            using (var cmd = new SqlCommand("INSERT INTO UsuarioEmpresaLogistica (Nombre,Apellido,Correo,Clave,Rol,Estado,EmpresaLogisticaId)" +
+                " OUTPUT INSERTED.Id " +
                 " VALUES (@Nombre,@Apellido,@Correo,@Clave,@Rol,@Estado,@EmpresaLogisticaId) ", con))
             {
                 cmd.Parameters.AddWithValue("@Nombre", ue.Nombre);

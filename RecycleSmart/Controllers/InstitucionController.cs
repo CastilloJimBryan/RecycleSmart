@@ -35,6 +35,8 @@ namespace RecycleSmart.Controllers
             }
             return View(institucion);
         }
+
+        //[Authorize(Roles=Roles.Gestion)]
         public IActionResult Registrar()
         {
             ViewBag.Tipos = InstitucionClienteBLL.Tipos;
