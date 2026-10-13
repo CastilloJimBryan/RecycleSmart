@@ -1,0 +1,55 @@
+﻿@model RecycleSmartBE.Contenedor;
+
+@{
+    ViewData["Title"] = "Registrar Contenedor";
+    //var instituciones = ViewBag.Instituciones as List<InstitucionCliente> ?? new();
+    var tipos = ViewBag.Tipos as string[] ?? Array.Empty<string>();
+}
+@if(!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+}
+<div>
+    <a asp-action="Index" asp-route-institucionId="@Model.InstitucionId">Volver al Listado</a>
+</div>
+
+<h2>Registar Nuevo Contenedor a - @ViewBag.InstitucionNombre </h2>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Registrar" method="post">
+            <input type="hidden" name="InstitucionId" value="@Model.InstitucionId" />
+            <div class="mb-2">
+                <label class="form-label">Nombre</label>
+                <input type="text" name="nombre"  value="@Model.Nombre" class="form-control"  maxlength="100" required />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Tipo Residuo</label>
+                <select name="tiporesiduo" class="form-select">
+                    <option value="">Seleccionar un Tipo</option>
+                     @foreach (var item in tipos)
+                        {
+                           <option value="@item" selected="@(item==Model.TipoResiduo)">@item</option>
+                        }
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Capacidad (L)</label>
+                <input name="capacidad" class="form-control" type="number" min="1" required value="@Model.CapacidadLitros>0 ? @Model.CapacidadLitros : null"/>
+            </div>
+            <div class="row mb-2">
+                <div class="col">
+                    <label class="form-label">Piso</label>
+                    <input name="piso" type="number" value="@Model.Piso" min="-5" max="100" required maxlength="50" class="form-control" />
+                </div>
+                <div class="col">
+                    <label class="form-label">Sector</label>
+                    <input name="sector" type="text" value="@Model.Sector" required class="form-control"/>
+                </div>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-success" >Registrar</button>
+                <a asp-action="Index" asp-route-InstitucionId="@Model.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

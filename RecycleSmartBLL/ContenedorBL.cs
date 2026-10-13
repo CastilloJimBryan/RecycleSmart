@@ -58,7 +58,7 @@ namespace RecycleSmartBLL
 
             if (c.Nombre == "") throw new Exception("Debe Completar Nombre");
             if (!TiposResiduo.Contains(c.TipoResiduo)) throw new Exception("Debe Elegir un tipo Valido");
-            if (c.CapacidadLitros < 0) throw new Exception("Debe ser un valor positivo");
+            if (c.CapacidadLitros <= 0) throw new Exception("Debe ser un valor positivo");
 
             if (_contenedorDAL.ExisteContenedor(c.Nombre, c.InstitucionId, c.Id))
             {
@@ -113,6 +113,7 @@ namespace RecycleSmartBLL
 
             ValidarCampos(c);
             VerificarLimitePlan(empresaid);
+            c.Estado = TipoEstado.Estados.Activo;
             return _contenedorDAL.AltaContenedor(c);
         }
 

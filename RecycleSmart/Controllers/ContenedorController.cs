@@ -48,12 +48,13 @@ namespace RecycleSmart.Controllers
             return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
         }
 
-        public IActionResult Registar(int institucionId=0)
+        public IActionResult Registrar(int institucionId=0)
         {
             var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid)
-                .Where(i=>i.Estados!=TipoEstado.Estados.Activo).ToList();
+                .FirstOrDefault( i=>i.Id==institucionId && i.Estados==TipoEstado.Estados.Activo);
+            if (instituciones == null) return RedirectToAction("Index");
 
-            ViewBag.Instituciones=instituciones;
+            ViewBag.InstitucionNombre=instituciones.Nombre;
             ViewBag.Tipos = ContenedorBL.TiposResiduo;
 
             return View(new Contenedor { InstitucionId=institucionId});
@@ -78,15 +79,15 @@ namespace RecycleSmart.Controllers
             {
                 _contenedorBL.AgregarContenedor(contenedor, empresaid);
                 TempData["Mensaje"] = $"Contenedor {contenedor.Nombre} Se Agrego Correctameente";
-                return RedirectToAction("Index",new {institucionId=InstitucionId});
+                return RedirectToAction("Index", new { institucionId = InstitucionId });
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ModelState.AddModelError("", ex.Message);
                 var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid)
-                .Where(i => i.Estados != TipoEstado.Estados.Activo).ToList();
+                .FirstOrDefault(i => i.Id == InstitucionId)?.Nombre ?? "";
 
-                ViewBag.Instituciones = instituciones;
+                ViewBag.InstitucionNombre = instituciones;
                 ViewBag.Tipos = ContenedorBL.TiposResiduo;
                 return View(contenedor);
             }

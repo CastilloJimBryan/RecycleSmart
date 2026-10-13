@@ -19,7 +19,7 @@ namespace RecycleSmartDAL
         {
             List<Contenedor> listar=new List<Contenedor>();
             using(var con=new SqlConnection(_contectar))
-            using(var cmd=new SqlCommand("SELECT Contenedor.Id,Contenedor.Nombre,TipoResiduo,CapacidadLitro,Piso,Sector,PosicionX,PosicionY, Contenedor.Estado,InstitucionId " +
+            using(var cmd=new SqlCommand("SELECT Contenedor.Id,Contenedor.Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,PosicionX,PosicionY, Contenedor.Estado,InstitucionId " +
                 " FROM Contenedor " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
                 " WHERE InstitucionId = @InstitucionId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId ",con))
@@ -38,13 +38,13 @@ namespace RecycleSmartDAL
                             Id = leer.GetInt32(0),
                             Nombre = leer.GetString(1),
                             TipoResiduo = leer.GetString(2),
-                            CapacidadLitros = leer.GetFloat(3),
+                            CapacidadLitros = leer.GetDouble(3),
                             Piso = leer.IsDBNull(4) ? null : leer.GetInt32(4),
                             Sector=leer.IsDBNull(5)? null:leer.GetString(5),
-                            PosicionX=leer.IsDBNull(6)?null : leer.GetInt32(6),
-                            PosicionY=leer.IsDBNull(7)?null : leer.GetInt32(7),
+                            PosicionX=leer.IsDBNull(6)?null : leer.GetDouble(6),
+                            PosicionY=leer.IsDBNull(7)?null : leer.GetDouble(7),
                             Estado=Enum.Parse<TipoEstado.Estados>(leer.GetString(8)),
-                            InstitucionId=leer.GetInt32(8),
+                            InstitucionId=leer.GetInt32(9),
                         });
                     }
                 }
@@ -123,15 +123,16 @@ namespace RecycleSmartDAL
         public int AltaContenedor(Contenedor c)
         {
             using (var con = new SqlConnection(_contectar))
-            using (var cmd = new SqlCommand("INSERT INTO Contenedor (Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,InstitucionId) " +
+            using (var cmd = new SqlCommand("INSERT INTO Contenedor (Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,Estado,InstitucionId) " +
                 " OUTPUT INSERTED.Id " +
-                " VALUES (@Nombre,@TipoResiduo,@CapacidadLitros,@Piso,@Sector,@InstitucionId) ", con))
+                " VALUES (@Nombre,@TipoResiduo,@CapacidadLitros,@Piso,@Sector,@Estado,@InstitucionId) ", con))
             {
                 cmd.Parameters.AddWithValue("@Nombre", c.Nombre);
                 cmd.Parameters.AddWithValue("@TipoResiduo", c.TipoResiduo);
                 cmd.Parameters.AddWithValue("@CapacidadLitros", c.CapacidadLitros);
                 cmd.Parameters.AddWithValue("@Piso",(object?)c.Piso ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@Sector", (object?)c.Sector ?? DBNull.Value );
+                cmd.Parameters.AddWithValue("@Estado", c.Estado); 
                 cmd.Parameters.AddWithValue("@InstitucionId", c.InstitucionId);
                 con.Open();
 

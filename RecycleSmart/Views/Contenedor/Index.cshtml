@@ -4,7 +4,7 @@
     ViewData["Title"] = "Listado de Contenedores";
     var insti = ViewBag.Instituciones as List<InstitucionCliente> ?? new();
     int instiId = ViewBag.InstitucionId ?? 0;
-    int usada = ViewBag.Usadas ?? 0;
+    int usada = ViewBag.Usado ?? 0;
     int maximo = ViewBag.Maximo ?? 0;
 
     bool limiteAlcanzado = maximo != 0 && usada >= maximo;
@@ -21,7 +21,7 @@
         }
         else
         {
-            <a asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
+            <a asp-controller="Contenedor" asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
         }
     }
 </div>
@@ -38,7 +38,7 @@
 <form method="get" asp-action="Index">
     <label class="form-label">Instituciones</label>
     <select name="institucionId" class="form-select" onchange="this.form.submit()">
-        <option value="0">Seleccione una Institucion</option>
+        <option value=" ">Seleccione una Institucion</option>
         @foreach (var item in insti)
             {
                 <option value="@item.Id" selected="@(item.Id==instiId)">@item.Nombre</option>
@@ -77,8 +77,8 @@ else
                         <tr>
                             <td>@item.Nombre</td>
                             <td>@item.TipoResiduo</td>
-                            <td>@item.CapacidadLitros</td>
-                            <td>@item.Piso</td>
+                            <td>@item.CapacidadLitros L</td>
+                            <td>@piso</td>
                             <td>@item.Sector</td>
                             <td>
                                 <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
