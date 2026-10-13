@@ -132,7 +132,7 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@CapacidadLitros", c.CapacidadLitros);
                 cmd.Parameters.AddWithValue("@Piso",(object?)c.Piso ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@Sector", (object?)c.Sector ?? DBNull.Value );
-                cmd.Parameters.AddWithValue("@Estado", c.Estado); 
+                cmd.Parameters.AddWithValue("@Estado", c.Estado.ToString()); 
                 cmd.Parameters.AddWithValue("@InstitucionId", c.InstitucionId);
                 con.Open();
 
