@@ -6,5 +6,6 @@
         {
             Activo,Suspendido,Baja
         }
+        public enum EstadoDispositivo { Pendiente,Offline,Activo,Baja}
     }
 }
