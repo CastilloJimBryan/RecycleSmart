@@ -40,8 +40,8 @@ namespace RecycleSmartDAL
                             Tipo=leer.GetString(3),
                             Direccion=leer.GetString(4),
                             Estados=Enum.Parse<TipoEstado.Estados>(leer.GetString(5)),
-                            CantidadContenedores=leer.GetInt32(6),
-                            EmpresaLogisticaId=leer.GetInt32(7),
+                            EmpresaLogisticaId=leer.GetInt32(6),
+                            CantidadContenedores=leer.GetInt32(7),
                         });
                     }
                 }

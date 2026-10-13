@@ -49,23 +49,23 @@ else
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var i in Model)
+                    @foreach (var c in Model)
                     {
-                        var estado = i.Estados.ToString();
+                        var estado = c.Estados.ToString();
                         <tr>
-                            <td>@i.Nombre</td>
-                            <td>@i.Direccion</td>
-                            <td>@i.Tipo</td>
-                            <td>@FormatoEtiqueta.CUIT(i.Cuit)</td>
+                            <td>@c.Nombre</td>
+                            <td>@c.Direccion</td>
+                            <td>@c.Tipo</td>
+                            <td>@FormatoEtiqueta.CUIT(c.Cuit)</td>
                             <td>
-                                <a class="btn btn-sm btn-outline-secondary">
-                                    Ver Contenedores
+                                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@c.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class='bx bx-box'></i> Ver Contenedores
                                 </a>
                             </td>
                             <td>
-                                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@i.Id"
+                                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@c.Id"
                                    class="btn btn-sm btn-outline-success">
-                                    <i class='bx bx-box'></i> @i.CantidadContenedores
+                                    <i class='bx bx-box'></i> @c.CantidadContenedores
                                 </a>
                             </td>
                             <td>
@@ -75,7 +75,7 @@ else
                             </td>
                             <td><span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span></td>
                             <td class="text-center">
-                                <a asp-action="Detalle" asp-route-id="@i.Id" class="btn btn-sm btn-outline-secondary">
+                                <a asp-action="Detalle" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">
                                     <i class='bx bx-show'></i> Ver detalle
                                 </a>
                             </td>
