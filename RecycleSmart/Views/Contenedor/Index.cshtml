@@ -6,7 +6,7 @@
     int instiId = ViewBag.InstitucionId ?? 0;
     int usada = ViewBag.Usado ?? 0;
     int maximo = ViewBag.Maximo ?? 0;
-
+    var dispositivo = ViewBag.Dispositivos as Dictionary<int, DispositivoIoT> ?? new();
     bool limiteAlcanzado = maximo != 0 && usada >= maximo;
     bool PuedeGestionaar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
 }
@@ -85,7 +85,22 @@ else
                                 <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
                             </td>
                             <td>
-
+                                @if(dispositivo.TryGetValue(item.Id,out var dispositivos))
+                                {
+                                    var estadoDispositivo = dispositivos.EstadoDispositivo.ToString();
+                                    <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)">@estadoDispositivo</span>
+                                    <small>@dispositivos.MacAdress</small>
+                                }
+                                else if(PuedeGestionaar&&estado=="Activo")
+                                {
+                                    <a asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@item.Id">
+                                        Vincular
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin DispositivoIoT</span>
+                                }
                             </td>
                         </tr>
                     }

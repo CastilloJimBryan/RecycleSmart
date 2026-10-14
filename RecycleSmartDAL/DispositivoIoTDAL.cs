@@ -19,7 +19,12 @@ namespace RecycleSmartDAL
         public DispositivoIoT? BuscarXContenedor(int contenedorid,int empresaid)
         {
             using(var con=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand("",con))
+            using(var cmd=new SqlCommand("SELECT DispositivoIoT.Id,MacAddress,Mqqt,Bateria,NivelConexion,Firmware,FechaInstalacion,UltimaActualizacion,EstadoDispositivo,ContenedorId " +
+                " FROM DispositivoIoT " +
+                " INNER JOIN Contenedor ON Contenedor.Id= dispositivoIoT.ContenedorId " +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                " WHERE dispositivoIoT.ContenedorId=@contenedorid " +
+                " AND DispositivoIoT.EstadoDispositivo<>'Baja' AND InstitucionCliente.EmpresaLogisticaId=@empresaid ", con))
             {
                 cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
@@ -41,7 +46,7 @@ namespace RecycleSmartDAL
                             FechaInstalacion = leer.IsDBNull(6) ? null : leer.GetDateTime(6),
                             UltimaActualizacion = leer.IsDBNull(7) ? null : leer.GetDateTime(7),
                             EstadoDispositivo = Enum.Parse<TipoEstado.EstadoDispositivo>(leer.GetString(8), true),
-                            ContenedorId = leer.GetInt32(8),
+                            ContenedorId = leer.GetInt32(9),
                         };
                     }
                 }
@@ -52,9 +57,14 @@ namespace RecycleSmartDAL
         {
             List<DispositivoIoT> listar=new List<DispositivoIoT>();
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("", con))
+            using (var cmd = new SqlCommand("SELECT DispositivoIoT.Id,MacAddress,Mqqt,Bateria,NivelConexion,Firmware,FechaInstalacion,UltimaActualizacion,EstadoDispositivo,ContenedorId " +
+                " FROM DispositivoIoT " +
+                " INNER JOIN Contenedor ON Contenedor.Id= dispositivoIoT.ContenedorId " +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                " WHERE Contenedor.InstitucionId=@InstitucionId " +
+                " AND DispositivoIoT.EstadoDispositivo<>'Baja' AND InstitucionCliente.EmpresaLogisticaId=@Empresaid ", con))
             {
-                cmd.Parameters.AddWithValue("@InstituicionId", institucionId);
+                cmd.Parameters.AddWithValue("@InstitucionId", institucionId);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
 
                 con.Open();
@@ -74,7 +84,7 @@ namespace RecycleSmartDAL
                             FechaInstalacion = leer.IsDBNull(6) ? null : leer.GetDateTime(6),
                             UltimaActualizacion = leer.IsDBNull(7) ? null : leer.GetDateTime(7),
                             EstadoDispositivo = Enum.Parse<TipoEstado.EstadoDispositivo>(leer.GetString(8), true),
-                            ContenedorId = leer.GetInt32(8),
+                            ContenedorId = leer.GetInt32(9),
                         });
                     }
                 }
@@ -85,7 +95,8 @@ namespace RecycleSmartDAL
         public bool ExisteMAC(string mac)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("", con))
+            using (var cmd = new SqlCommand("SELECT COUNT (*) FROM DispositivoIoT " +
+                " WHERE MacAddress=@MacAddress AND EstadoDispositivo<>'Baja'", con))
             {
                 cmd.Parameters.AddWithValue("@MacAddress", mac);
                 con.Open();
@@ -96,7 +107,10 @@ namespace RecycleSmartDAL
         public int CambiarEstado(string estado,int id,int empresaid)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("", con))
+            using (var cmd = new SqlCommand("UPDATE DispositivoIoT SET Estado=@Estado" +
+                " INNER JOIN Contenedor ON Contenedor.Id=DispositivoIoT.ContenedorId" +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                " WHERE DispositivoIoT.Id=@Id AND EmpresaLogisticaId=@Id", con))
             {
                 cmd.Parameters.AddWithValue("@Id", id);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
@@ -108,12 +122,14 @@ namespace RecycleSmartDAL
         public int AgregarDispositivoIoT(DispositivoIoT iot)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("", con))
+            using (var cmd = new SqlCommand("INSERT INTO DispositivoIoT (MacAddress,Mqqt,Firmware,EstadoDispositivo,ContenedorId) " +
+                " OUTPUT INSERTED.Id " +
+                " VALUES (@MacAddress,@Mqtt,@Firmware,@EstadoDispositivo,@ContenedorId) ", con))
             {
-                cmd.Parameters.AddWithValue("@Id", iot);
                 cmd.Parameters.AddWithValue("@MacAddress", iot.MacAdress);
                 cmd.Parameters.AddWithValue("@Mqtt", iot.Mqtt);
                 cmd.Parameters.AddWithValue("@Firmware",(object?) iot.Firmware ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@EstadoDispositivo",iot.EstadoDispositivo.ToString());
                 cmd.Parameters.AddWithValue("@ContenedorId", iot.ContenedorId);
                 con.Open();
                 return (int)cmd.ExecuteScalar();

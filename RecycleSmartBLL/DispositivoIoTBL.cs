@@ -33,7 +33,7 @@ namespace RecycleSmartBLL
             var limpio = new string((mac ?? "").Where(Uri.IsHexDigit).ToArray()).ToUpperInvariant();
             if (limpio.Length != 12)
             {
-                throw new Exception("");
+                throw new Exception("La MAC debe tener 12 caracteres hexadecimales (0-9, A-F). Ej: AA:BB:CC:DD:EE:FF");
             }
             return string.Join(":", Enumerable.Range(0, 6).Select(i => limpio.Substring(i * 2, 2)));
         }
@@ -52,11 +52,18 @@ namespace RecycleSmartBLL
 
             var macNormalizada = NormalizarMac(mac);
 
+            if(_dispositivoIoTDAL.ExisteMAC(macNormalizada))
+            {
+                throw new Exception("MacAddress ya asignado a un Contenedor");
+
+            }
+
             var dispositivo = new DispositivoIoT
             {
                 ContenedorId = contenedorid,
                 MacAdress = macNormalizada,
                 Mqtt = $"RecycleSmart/{macNormalizada}",
+                EstadoDispositivo = TipoEstado.EstadoDispositivo.Pendiente,
                 Firmware = string.IsNullOrWhiteSpace(firmware) ? null : firmware.Trim()
             };
 

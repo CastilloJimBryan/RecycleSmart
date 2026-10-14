@@ -17,9 +17,9 @@ namespace RecycleSmart.Controllers
         }
         private int empresaid => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
 
-        public IActionResult AgregarDispositivo (int contenedorid)
+        public IActionResult RegistrarDispositivo (int contenedorid)
         {
-            if(_contenedorBL.BuscarContenedorXId(contenedorid,empresaid) is not Contenedor contenedor)
+           if (_contenedorBL.BuscarContenedorXId(contenedorid,empresaid) is not Contenedor contenedor)
             {
                 return NotFound();
             }
@@ -36,7 +36,7 @@ namespace RecycleSmart.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public IActionResult AgregarDispositivo(int contenedorid,string? mac,string? firmware)
+        public IActionResult RegistrarDispositivo(int contenedorid,string? mac,string? firmware)
         {
             if(_contenedorBL.BuscarContenedorXId(contenedorid,empresaid)is not Contenedor contenedor)
             {

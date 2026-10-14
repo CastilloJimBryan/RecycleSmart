@@ -12,6 +12,7 @@ namespace RecycleSmart.Controllers
     public class ContenedorController : Controller
     {
         readonly ContenedorBL _contenedorBL;
+        readonly DispositivoIoTBL _dispositivoIoT;
         readonly InstitucionClienteBLL _institucionClienteBLL;
         private int empresaid => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
 
@@ -21,12 +22,14 @@ namespace RecycleSmart.Controllers
 
             _contenedorBL = new ContenedorBL(conectar);
             _institucionClienteBLL = new InstitucionClienteBLL(conectar);
+            _dispositivoIoT = new DispositivoIoTBL(conectar);
         }
 
         public IActionResult Index(int institucionId = 0)
         {
             var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid)
                 .Where(i=>i.Estados!=TipoEstado.Estados.Baja).ToList();
+            var dispositivos = _dispositivoIoT.DispositivosXInstitucion(institucionId, empresaid);
 
             ViewBag.InstitucionId = institucionId;
             ViewBag.Instituciones = instituciones;
@@ -44,7 +47,7 @@ namespace RecycleSmart.Controllers
             if (institucion == null) { return NotFound(); }
 
             ViewBag.InstitucionNombre = institucion.Nombre;
-
+            ViewBag.Dispositivos = dispositivos;
             return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
         }
 
