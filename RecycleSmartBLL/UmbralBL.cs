@@ -30,12 +30,12 @@ namespace RecycleSmartBLL
             {
                 throw new Exception("La Humedad maxima debe estar entre 1% y 100%");
             }
-            if(u.TemperaturaMaxima>-10 || u.TemperaturaMaxima>=80)
+            if(u.TemperaturaMaxima<-10 || u.TemperaturaMaxima>80)
             {
                 throw new Exception("Error de valores de temperatura maxima");
             }
 
-            if(u.MinutosSinConexion<0)
+            if(u.MinutosSinConexion<1 || u.MinutosSinConexion>1440)
             {
                 throw new Exception("Error de Valores");
             }
@@ -68,8 +68,7 @@ namespace RecycleSmartBLL
             u.EstadoSync = TipoEstado.EstadoSync.Pendiente;
             if(_umbralDAl.BuscarxContenedor(u.ContenedorId, empresaid)==null)
             {
-                u.EstadoSync = TipoEstado.EstadoSync.Pendiente;
-                u.UltimaActualizacion = DateTime.Today;
+                u.UltimaActualizacion = DateTime.Now;
                 _umbralDAl.AgregarUmbral(u);
                 return true;
             }

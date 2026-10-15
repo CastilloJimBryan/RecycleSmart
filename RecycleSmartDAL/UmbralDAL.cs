@@ -2,6 +2,7 @@
 using RecycleSmartBE;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace RecycleSmartDAL
@@ -41,7 +42,7 @@ namespace RecycleSmartDAL
                             HumedadMaxima = leer.GetInt32(4),
                             MinutosSinConexion = leer.GetInt32(5),
                             UltimaActualizacion = leer.GetDateTime(6),
-                            EstadoSync =Enum.Parse<TipoEstado.EstadoSync>(leer.GetInt32(7).ToString()),
+                            EstadoSync =Enum.Parse<TipoEstado.EstadoSync>(leer.GetString(7)),
                             ContenedorId = leer.GetInt32(8)
                         };
                     }
@@ -52,15 +53,16 @@ namespace RecycleSmartDAL
         public int AgregarUmbral(Umbral u)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("INSERT INTO Umbral (NivelAdvertencia,NivelCritico,TemperaturaMaxima,HumedadMaxima,MinutosSinConexion,EstadoSync,ContenedorId) " +
+            using (var cmd = new SqlCommand("INSERT INTO Umbral (NivelAdvertencia,NivelCritico,TemperaturaMaxima,HumedadMaxima,MinutosSinConexion,UltimaActualizacion,EstadoSync,ContenedorId) " +
                 " OUTPUT INSERTED.Id " +
-                " VALUES () ", con))
+                " VALUES (@NivelAdvertencia,@NivelCritico,@TemperaturaMaxima,@HumedadMaxima,@MinutosSinConexion,@UltimaActualizacion,@EstadoSync,@ContenedorId) ", con))
             {
                 cmd.Parameters.AddWithValue("@NivelAdvertencia", u.NivelAdvertencia);
                 cmd.Parameters.AddWithValue("@NivelCritico", u.NivelCritico);
                 cmd.Parameters.AddWithValue("@TemperaturaMaxima",u.TemperaturaMaxima);
                 cmd.Parameters.AddWithValue("@HumedadMaxima", u.HumedadMaxima);
                 cmd.Parameters.AddWithValue("@MinutosSinConexion", u.MinutosSinConexion);
+                cmd.Parameters.AddWithValue("@UltimaActualizacion", u.UltimaActualizacion);
                 cmd.Parameters.AddWithValue("@EstadoSync", u.EstadoSync.ToString());
                 cmd.Parameters.AddWithValue("@ContenedorId", u.ContenedorId);
 
@@ -73,9 +75,9 @@ namespace RecycleSmartDAL
         public int ModificarUmbral(Umbral u,int empresaid)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("UPDATE SET NivelAdvertencia=@NivelAdvertencia,NivelCritico=@NivelCritico," +
-                "TemperaturaMaxima=@TemperaturaMaxima,HumedadMaxima=@HumedadMaxima,MinutosSinConexion=@MinutosSinConexion, " +
-                "UltimaActualizacion=@UltimaActualizacion , EstadoSync=@EstadoSync " +
+            using (var cmd = new SqlCommand("UPDATE Umbral SET NivelAdvertencia=@NivelAdvertencia,NivelCritico=@NivelCritico," +
+                " TemperaturaMaxima=@TemperaturaMaxima,HumedadMaxima=@HumedadMaxima,MinutosSinConexion=@MinutosSinConexion, " +
+                " UltimaActualizacion=@UltimaActualizacion , EstadoSync=@EstadoSync " +
                 " FROM Umbral " +
                 " INNER JOIN Contenedor ON Contenedor.Id=Umbral.ContenedorId " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
@@ -86,8 +88,8 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@TemperaturaMaxima", u.TemperaturaMaxima);
                 cmd.Parameters.AddWithValue("@HumedadMaxima", u.HumedadMaxima);
                 cmd.Parameters.AddWithValue("@MinutosSinConexion", u.MinutosSinConexion);
-                cmd.Parameters.AddWithValue("@UltimaActualizacion", u.UltimaActualizacion);
-                cmd.Parameters.AddWithValue("@EstadoSync", u.EstadoSync);
+                cmd.Parameters.AddWithValue("@UltimaActualizacion", DateTime.Now);
+                cmd.Parameters.AddWithValue("@EstadoSync", u.EstadoSync.ToString());
                 cmd.Parameters.AddWithValue("@ContenedorId", u.ContenedorId);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
 
@@ -125,7 +127,7 @@ namespace RecycleSmartDAL
                             HumedadMaxima = leer.GetInt32(4),
                             MinutosSinConexion = leer.GetInt32(5),
                             UltimaActualizacion = leer.GetDateTime(6),
-                            EstadoSync = Enum.Parse<TipoEstado.EstadoSync>(leer.GetInt32(7).ToString()),
+                            EstadoSync = Enum.Parse<TipoEstado.EstadoSync>(leer.GetString(7)),
                             ContenedorId = leer.GetInt32(8)
                         });
               
