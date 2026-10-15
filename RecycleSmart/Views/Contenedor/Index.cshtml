@@ -14,17 +14,6 @@
 <partial name="_Mensajes" />
 <div>
     <h2>Contenedores</h2>
-    @if (PuedeGestionaar && instiId != 0)
-    {
-        @if (limiteAlcanzado)
-        {
-            <button class="btn btn-success" disabled title="Alcanzo el Limite del Plan">Registrar Contenedor</button>
-        }
-        else
-        {
-            <a asp-controller="Contenedor" asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
-        }
-    }
 </div>
 <p class="text-muted">
     @(maximo == 0 ? $"{usada} contenedores · plan ilimitado" : $"{usada} de {maximo} contenedores de su plan")
@@ -34,11 +23,9 @@
     }
 </p>
 
-
-
 <form method="get" asp-action="Index">
     <label class="form-label">Instituciones</label>
-    <select name="institucionId" class="form-select" onchange="this.form.submit()">
+    <select name="institucionId" class="form-select mb-3" onchange="this.form.submit() ">
         <option value=" ">Seleccione una Institucion</option>
         @foreach (var item in insti)
             {
@@ -49,18 +36,18 @@
     </form> 
     @if (instiId == 0)
 {
-    <div>Seleccione una Institucion Para ver los contenedores</div>
+    <div class="alert alert-info">Seleccione una Institucion Para ver los contenedores</div>
 }
 else if (Model.Count == 0)
 {
-    <div>Todavia no tiene contenedores</div>
+    <div class="alert alert-info">Todavia no tiene contenedores</div>
 }
 else
 {
-    <div>
+    <div class="card shadow">
         <div class="table-responsive">
-            <table>
-                <thead>
+            <table class="table table-bordered table-striped">
+                <thead class="table table-success ">
                     <tr>
                         <th>Nombre</th>
                         <th>Tipo Residuo</th>
@@ -109,7 +96,7 @@ else
                                 {
                                     bool tiene = umbral.Contains(item.Id);
                                     <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorId="@item.Id"
-                                     class=" btn btn-sm btn-outline-secondary">@(tiene ? "Editar":"Configurar")
+                                     class=" btn btn-sm btn-outline-dark">@(tiene ? "Editar":"Configurar")
                                     </a>
                                 }
                                 else
@@ -123,4 +110,18 @@ else
             </table>
         </div>
     </div>
+            <div class="mt-2">
+
+                @if (PuedeGestionaar && instiId != 0)
+                {
+                    @if (limiteAlcanzado)
+                    {
+                        <button class="btn btn-success" disabled title="Alcanzo el Limite del Plan">Registrar Contenedor</button>
+                    }
+                    else
+                    {
+                        <a asp-controller="Contenedor" asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
+                    }
+                }
+            </div>
 }

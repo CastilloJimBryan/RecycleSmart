@@ -10,7 +10,9 @@
     <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
 }
 <div>
-    <a asp-action="Index" asp-route-institucionId="@Model.InstitucionId">Volver al Listado</a>
+    <a asp-action="Index" asp-route-institucionId="@Model.InstitucionId" class="btn btn-theme-success">
+        <i class="bx bx-arrow-back"></i>Volver al Listado
+    </a>
 </div>
 
 <h2>Registar Nuevo Contenedor a - @ViewBag.InstitucionNombre </h2>
@@ -33,8 +35,11 @@
                 </select>
             </div>
             <div class="mb-2">
-                <label class="form-label">Capacidad (L)</label>
+                <label class="form-label">Capacidad</label>
+                <div class="input-group">
                 <input name="capacidad" class="form-control" type="number" min="1" required value="@Model.CapacidadLitros>0 ? @Model.CapacidadLitros : null"/>
+                    <span class="input-group-text">Litros</span>
+                </div>
             </div>
             <div class="row mb-2">
                 <div class="col">
