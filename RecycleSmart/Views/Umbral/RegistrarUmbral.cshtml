@@ -1,0 +1,27 @@
+﻿@model Umbral
+
+@{
+    ViewData["Title"] = "Configuracion de  Umbral";
+    var contenedores = ViewBag.Contenedor as Contenedor;
+    bool nuevo = Model.Id == 0;
+    var estadosync = Model.EstadoSync.ToString();
+}
+
+<div>
+    <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId" class="btn bt-">
+        Volver a Contenedores
+    </a>
+</div>
+
+<h2>Umbrales de Alerta - @contenedores?.Nombre</h2>
+<p>
+    @if(nuevo)
+    {
+        <span>sin configurar</span>
+    }
+    else
+    {
+       <span class="badge @EstadosColor.EstadoBadge(estadosync)">@estadosync</span>
+        <small>Ultima Modificacion : @Model.UltimaActualizacion.ToString("dd/MM/yyyy HH:mm")</small>
+    }
+</p>

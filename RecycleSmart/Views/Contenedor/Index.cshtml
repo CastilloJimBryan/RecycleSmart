@@ -9,8 +9,9 @@
     var dispositivo = ViewBag.Dispositivos as Dictionary<int, DispositivoIoT> ?? new();
     bool limiteAlcanzado = maximo != 0 && usada >= maximo;
     bool PuedeGestionaar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
+    var umbral = ViewBag.Umbrales as HashSet<int> ?? new();
 }
-
+<partial name="_Mensajes" />
 <div>
     <h2>Contenedores</h2>
     @if (PuedeGestionaar && instiId != 0)
@@ -33,7 +34,7 @@
     }
 </p>
 
-<partial name="_Mensajes" />
+
 
 <form method="get" asp-action="Index">
     <label class="form-label">Instituciones</label>
@@ -68,6 +69,7 @@ else
                         <th>Sector</th>
                         <th>Estado</th>
                         <th>DispositivoIoT</th>
+                        <th>Umbrales</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,7 +93,7 @@ else
                                     <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)">@estadoDispositivo</span>
                                     <small>@dispositivos.MacAdress</small>
                                 }
-                                else if(PuedeGestionaar&&estado=="Activo")
+                                else if(PuedeGestionaar&&estado!="Baja")
                                 {
                                     <a asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@item.Id">
                                         Vincular
@@ -100,6 +102,19 @@ else
                                 else
                                 {
                                     <span class="text-muted">Sin DispositivoIoT</span>
+                                }
+                            </td>
+                            <td>
+                                @if(PuedeGestionaar && estado!="Baja")
+                                {
+                                    bool tiene = umbral.Contains(item.Id);
+                                    <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorId="@item.Id"
+                                     class=" btn btn-outline-secondary">@(tiene ? "Editar":"Configurar")
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">@(umbral.Contains(item.Id) ? "Configurado" : "-")</span>
                                 }
                             </td>
                         </tr>

@@ -17,7 +17,7 @@ namespace RecycleSmartDAL
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT Umbral.Id,NivelAdvertencia,NivelCritico,TemperaturaMaxima,HumedadMaxima, " +
-                " MinutoSinSenal,UltimaActualizacion,EstadoSync,ContenedorId " +
+                " MinutoSinConexion,UltimaActualizacion,EstadoSync,ContenedorId " +
                 " FROM Umbral " +
                 " INNER JOIN Contenedor ON Contenedor.Id=Umbral.ContenedorId " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +

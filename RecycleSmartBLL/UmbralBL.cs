@@ -68,6 +68,8 @@ namespace RecycleSmartBLL
             u.EstadoSync = TipoEstado.EstadoSync.Pendiente;
             if(_umbralDAl.BuscarxContenedor(u.ContenedorId, empresaid)==null)
             {
+                u.EstadoSync = TipoEstado.EstadoSync.Pendiente;
+                u.UltimaActualizacion = DateTime.Today;
                 _umbralDAl.AgregarUmbral(u);
                 return true;
             }
