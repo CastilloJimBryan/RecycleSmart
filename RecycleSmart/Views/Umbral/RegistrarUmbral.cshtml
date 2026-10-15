@@ -6,12 +6,17 @@
     bool nuevo = Model.Id == 0;
     var estadosync = Model.EstadoSync.ToString();
 }
-
+@if(!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
+}
+<partial name="_Mensajes" />
 <div>
-    <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId" class="btn bt-">
+    <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId" class="btn btn-secondary">
         Volver a Contenedores
     </a>
 </div>
+
 
 <h2>Umbrales de Alerta - @contenedores?.Nombre</h2>
 <p>
@@ -25,3 +30,34 @@
         <small>Ultima Modificacion : @Model.UltimaActualizacion.ToString("dd/MM/yyyy HH:mm")</small>
     }
 </p>
+<div>
+    <div>
+        <form asp-action="RegistrarUmbral" method="post">
+            <input name="contenedorid" type="hidden" value="@Model.ContenedorId"/>
+            
+            <div>
+                <label>Nivel de Advertencia</label>
+                <input />
+            </div>
+            <div>
+                <label>Nivel Critico</label>
+                <input />
+            </div>
+            <div>
+                <label>Temperatura Maxima</label>
+                <input />
+            </div>
+            <div>
+                <label>Humedad Maxima</label>
+                <input />
+            </div>
+            <div>
+                <label>Sin Conexion</label>
+                <input />
+            </div>
+
+            <button type="submit">@(nuevo?"Guardar Configuracion":"Guardar")</button>
+            <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId">Cancelar</a>
+        </form>
+    </div>
+</div>
