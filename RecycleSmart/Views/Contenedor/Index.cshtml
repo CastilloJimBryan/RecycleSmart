@@ -67,9 +67,9 @@ else
                         <th>Capacidad</th>
                         <th>Piso</th>
                         <th>Sector</th>
-                        <th>Estado</th>
-                        <th>DispositivoIoT</th>
                         <th>Umbrales</th>
+                        <th>DispositivoIoT</th>
+                        <th>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,7 +84,17 @@ else
                             <td>@piso</td>
                             <td>@item.Sector</td>
                             <td>
-                                <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+                                @if(PuedeGestionaar && estado!="Baja")
+                                {
+                                    bool tiene = umbral.Contains(item.Id);
+                                    <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorId="@item.Id"
+                                     class=" btn btn-sm btn-outline-secondary">@(tiene ? "Editar":"Configurar")
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">@(umbral.Contains(item.Id) ? "Configurado" : "-")</span>
+                                }
                             </td>
                             <td>
                                 @if(dispositivo.TryGetValue(item.Id,out var dispositivos))
@@ -105,17 +115,7 @@ else
                                 }
                             </td>
                             <td>
-                                @if(PuedeGestionaar && estado!="Baja")
-                                {
-                                    bool tiene = umbral.Contains(item.Id);
-                                    <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorId="@item.Id"
-                                     class=" btn btn-outline-secondary">@(tiene ? "Editar":"Configurar")
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">@(umbral.Contains(item.Id) ? "Configurado" : "-")</span>
-                                }
+                                <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
                             </td>
                         </tr>
                     }

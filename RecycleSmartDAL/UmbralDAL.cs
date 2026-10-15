@@ -17,7 +17,7 @@ namespace RecycleSmartDAL
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT Umbral.Id,NivelAdvertencia,NivelCritico,TemperaturaMaxima,HumedadMaxima, " +
-                " MinutoSinConexion,UltimaActualizacion,EstadoSync,ContenedorId " +
+                " MinutosSinConexion,UltimaActualizacion,EstadoSync,ContenedorId " +
                 " FROM Umbral " +
                 " INNER JOIN Contenedor ON Contenedor.Id=Umbral.ContenedorId " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
@@ -74,20 +74,20 @@ namespace RecycleSmartDAL
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("UPDATE SET NivelAdvertencia=@NivelAdvertencia,NivelCritico=@NivelCritico," +
-                "TemperaturaMaxima=@TemperaturaMaxima,HumedadMaxima=@HumedadMaxima,MinutosSinConexion=@MinutoSinConexion, " +
+                "TemperaturaMaxima=@TemperaturaMaxima,HumedadMaxima=@HumedadMaxima,MinutosSinConexion=@MinutosSinConexion, " +
                 "UltimaActualizacion=@UltimaActualizacion , EstadoSync=@EstadoSync " +
                 " FROM Umbral " +
                 " INNER JOIN Contenedor ON Contenedor.Id=Umbral.ContenedorId " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
                 " WHERE Umbral.ContenedorId=@ContenedorId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId", con))
             {
-                cmd.Parameters.AddWithValue("@", u.NivelAdvertencia);
-                cmd.Parameters.AddWithValue("@", u.NivelCritico);
-                cmd.Parameters.AddWithValue("@", u.TemperaturaMaxima);
-                cmd.Parameters.AddWithValue("@", u.HumedadMaxima);
-                cmd.Parameters.AddWithValue("@", u.MinutosSinConexion);
-                cmd.Parameters.AddWithValue("@", u.UltimaActualizacion);
-                cmd.Parameters.AddWithValue("@", u.EstadoSync);
+                cmd.Parameters.AddWithValue("@NivelAdvertencia", u.NivelAdvertencia);
+                cmd.Parameters.AddWithValue("@NivelCritico", u.NivelCritico);
+                cmd.Parameters.AddWithValue("@TemperaturaMaxima", u.TemperaturaMaxima);
+                cmd.Parameters.AddWithValue("@HumedadMaxima", u.HumedadMaxima);
+                cmd.Parameters.AddWithValue("@MinutosSinConexion", u.MinutosSinConexion);
+                cmd.Parameters.AddWithValue("@UltimaActualizacion", u.UltimaActualizacion);
+                cmd.Parameters.AddWithValue("@EstadoSync", u.EstadoSync);
                 cmd.Parameters.AddWithValue("@ContenedorId", u.ContenedorId);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
 
@@ -101,7 +101,7 @@ namespace RecycleSmartDAL
             List<Umbral> Listado=new List<Umbral>();
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT Umbral.Id,NivelAdvertencia,NivelCritico,TemperaturaMaxima,HumedadMaxima, " +
-                " MinutoSinConexion,UltimaActualizacion,EstadoSync,ContenedorId " +
+                " MinutosSinConexion,UltimaActualizacion,EstadoSync,ContenedorId " +
                 " FROM Umbral " +
                 " INNER JOIN Contenedor ON Contenedor.Id=Umbral.ContenedorId " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +

@@ -6,27 +6,27 @@
 {
     <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
 }
-
-<a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedor?.InstitucionId">
-    Volver al Listado de Contenedores
+<div class="mb-3">
+<a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedor?.InstitucionId" class="btn btn-theme-success">
+        <i class="bx bx-arrow-back"></i> Volver al Listado de Contenedores
 </a>
-<h2>Vincular Dispositivo</h2>
-<p>@contenedor?.Nombre</p>
-<div>
+</div>
+<h2>Vincular Dispositivo - @contenedor?.Nombre</h2>
+<div class="card shadow">
     <div class="card-body">
         <form asp-action="RegistrarDispositivo" method="post" autocomplete="off">
             <input type="hidden" name="contenedorid" value="@contenedor?.Id"/>
-            <div>
-                <label>Direccion MacAdrress</label>
-                <input name="mac" value="@ViewBag.MAC" class="font-monospace" maxlength="17" />
+            <div class="mb-3">
+                <label class="form-label">Direccion MacAdrress:</label>
+                <input name="mac" value="@ViewBag.MAC" class="font-monospace form-control" maxlength="17" />
             </div>
-            <div>
-                <label>Version de Firmware</label>
-                <input name="firmware" value="@ViewBag.Firmware" maxlength="30" />
+            <div class="mb-3">
+                <label class="form-label">Version de Firmware:</label>
+                <input name="firmware" class="form-control" value="@ViewBag.Firmware" maxlength="30" />
             </div>
-            <div>
-                <button type="submit">Vincular</button>
-                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedor?.InstitucionId">Cancelar</a>
+            <div class="mb-3 d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-success">Vincular Dispositivo</button>
+                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedor?.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
             </div>
         </form>
     </div>

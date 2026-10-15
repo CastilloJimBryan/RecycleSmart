@@ -33,7 +33,7 @@ namespace RecycleSmart.Controllers
                 return RedirectToAction("Index", "Contenedor", new {institucionId=contenedor.InstitucionId });
             }
         }
-
+         
         [HttpPost]
 
         public IActionResult RegistrarUmbral(int contenedorid,int? nivelcritico,int?niveladvertencia,string?tempmaxima,int?humedad,int?minutosinconexion)

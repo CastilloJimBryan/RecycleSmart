@@ -1,4 +1,5 @@
-﻿@model Umbral
+﻿@using System.Globalization;
+@model Umbral
 
 @{
     ViewData["Title"] = "Configuracion de  Umbral";
@@ -11,9 +12,9 @@
     <div class="alert alert-danger" asp-validation-summary="ModelOnly"></div>
 }
 <partial name="_Mensajes" />
-<div>
-    <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId" class="btn btn-secondary">
-        Volver a Contenedores
+<div class="mb-2">
+    <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId" class="btn btn-theme-success">
+        <i class="bx bx-arrow-back"></i> Volver a Contenedores
     </a>
 </div>
 
@@ -22,7 +23,7 @@
 <p>
     @if(nuevo)
     {
-        <span>sin configurar</span>
+        <span class="badge bg-dark text-white ms-2">Sin Configurar</span>
     }
     else
     {
@@ -30,34 +31,52 @@
         <small>Ultima Modificacion : @Model.UltimaActualizacion.ToString("dd/MM/yyyy HH:mm")</small>
     }
 </p>
-<div>
-    <div>
+<div class=" card shadow " style="max-width:700px">
+    <div class="card-body">
         <form asp-action="RegistrarUmbral" method="post">
             <input name="contenedorid" type="hidden" value="@Model.ContenedorId"/>
-            
-            <div>
-                <label>Nivel de Advertencia</label>
-                <input />
+        
+            <div class="mb-3">
+                <label class="form-label">Nivel de Advertencia</label>
+                <div class="input-group">
+                <input name="niveladvertencia" type="number" class="form-control" value="@Model.NivelAdvertencia" required  />
+                <span class="input-group-text">%</span>
+                </div>
             </div>
-            <div>
-                <label>Nivel Critico</label>
-                <input />
+            <div class="mb-3">
+                <label class="form-label">Nivel Critico</label>
+                <div class="input-group">
+                <input name="nivelcritico" type="number" class="form-control" value="@Model.NivelCritico" required /> 
+                <span class="input-group-text">%</span>
+                </div>
             </div>
-            <div>
-                <label>Temperatura Maxima</label>
-                <input />
+            <div class="mb-3">
+                <label class="form-label">Temperatura Maxima</label>
+                <div class="input-group">
+                <input name="tempmax" type="number" class="form-control" value="@Model.TemperaturaMaxima.ToString(CultureInfo.InvariantCulture)" />
+                <span class="input-group-text">C°</span>
+                </div>
             </div>
-            <div>
-                <label>Humedad Maxima</label>
-                <input />
+            <div class="mb-3">
+                <label class="form-label">Humedad Maxima</label>
+                <div class="input-group">
+                <input name="humedad" type="number" class="form-control" value="@Model.HumedadMaxima" required/>
+                <span class="input-group-text">%</span>
+                </div>
             </div>
-            <div>
-                <label>Sin Conexion</label>
-                <input />
+            <div class="mb-3">
+                <label class="form-label">Tiempo sin Conexion</label>
+                <div class="input-group">
+                    <input name="sinconexion" type="number" class="form-control" value="@Model.MinutosSinConexion" required  />
+                    <span class="input-group-text">Min.</span>
+                </div>
+                <div class="text-muted">Tiempo maximo que puede estar sin conexion en minutos (maximo 24hs )</div>
             </div>
-
-            <button type="submit">@(nuevo?"Guardar Configuracion":"Guardar")</button>
-            <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId">Cancelar</a>
+           
+            <div class="mb-3 d-flex justify-content-between">
+            <button type="submit" class="btn btn-outline-success">@(nuevo?"Guardar Configuracion":"Guardar")</button>
+            <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
+            </div>
         </form>
     </div>
 </div>
