@@ -122,13 +122,14 @@ namespace RecycleSmartDAL
         public int AgregarDispositivoIoT(DispositivoIoT iot)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("INSERT INTO DispositivoIoT (MacAddress,Mqqt,Firmware,EstadoDispositivo,ContenedorId) " +
+            using (var cmd = new SqlCommand("INSERT INTO DispositivoIoT (MacAddress,Mqqt,Firmware,FechaInstalacion,EstadoDispositivo,ContenedorId) " +
                 " OUTPUT INSERTED.Id " +
-                " VALUES (@MacAddress,@Mqtt,@Firmware,@EstadoDispositivo,@ContenedorId) ", con))
+                " VALUES (@MacAddress,@Mqtt,@Firmware,@FechaInstalacion,@EstadoDispositivo,@ContenedorId) ", con))
             {
                 cmd.Parameters.AddWithValue("@MacAddress", iot.MacAdress);
                 cmd.Parameters.AddWithValue("@Mqtt", iot.Mqtt);
                 cmd.Parameters.AddWithValue("@Firmware",(object?) iot.Firmware ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@FechaInstalacion", iot.FechaInstalacion);
                 cmd.Parameters.AddWithValue("@EstadoDispositivo",iot.EstadoDispositivo.ToString());
                 cmd.Parameters.AddWithValue("@ContenedorId", iot.ContenedorId);
                 con.Open();

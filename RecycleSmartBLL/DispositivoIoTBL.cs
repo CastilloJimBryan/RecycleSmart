@@ -64,6 +64,7 @@ namespace RecycleSmartBLL
                 MacAdress = macNormalizada,
                 Mqtt = $"RecycleSmart/{macNormalizada}",
                 EstadoDispositivo = TipoEstado.EstadoDispositivo.Pendiente,
+                FechaInstalacion = DateTime.Now,
                 Firmware = string.IsNullOrWhiteSpace(firmware) ? null : firmware.Trim()
             };
 
