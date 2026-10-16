@@ -49,7 +49,7 @@ namespace RecycleSmartDAL
             return Listar;
         }
 
-        public InstitucionCliente?BuscarXId(int institucionId,int empresaId)
+        public InstitucionCliente? BuscarXId(int institucionId,int empresaId)
         {
             using (var con = new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT Id,Nombre,CUIT,Tipo,Direccion,Estado,EmpresaLogisticaId" +

@@ -1,0 +1,88 @@
+﻿@model List<UsuarioInstitucion>
+@{
+    ViewData["Title"] = "Usuarios Instituciones";
+    var instituciones = ViewBag.Instituciones as List<InstitucionCliente> ?? new();
+
+    int instiId = ViewBag.InstitucionesId??0;
+    bool puedegestionar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
+}
+
+<partial name="_Mensajes"/>
+<h2>Usuarios Instituciones</h2>
+<form method="get">
+    <label class="form-label">Instituciones</label>
+    <select class="form-select mb-3" name="institucionId" onchange="this.form.submit()">
+        <option value="0">Selecciones una Institucion</option>
+        @foreach (var item in instituciones)
+            {
+                <option value="@item.Id" selected="@(item.Id==instiId)">@item.Nombre</option>
+            }
+    </select>
+</form>
+@if (instituciones.Count == 0)
+{
+    <p class="text-muted">Todavia no hay instituciones registradas</p>
+}
+else
+{
+
+    @if (instiId == 0)
+    {
+        <div class=" alert alert-info">Seleccione una Institucion para ver a los usuarios </div>
+    }
+    
+    else
+    {
+        <div>
+            @if (puedegestionar)
+            {
+
+                <a asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success mb-2">Registrar Usuario</a>
+            }
+        </div>
+        @if (Model.Count == 0)
+        {
+            <div class="alert alert-info">Todavia No hay usuarios Registrados</div>
+        }
+        else
+        {
+            
+        <div class="card shadow">
+            <div class="card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>DNI</th>
+                            <th>Rol</th>
+                            <th>Sector</th>
+                            <th>Estado</th>
+                            <th>Alta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var estado = item.Estado.ToString();
+                            <tr>
+                                <td>@item.Nombre</td>
+                                <td>@item.Apellido</td>
+                                <td>@item.DNI</td>
+                                <td>@item.Rol</td>
+                                <td>@item.Sector</td>
+                                <td></td>
+                                <td>@item.FechaRegistro.ToString("dd/MM/yy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        }
+       
+    }
+
+}
+
+
