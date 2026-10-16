@@ -62,8 +62,8 @@ else
                                 </a>
                             </td>
                             <td>
-                                <a class ="btn btn-sm btn-outline-dark">
-                                    Ver Tarjetas
+                                <a asp-controller="UsuarioInstitucion" asp-action="Index" asp-route-institucionId="@c.Id" class ="btn btn-sm btn-outline-dark">
+                                    <i class='bx bx-id-card'></i> Ver Tarjetas
                                 </a> 
                             </td>
                             <td><span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span></td>

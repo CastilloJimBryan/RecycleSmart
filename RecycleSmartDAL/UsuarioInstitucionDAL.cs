@@ -17,7 +17,7 @@ namespace RecycleSmartDAL
         public UsuarioInstitucion?BuscarXId(int id,int empresaid)
         {
             using(var con=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand("SELECT * FROM UsuarioIntitucion " +
+            using(var cmd=new SqlCommand("SELECT UsuarioInstitucion.Id,UsuarioInstitucion.Nombre,Apellido,DNI,Rol,Sector,UsuarioInstitucion.Estado,FechaRegistro,UsuarioInstitucion.InstitucionId FROM UsuarioIntitucion " +
                 " INNER JOIN  InstitucionCliente ON InstitucionCliente.Id = UsuarioInstitucion.InstitucionId" +
                 " WHERE UsuarioInstitucion.Id=@Id AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId",con))
             {
@@ -50,7 +50,7 @@ namespace RecycleSmartDAL
         {
             List<UsuarioInstitucion> Listado = new List<UsuarioInstitucion>();
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("SELECT * FROM UsuarioInstitucion " +
+            using (var cmd = new SqlCommand("SELECT UsuarioInstitucion.Id,UsuarioInstitucion.Nombre,Apellido,DNI,Rol,Sector,UsuarioInstitucion.Estado,FechaRegistro,UsuarioInstitucion.InstitucionId FROM UsuarioInstitucion " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=UsuarioInstitucion.InstitucionId " +
                 " WHERE InstitucionCliente.Id=@InstitucionId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId " +
                 " AND UsuarioInstitucion.Estado <> 'Baja' ", con))
@@ -61,7 +61,7 @@ namespace RecycleSmartDAL
                 con.Open();
                 using (var buscar = cmd.ExecuteReader())
                 {
-                    if (buscar.Read())
+                    while (buscar.Read())
                     {
                         Listado.Add(new UsuarioInstitucion
                         {
@@ -88,7 +88,7 @@ namespace RecycleSmartDAL
                 " WHERE DNI=@DNI AND InstitucionId=@InstitucionId AND Estado <> 'Baja' ", con))
             {
                 cmd.Parameters.AddWithValue("@DNI", dni);
-                cmd.Parameters.AddWithValue("@InsitucionId", institucionid);
+                cmd.Parameters.AddWithValue("@InstitucionId", institucionid);
 
                 con.Open();
                return (int) cmd.ExecuteScalar()>0;
@@ -98,7 +98,7 @@ namespace RecycleSmartDAL
         public int AltaUsuarioInstitucion(UsuarioInstitucion ui)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("INSERT INTO UsuarioInstitucion (Nombre,Apellido,DNI,Rol,Sector,Estado,FechaRegistro,InstitucionId ) " +
+            using (var cmd = new SqlCommand("INSERT INTO UsuarioInstitucion.Id,UsuarioInstitucion (Nombre,Apellido,DNI,Rol,Sector,Estado,FechaRegistro,InstitucionId ) " +
                 " OUTPUT INSERTED.Id " +
                 " VALUES (@Nombre,@Apellido,@DNI,@Rol,@Sector,@Estado,@FechaRegistro,@InstitucionId) ", con))
             {

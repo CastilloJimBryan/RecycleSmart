@@ -31,7 +31,7 @@ namespace RecycleSmart.Controllers
             return View(usuarios);
         }
 
-        public IActionResult Registrar(int institucionid)
+        public IActionResult RegistrarUsuario(int institucionid)
         {
             var institucion = _institucionClienteBLL.BuscarInstitucionXId(institucionid, empresaId);
             if(institucion==null || institucion.Estados!=TipoEstado.Estados.Activo)
@@ -47,7 +47,7 @@ namespace RecycleSmart.Controllers
 
         [HttpPost]
 
-        public IActionResult Registrar(string? nombre,string? apellido,string? dni,string? rol,string ? sector,int institucionid)
+        public IActionResult RegistrarUsuario(string? nombre,string? apellido,string? dni,string? rol,string ? sector,int institucionid)
         {
             var usuario = new UsuarioInstitucion
             {

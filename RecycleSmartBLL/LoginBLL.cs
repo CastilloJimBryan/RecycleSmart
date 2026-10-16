@@ -25,6 +25,8 @@ namespace RecycleSmartBLL
                 return null;
             }
 
+            //var admins = Servicio.Encriptacion.Hash("admin");
+
             correo= correo.Trim();
 
             var admin = _usuarioRecycleSmart.BuscarXCorreo(correo);

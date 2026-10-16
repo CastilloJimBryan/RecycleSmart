@@ -1,0 +1,42 @@
+﻿@model UsuarioInstitucion
+
+@{
+    ViewData["Title"] = "Registar Usuario Institucion";
+}
+
+<h2>Registrar Usuario a Institucion</h2>
+<div class="card shadow">
+    <div class="card-body">
+    <partial name="_Error"/>
+        <form method="post" asp-controller="UsuarioInstitucion" asp-action="RegistrarUsuario">
+            <input type="hidden" name="institucionid" value="@Model.InstitucionId" />
+            <div class="mb-3">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" value="@Model.Nombre" name="nombre" type="text" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Apellido</label>
+                <input name="apellido" class="form-control" value="@Model.Apellido" type="text" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">DNI</label>
+                <input name="dni" class="form-control" value="@Model.DNI" type="text" />
+            </div>
+            <div class="row">
+            <div class="col mb-3 ">
+                <label class="form-label">Rol</label>
+                <input name="rol" value="@Model.Rol" type="text" class="form-control"/>
+            </div>
+            <div class=" col mb-3 ">
+                    <label class="form-label">Sector</label><small class="text-muted">(Opcional)</small>
+                <input name="sector" value="@Model.Sector" type="text" class=" form-control" />
+                
+            </div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-success">Registrar Usuario</button>
+                <a asp-controller="UsuarioInstitucion" asp-action="Index" asp-route-institucionId="@Model.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
