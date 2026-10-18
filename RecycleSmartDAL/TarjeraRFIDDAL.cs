@@ -69,7 +69,7 @@ namespace RecycleSmartDAL
                         }
                         foreach (var item in t.ContenedoresId)
                         {
-                            using (var cmd = new SqlCommand("INSERT INTO Contenedor_Tarjeta (TarjetaId,ContenedorId) " +
+                            using (var cmd = new SqlCommand("INSERT INTO Contenedor_Tarjeta (TarjetaRFIDId,ContenedorId) " +
                                 " VALUES (@TarjetaId,@ContenedorId)", con, trans))
                             {
                                 cmd.Parameters.AddWithValue("@TarjetaId", tarjetarfid);
