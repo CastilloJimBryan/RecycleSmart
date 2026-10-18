@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static RecycleSmartBE.DiasSemana;
 
 namespace RecycleSmartBE
 {
@@ -9,7 +10,7 @@ namespace RecycleSmartBE
         public int Id {  get; set; }
         public string UID { get; set; } = string.Empty;
         public DateTime FechaVecimiento { get; set; }
-        public DiasSemana.DiaSemana DiasHabilitados {  get; set; }
+        public DiaSemana DiasHabilitados {  get; set; }
         public TimeSpan HoraInicio { get; set; }
         public TimeSpan HoraFin {  get; set; }
         public TipoEstado.Estados TipoEstado { get; set; }
