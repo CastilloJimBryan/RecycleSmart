@@ -34,6 +34,7 @@ namespace RecycleSmart.Controllers
                 return View(new TarjetaRFID
                 {
                     UsuarioInstitucionId = usuarioid,
+                    FechaVecimiento = DateTime.Today,
                     DiasHabilitados = DiasSemana.DiaSemana.Lunes | DiasSemana.DiaSemana.Martes | DiasSemana.DiaSemana.Miercoles | DiasSemana.DiaSemana.Jueves | DiasSemana.DiaSemana.Viernes,
                 });
             }
@@ -49,13 +50,15 @@ namespace RecycleSmart.Controllers
 
         public IActionResult Asignar(int usuarioinstitucionId,string ? uid,DateTime? fechavencimiento, int[]? dias,TimeSpan?horainicio,TimeSpan? horafin, int[]?contenedores )
         {
-            var tarjeta = new TarjetaRFID
+            /* return Content($"DEBUG: usuarioId={usuarioinstitucionId} empresaId={empresaid}");*/
+           var tarjeta = new TarjetaRFID
             {
                 UID = uid ?? "",
                 FechaVecimiento = fechavencimiento ?? DateTime.MinValue,
                 DiasHabilitados = (DiaSemana)(dias?.Sum() ?? 0),
                 HoraInicio = horainicio ?? TimeSpan.Zero,
                 HoraFin = horafin ?? TimeSpan.Zero,
+                UsuarioInstitucionId=usuarioinstitucionId,
                 ContenedoresId = contenedores?.ToList() ?? new List<int>()
             };
 
@@ -72,7 +75,7 @@ namespace RecycleSmart.Controllers
                 ModelState.AddModelError("", ex.Message);
                 try
                 {
-                    CargarFormulario(_tarjetaRFIDBL.ObtnerUsuario(usuarioinstitucionId,empresaid))
+                    CargarFormulario(_tarjetaRFIDBL.ObtnerUsuario(usuarioinstitucionId, empresaid));
                 }
                 catch(Exception e)
                 {

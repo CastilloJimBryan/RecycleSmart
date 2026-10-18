@@ -17,7 +17,7 @@ namespace RecycleSmartDAL
         public UsuarioInstitucion?BuscarXId(int id,int empresaid)
         {
             using(var con=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand("SELECT UsuarioInstitucion.Id,UsuarioInstitucion.Nombre,Apellido,DNI,Rol,Sector,UsuarioInstitucion.Estado,FechaRegistro,UsuarioInstitucion.InstitucionId FROM UsuarioIntitucion " +
+            using(var cmd=new SqlCommand("SELECT UsuarioInstitucion.Id,UsuarioInstitucion.Nombre,Apellido,DNI,Rol,Sector,UsuarioInstitucion.Estado,FechaRegistro,UsuarioInstitucion.InstitucionId FROM UsuarioInstitucion " +
                 " INNER JOIN  InstitucionCliente ON InstitucionCliente.Id = UsuarioInstitucion.InstitucionId" +
                 " WHERE UsuarioInstitucion.Id=@Id AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId",con))
             {

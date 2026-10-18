@@ -53,7 +53,7 @@ namespace RecycleSmartDAL
                         using (var cmd = new SqlCommand("INSERT INTO TarjetaRFID (UID,FechaVencimiento,DiasHabilitados,HoraInicio,HoraFin," +
                             " Estado,EstadoSync,FechaRegistro,UsuarioInstitucionId) " +
                             " OUTPUT INSERTED.Id " +
-                            " VALUES (@UID,@FechaVencimiento,@DiasHabilitados,@HoraInicio,@TipoEstado,@EstadoSync,@FechaRegistro,@UsuarioInstitucionId) ", con, trans))
+                            " VALUES (@UID,@FechaVencimiento,@DiasHabilitados,@HoraInicio,@HoraFin,@TipoEstado,@EstadoSync,@FechaRegistro,@UsuarioInstitucionId) ", con, trans))
                         {
                             cmd.Parameters.AddWithValue("@UID", t.UID);
                             cmd.Parameters.AddWithValue("@FechaVencimiento", t.FechaVecimiento.Date);

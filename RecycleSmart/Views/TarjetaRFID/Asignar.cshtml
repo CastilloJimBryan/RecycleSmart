@@ -1,0 +1,76 @@
+﻿@using static RecycleSmartBE.DiasSemana
+@model TarjetaRFID
+
+@{
+    ViewData["Title"] = "Asignar Tarjeta";
+    var usuario = ViewBag.Usuario as UsuarioInstitucion;
+    var contenedores = ViewBag.Contenedores as List<Contenedor> ?? new();
+
+    var diassemana = Enum.GetValues<DiaSemana>().Where(d => d != DiaSemana.Ninguno);
+}
+
+<h2>Asignar Tarjeta RFID - @usuario?.Nombre,@usuario?.Apellido-@usuario?.DNI</h2>
+
+<partial name="_Error"/>
+<div class="card shadow">
+    <div class="card-body">
+        <form asp-action="Asignar" method="post">
+           
+            <input type="hidden" name="usuarioinstitucionId" value="@Model.UsuarioInstitucionId" />
+            <div class="mb-2">
+                <label class="form-label">UID</label>
+                <input name="uid" type="text" value="@Model.UID" class="form-control" />
+            </div>
+                <label class="form-label">Dias Habilitados</label>
+            <div class="border rounded p-2 mb-3">
+                @foreach (var item in diassemana)
+                    {
+                        <div>
+                        <input class="form-check-input" type="checkbox" name="dias" id="dia-@((int)item)"
+                               value="@((int)item)" checked="@Model.DiasHabilitados.HasFlag(item)" />
+                        <label class="form-check-label" for="dia-@((int)item)">@item</label>
+                        </div>
+                    }
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label class="form-label">Hora Inicio</label>
+                    <input class="form-control" name="horainicio" value="@Model.HoraInicio" type="time" />
+                </div>
+                <div class="col">
+                    <label class="form-label">Hora Fin</label>
+                    <input class="form-control" name="horafin" value="@Model.HoraFin" type="time" />
+                </div>
+            </div>
+            <label class="form-label">Contenedores Habilitados</label>
+            @if(contenedores.Count==0)
+                {
+                    <div class="alert alert-danger">
+                        La institucion no tiene contenedores activos, registre uno para continuar
+                    </div>
+                }
+                else
+                {
+                <div class="border rounded p-2 mb-3">
+                        @foreach(var c in contenedores)
+                        {
+                            <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="contenedores" id="cont-@c.Id" value="@c.Id" checked="@Model.ContenedoresId.Contains(c.Id)"/>
+                            <label class="form-check-label" for="cont-@c.Id">
+                                @c.Nombre <small>@c.TipoResiduo-@c.Sector</small>
+                            </label>
+                            </div>
+                        }
+                    </div>
+                }
+            <div class="mb-2">
+                <label class="form-label">Fecha Vencimiento</label>
+                <input type="date" name="fechavencimiento" class="form-control" value="@Model.FechaVecimiento.ToString("yyyy-MM-dd")"/>
+            </div>
+                <div class="d-flex mt-3 justify-content-between">
+                <button type="submit" disabled="@(contenedores.Count==0)" class="btn btn-success">Asignar</button>
+                <a asp-controller="UsuarioInstitucion" asp-action="Index" asp-route-institucionId="@usuario?.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
