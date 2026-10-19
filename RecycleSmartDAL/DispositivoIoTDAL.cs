@@ -53,6 +53,32 @@ namespace RecycleSmartDAL
             }
             return null;
         }
+        public DispositivoIoT? BuscarMAC(string mac)
+        {
+            using(var con=new SqlConnection(_conectar))
+            using(var cmd=new SqlCommand("SELECT Id,MacAddress,EstadoDispositivo,ContenedorId FROM DispositivoIoT " +
+                " WHERE MacAddress=@Mac AND EstadoDispositivo <> 'Baja' ", con))
+            {
+                cmd.Parameters.AddWithValue("@Mac", mac);
+
+                con.Open();
+
+                using(var leer=cmd.ExecuteReader())
+                {
+                    if(leer.Read())
+                    {
+                        return new DispositivoIoT
+                        {
+                            Id = leer.GetInt32(0),
+                            MacAdress = leer.GetString(1),
+                            EstadoDispositivo = Enum.Parse<TipoEstado.EstadoDispositivo>(leer.GetString(2), true),
+                            ContenedorId = leer.GetInt32(3),
+                        };
+                    }
+                }
+            }
+            return null;
+        }
         public List<DispositivoIoT> ListarDispositivoXInstitucion(int institucionId , int empresaId)
         {
             List<DispositivoIoT> listar=new List<DispositivoIoT>();
