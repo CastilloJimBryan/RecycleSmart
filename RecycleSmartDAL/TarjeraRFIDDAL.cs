@@ -93,10 +93,10 @@ namespace RecycleSmartDAL
         {
             List<TarjetaRFID> Listar=new List<TarjetaRFID>();
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("SELECT Id,UID,FechaRegistro,DiasHabilitados,HoraInicio,HoraFin,Estado,EstadoSync,FechaVencimiento,UsuarioInstitucionId FROM TarjetaRFID " +
-                            " INNER JOIN UsuarioInstitucion ON UsuarioInstitucion.Id=TarjetaRFID.InstitucionId" +
+            using (var cmd = new SqlCommand("SELECT TarjetaRFID.Id,UID,TarjetaRFID.FechaRegistro,DiasHabilitados,HoraInicio,HoraFin,TarjetaRFID.Estado,EstadoSync,FechaVencimiento,UsuarioInstitucionId FROM TarjetaRFID " +
+                            " INNER JOIN UsuarioInstitucion ON UsuarioInstitucion.Id=TarjetaRFID.UsuarioInstitucionId" +
                             " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=UsuarioInstitucion.InstitucionId" +
-                            " WHERE UsuarioInstitucion.InstitucionId=@ AND InstitucionCliente.EmpresaId=@EmpresaId ", con))
+                            " WHERE UsuarioInstitucion.InstitucionId=@InstitucionId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId ", con))
             {
                 cmd.Parameters.AddWithValue("@InstitucionId", institucionid);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaid);

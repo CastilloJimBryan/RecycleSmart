@@ -8,11 +8,14 @@ namespace RecycleSmart.Controllers
     {
         private readonly UsuarioInstitucionBL _usuarioInstitucionBL;
         private readonly InstitucionClienteBLL _institucionClienteBLL;
+        private readonly TarjetaRFIDBL _tarjetaRFIDBL;
+
         public UsuarioInstitucionController(IConfiguration configuration)
         {
             string conectar = configuration.GetConnectionString("BDTFI")!;
             _usuarioInstitucionBL = new UsuarioInstitucionBL(conectar);
             _institucionClienteBLL = new InstitucionClienteBLL(conectar);
+            _tarjetaRFIDBL=new TarjetaRFIDBL(conectar);
         }
         int empresaId => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
         public IActionResult Index(int institucionid=0)
@@ -28,6 +31,8 @@ namespace RecycleSmart.Controllers
 
             var usuarios = institucionid == 0 ? new List<UsuarioInstitucion>() : _usuarioInstitucionBL.ListarxInstitucion(institucionid, empresaId);
 
+            ViewBag.Tarjetas = institucionid == 0 ? new Dictionary<int, TarjetaRFID>() : _tarjetaRFIDBL.TarjetaXInstitucion(institucionid, empresaId);
+            
             return View(usuarios);
         }
 

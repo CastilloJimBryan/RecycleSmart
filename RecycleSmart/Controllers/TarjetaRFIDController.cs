@@ -35,7 +35,9 @@ namespace RecycleSmart.Controllers
                 {
                     UsuarioInstitucionId = usuarioid,
                     FechaVecimiento = DateTime.Today,
-                    DiasHabilitados = DiasSemana.DiaSemana.Lunes | DiasSemana.DiaSemana.Martes | DiasSemana.DiaSemana.Miercoles | DiasSemana.DiaSemana.Jueves | DiasSemana.DiaSemana.Viernes,
+                    HoraInicio=new TimeSpan(5,0,0),
+                    HoraFin=new TimeSpan(23,0,0),
+                    //DiasHabilitados = DiasSemana.DiaSemana.Lunes | DiasSemana.DiaSemana.Martes | DiasSemana.DiaSemana.Miercoles | DiasSemana.DiaSemana.Jueves | DiasSemana.DiaSemana.Viernes,
                 });
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@
     ViewData["Title"] = "Usuarios Instituciones";
     var instituciones = ViewBag.Instituciones as List<InstitucionCliente> ?? new();
 
+    var tarjetas = ViewBag.Tarjetas as Dictionary<int, TarjetaRFID> ?? new();
     int instiId = ViewBag.InstitucionesId??0;
     bool puedegestionar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
 }
@@ -57,6 +58,7 @@ else
                             <th>DNI</th>
                             <th>Rol</th>
                             <th>Sector</th>
+                            <th>TarjetaRFID</th>
                             <th>Estado</th>
                             <th>Alta</th>
                         </tr>
@@ -71,6 +73,25 @@ else
                                 <td>@item.DNI</td>
                                 <td>@item.Rol</td>
                                 <td>@item.Sector</td>
+                                <td>
+                                    @if(tarjetas.TryGetValue(item.Id, out var tarjeta))
+                                        {
+                                            var estadoTarjeta = tarjeta.FechaVecimiento.Date<DateTime.Now ? "Vencida" : tarjeta.TipoEstado.ToString();
+                                           <code>@tarjeta.UID</code>
+                                           <span class="badge @EstadosColor.EstadoBadge(estadoTarjeta)">@estadoTarjeta</span>
+                                           <div>
+                                               <small class="text-muted">Vence @tarjeta.FechaVecimiento.ToString("dd/MM/yyyy")</small>
+                                           </div>
+                                        }
+                                        else if(puedegestionar && estado=="Activo")
+                                        {
+                                             <a asp-controller="TarjetaRFID" asp-action="Asignar" asp-route-usuarioId="@item.Id"  class="btn btn-outline-dark btn-sm">Asignar Tarjeta</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
                                 <td>
                                         <span class="badge @EstadosColor.EstadoBadge(estado)" >@estado</span>
                                 </td>

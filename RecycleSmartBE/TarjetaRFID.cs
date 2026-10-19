@@ -17,7 +17,6 @@ namespace RecycleSmartBE
         public TipoEstado.EstadoSync estadoSync { get; set; }
         public DateTime FechaRegistro { get; set; }
         public int UsuarioInstitucionId {  get; set; }
-
         public List<int> ContenedoresId { get; set; } = new();
 
     }
