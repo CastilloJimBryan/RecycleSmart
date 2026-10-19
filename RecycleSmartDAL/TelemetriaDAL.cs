@@ -64,5 +64,46 @@ namespace RecycleSmartDAL
                 }
             }
         }
+
+        public List<Telemetria> UltimasLecturasxInstitucion(int institucionid,int empresaid)
+        {
+            var listar=new List<Telemetria>();
+            using(var con=new SqlConnection(_Conectar))
+            using(var cmd=new SqlCommand(" SELECT * FROM (SELECT Telemetria.* ,ROW_NUMBER() OVER (PARTITION BY Telemetria.ContenedorId ORDER BY Telemetria.FechaHora DESC , Telemetria.Id DESC ) AS Orden" +
+                " FROM Telemetria" +
+                " INNER JOIN Contenedor ON Contenedor.Id=Telemetria.ContenedorId " +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId" +
+                " WHERE Contenedor.InstitucionId = @InstitucionId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId )" +
+                " x WHERE Orden = 1 ",con))
+            {
+
+                cmd.Parameters.AddWithValue("@InstitucionId", institucionid);
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                con.Open();
+
+                using(var leer = cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                    {
+                        int colorbateria = leer.GetOrdinal("Bateria");
+                        int colorconexion =leer.GetOrdinal("NivelConexion");
+                        listar.Add(new Telemetria
+                        {
+                            Id = leer.GetInt64(leer.GetOrdinal("Id")),
+                            Nivel = leer.GetInt32(leer.GetOrdinal("Nivel")),
+                            Temperatura = leer.GetDecimal(leer.GetOrdinal("Temperatura")),
+                            Humedad = leer.GetInt32(leer.GetOrdinal("Humedad")),
+                            Bateria = leer.IsDBNull(colorbateria) ? null : leer.GetInt32(colorbateria),
+                            NivelConexion = leer.IsDBNull(colorconexion) ? null : leer.GetInt32(colorconexion),
+                            FechaHora = leer.GetDateTime(leer.GetOrdinal("FechaHora")),
+                            DispositivoIoTId = leer.GetInt32(leer.GetOrdinal("DispositivoIoTId")),
+                            ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
+                        });
+                    }
+                }
+            }
+            return listar;
+        }
+
     }
 }

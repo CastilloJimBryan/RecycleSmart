@@ -15,6 +15,7 @@ namespace RecycleSmart.Controllers
         readonly DispositivoIoTBL _dispositivoIoT;
         readonly InstitucionClienteBLL _institucionClienteBLL;
         readonly UmbralBL _usmbralBL;
+        readonly TelemetriaBL _telemetriaBL;
         private int empresaid => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
 
         public ContenedorController(IConfiguration configuracion)
@@ -25,6 +26,7 @@ namespace RecycleSmart.Controllers
             _institucionClienteBLL = new InstitucionClienteBLL(conectar);
             _dispositivoIoT = new DispositivoIoTBL(conectar);
             _usmbralBL=new UmbralBL(conectar);
+            _telemetriaBL=new TelemetriaBL(conectar);
         }
 
         public IActionResult Index(int institucionId = 0)
@@ -50,7 +52,10 @@ namespace RecycleSmart.Controllers
 
             ViewBag.InstitucionNombre = institucion.Nombre;
             ViewBag.Dispositivos = dispositivos;
-            ViewBag.Umbrales = _usmbralBL.ContenedorContieneUmbral(institucionId, empresaid);
+            ViewBag.Umbrales = _usmbralBL.UmbralxInstitucion(institucionId, empresaid);
+            ViewBag.Lecturas=_telemetriaBL.UltimasLecturas(institucionId,empresaid);
+
+
             return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
         }
 

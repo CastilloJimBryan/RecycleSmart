@@ -1,4 +1,5 @@
-﻿@model List<RecycleSmartBE.Contenedor>
+﻿@using RecycleSmartBLL
+@model List<RecycleSmartBE.Contenedor>
 
 @{
     ViewData["Title"] = "Listado de Contenedores";
@@ -9,7 +10,8 @@
     var dispositivo = ViewBag.Dispositivos as Dictionary<int, DispositivoIoT> ?? new();
     bool limiteAlcanzado = maximo != 0 && usada >= maximo;
     bool PuedeGestionaar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
-    var umbral = ViewBag.Umbrales as HashSet<int> ?? new();
+    var umbral = ViewBag.Umbrales as Dictionary<int, Umbral> ?? new();
+    var lecturas = ViewBag.Lecturas as Dictionary<int, Telemetria> ?? new();
 }
 <partial name="_Mensajes" />
 <div>
@@ -73,7 +75,9 @@ else
                         <th>Sector</th>
                         <th>DispositivoIoT</th>
                         <th>Estado</th>
+                        <th>Nivel</th>
                         <th>Umbrales</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -109,18 +113,48 @@ else
                                 <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
                             </td>
                             <td>
+                                @if(lecturas.TryGetValue(item.Id,out var lectura))
+                                {
+                                    umbral.TryGetValue(item.Id, out var umbralcont);
+                                    var clase=UmbralBL.ClasificarLectura(lectura,umbralcont);
+                                        var color = clase switch
+                                        {
+                                            "Critico" => "bg-danger",
+                                            "Advertencia" => "bg-warning",
+                                            "Sin Datos" => "bg-secondary",
+                                            _=>"bg-success"
+                                        };
+                                        <div class="progress" style="height: 18px;">
+                                            <div class ="progress-bar @color" style="width: @lectura.Nivel%">@lectura.Nivel %</div>
+                                        </div>
+                                            <small class="text-muted">
+                                                @lectura.Temperatura °C - @lectura.FechaHora.ToString("dd/MM HH:mm")
+                                                @if (clase != "Normal")
+                                                {
+                                                    <span class="badge @color">@clase</span>
+                                                }
+                                            </small>
+                                    }
+                                else
+                                {
+                                    <span class="text-muted">Sin Lecturas</span>
+
+                                }
+                            </td>
+                            <td>
                                 @if(PuedeGestionaar && estado!="Baja")
                                 {
-                                    bool tiene = umbral.Contains(item.Id);
+                                    bool tiene = umbral.ContainsKey(item.Id);
                                     <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorId="@item.Id"
                                      class=" btn btn-sm btn-outline-dark">@(tiene ? "Editar":"Configurar")
                                     </a>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">@(umbral.Contains(item.Id) ? "Configurado" : "-")</span>
+                                    <span class="text-muted">@(umbral.ContainsKey(item.Id) ? "Configurado" : "-")</span>
                                 }
                             </td>
+
                         </tr>
                     }
                 </tbody>

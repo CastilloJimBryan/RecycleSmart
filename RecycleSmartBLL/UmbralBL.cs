@@ -84,5 +84,27 @@ namespace RecycleSmartBLL
             return _umbralDAl.ContenedorConUmbral(institucionid, empresaid).Select(u => u.ContenedorId).ToHashSet();
         }
         
+        public Dictionary<int,Umbral> UmbralxInstitucion(int institucionid,int empresaid)
+        {
+            return _umbralDAl.ContenedorConUmbral(institucionid, empresaid).ToDictionary(u => u.ContenedorId);
+        }
+
+        public static string ClasificarLectura(Telemetria lectura, Umbral? umbral)
+        {
+            var u = umbral?? new Umbral();
+            if((DateTime.Now-lectura.FechaHora).TotalMinutes>u.MinutosSinConexion)
+            {
+                return "sin datos";
+            }
+            if (lectura.Nivel >= u.NivelCritico)
+            {
+                return "Critico";
+            }
+            if(lectura.Nivel>=u.NivelAdvertencia)
+            {
+                return "Advertencia";
+            }
+            return "Normal";
+        }
     }
 }
