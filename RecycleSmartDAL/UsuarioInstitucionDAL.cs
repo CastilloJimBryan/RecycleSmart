@@ -98,7 +98,7 @@ namespace RecycleSmartDAL
         public int AltaUsuarioInstitucion(UsuarioInstitucion ui)
         {
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("INSERT INTO UsuarioInstitucion.Id,UsuarioInstitucion (Nombre,Apellido,DNI,Rol,Sector,Estado,FechaRegistro,InstitucionId ) " +
+            using (var cmd = new SqlCommand("INSERT INTO UsuarioInstitucion (Nombre,Apellido,DNI,Rol,Sector,Estado,FechaRegistro,InstitucionId ) " +
                 " OUTPUT INSERTED.Id " +
                 " VALUES (@Nombre,@Apellido,@DNI,@Rol,@Sector,@Estado,@FechaRegistro,@InstitucionId) ", con))
             {
