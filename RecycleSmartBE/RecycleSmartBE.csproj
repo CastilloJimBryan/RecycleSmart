@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+    <PackageReference Include="MQTTnet" Version="4.3.7.1207" />
     <PackageReference Include="Newtonsoft.Json" Version="14.0.1-beta2" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="11.0.0-rc.2.26504.105" />
   </ItemGroup>

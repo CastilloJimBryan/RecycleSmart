@@ -16,6 +16,7 @@ builder.Services.AddAuthentication(ManejosSesiones.esquema).AddCookie(ManejosSes
         options.Cookie.HttpOnly = true;
     });
 
+builder.Services.AddHostedService<RecycleSmart.Servicios.MotorIoT>();
 var app=builder.Build();
 
 // Configure the HTTP request pipeline.
