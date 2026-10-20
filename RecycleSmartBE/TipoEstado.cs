@@ -8,5 +8,7 @@
         }
         public enum EstadoDispositivo { Pendiente,Offline,Activo,Baja }
         public enum EstadoSync { Pendiente,Sincronizado,Error }
+
+        public enum ClasificacionLectura { Normal,Advertencia,Critico}
     }
 }

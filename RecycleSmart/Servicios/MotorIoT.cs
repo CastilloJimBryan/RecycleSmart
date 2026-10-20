@@ -85,7 +85,7 @@ namespace RecycleSmart.Servicios
                     nivel=t.Nivel,
                     temperatura=t.Temperatura.ToString("0.0"),
                     fecha=t.FechaHora.ToString("dd/MM HH:mm"),
-                    clase=t.Clasificacion
+                    clase=t.Clasificacion.ToString()
                 });
             }
             catch (JsonException)

@@ -117,21 +117,25 @@ else
                                 {
                                     umbral.TryGetValue(item.Id, out var umbralcont);
                                     var clase=UmbralBL.ClasificarLectura(lectura,umbralcont);
+                                        bool viejo = UmbralBL.LecturaDesactualizada(lectura, umbralcont);
                                         var color = clase switch
                                         {
-                                            "Critico" => "bg-danger",
-                                            "Advertencia" => "bg-warning",
-                                            "Sin Datos" => "bg-secondary",
+                                            TipoEstado.ClasificacionLectura.Critico => "bg-danger",
+                                            TipoEstado.ClasificacionLectura.Advertencia => "bg-warning",
                                             _=>"bg-success"
                                         };
-                                        <div class="progress" style="height: 18px;">
+                                        <div class="progress" style="height: 18px; @(viejo ? "opacity:0.5;":"")">
                                             <div class ="progress-bar @color" style="width: @lectura.Nivel%" >@lectura.Nivel %</div>
                                         </div>
                                             <small class="text-muted">
                                                 @lectura.Temperatura °C - @lectura.FechaHora.ToString("dd/MM HH:mm")
-                                                @if (clase != "Normal")
+                                                @if (clase != TipoEstado.ClasificacionLectura.Normal)
                                                 {
                                                     <span class="badge @color">@clase</span>
+                                                }
+                                                @if(viejo)
+                                                {
+                                                    <span class="badge bg-secondary">Sin Datos Recientes</span>
                                                 }
                                             </small>
                                 }
@@ -161,7 +165,7 @@ else
                 </tbody>
             </table>
                
-                }
+                
         </div>
     </div>      
     }
@@ -173,7 +177,6 @@ else
         const colores = {
             "Critico": "bg-danger",
             "Advertencia": "bg-warning",
-            "Sin datos": "bg-secondary",
             "Normal": "bg-success"
         };
 
