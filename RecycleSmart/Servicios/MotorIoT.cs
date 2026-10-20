@@ -79,6 +79,10 @@ namespace RecycleSmart.Servicios
                 _log.LogInformation("Lectura {Id}: contenedor {Contenedor}, nivel {Nivel}%",
                                     t.Id, t.ContenedorId, t.Nivel);
 
+                foreach (var a in t.ALertasNuevas)
+                    _log.LogWarning("ALERTA {Severidad} ({Tipo}) en contenedor {Contenedor}: {Mensaje}",
+                                    a.TipoSeveridad, a.TipoAlerta, a.ContenedorId, a.Mensaje);
+
                 await _hub.Clients.Group($"Empresa-{t.EmpresaLogisticaId}").SendAsync("NuevaLectura", new
                 {
                     contenedorId=t.ContenedorId,
@@ -94,8 +98,11 @@ namespace RecycleSmart.Servicios
             }
             catch (Exception ex)
             {
-                _log.LogWarning("{Mensaje}", ex.Message);
+                //                _log.LogWarning("{Mensaje}", ex.Message);
+                _log.LogWarning(ex, "{Mensaje}", ex.Message);
             }
+
+           
         }
 
     }
