@@ -94,7 +94,7 @@ namespace RecycleSmartDAL
         public void ResolucionAutomatica(int id)
         {
             using (var con = new SqlConnection(_Conectar))
-            using (var cmd = new SqlCommand("UPDATE Alerta SET EstadoAlerta='Resuelta',FechaActualizacion=GETDATE(),ResueltaAutomaticamente=1 " +
+            using (var cmd = new SqlCommand("UPDATE Alerta SET EstadoAlerta='Resuelta',FechaResolucion=GETDATE(),ResueltaAutomaticamente=1 " +
                 " WHERE Id=@Id AND EstadoAlerta <> 'Resuelta' ", con))
             {
                 cmd.Parameters.AddWithValue("@Id", id);
