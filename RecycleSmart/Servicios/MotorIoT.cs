@@ -98,8 +98,8 @@ namespace RecycleSmart.Servicios
             }
             catch (Exception ex)
             {
-                //                _log.LogWarning("{Mensaje}", ex.Message);
-                _log.LogWarning(ex, "{Mensaje}", ex.Message);
+                _log.LogWarning("{Mensaje}", ex.Message);
+               // _log.LogWarning(ex, "{Mensaje}", ex.Message);
             }
 
            
