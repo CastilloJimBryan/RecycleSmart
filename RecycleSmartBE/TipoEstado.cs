@@ -10,5 +10,9 @@
         public enum EstadoSync { Pendiente,Sincronizado,Error }
 
         public enum ClasificacionLectura { Normal,Advertencia,Critico}
+
+        public enum TipoAlerta { Nivel,Temperatura,SinConexion}
+        public enum Severidad { Advertencia,Critico}
+        public enum EstadoAlerta { Activa,EnGestion,Resuelta}
     }
 }
