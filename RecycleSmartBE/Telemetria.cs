@@ -15,5 +15,8 @@ namespace RecycleSmartBE
         public DateTime FechaHora {  get; set; }
         public int DispositivoIoTId {  get; set; }
         public int ContenedorId {  get; set; }
+
+        public int EmpresaLogisticaId {  get; set; }
+        public string Clasificacion { get; set; } = "Normal";
     }
 }

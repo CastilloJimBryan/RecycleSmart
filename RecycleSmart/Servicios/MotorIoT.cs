@@ -1,5 +1,7 @@
-﻿using MQTTnet;
+﻿using Microsoft.AspNetCore.SignalR;
+using MQTTnet;
 using MQTTnet.Client;
+using RecycleSmart.HUB;
 using RecycleSmartBE;
 using RecycleSmartBLL;
 using System.Text;
@@ -14,11 +16,13 @@ namespace RecycleSmart.Servicios
         private readonly TelemetriaBL _telemetriabl;
 
         private static readonly JsonSerializerOptions _json = new() { PropertyNameCaseInsensitive = true };
-        public MotorIoT(IConfiguration confi,ILogger<MotorIoT>log)
+        private readonly IHubContext<MonitoreoHubs> _hub;
+        public MotorIoT(IConfiguration confi,ILogger<MotorIoT>log,IHubContext<MonitoreoHubs>hub)
         {
             _config = confi;
             _log = log;
             _telemetriabl = new TelemetriaBL(confi.GetConnectionString("BDTFI")!);
+            _hub = hub;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellation)
@@ -37,12 +41,7 @@ namespace RecycleSmart.Servicios
                 .Build();
 
             // Qué hacer con cada mensaje que llega
-            cliente.ApplicationMessageReceivedAsync += e =>
-            {
-                ProcesarMensaje(e.ApplicationMessage.Topic,
-                                Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment));
-                return Task.CompletedTask;
-            };
+            cliente.ApplicationMessageReceivedAsync += e => ProcesarMensaje(e.ApplicationMessage.Topic, Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment));
 
             // Bucle de conexión: si se corta, reintenta cada 5 segundos
             while (!cancellation.IsCancellationRequested)
@@ -64,7 +63,7 @@ namespace RecycleSmart.Servicios
                 await Task.Delay(5000, cancellation);
             }
         }
-        private void ProcesarMensaje(string topic, string json)
+        private async Task ProcesarMensaje(string topic, string json)
         {
             try
             {
@@ -79,6 +78,15 @@ namespace RecycleSmart.Servicios
                 var t = _telemetriabl.ProcesarLectura(partes[1], lectura);
                 _log.LogInformation("Lectura {Id}: contenedor {Contenedor}, nivel {Nivel}%",
                                     t.Id, t.ContenedorId, t.Nivel);
+
+                await _hub.Clients.Group($"Empresa-{t.EmpresaLogisticaId}").SendAsync("NuevaLectura", new
+                {
+                    contenedorId=t.ContenedorId,
+                    nivel=t.Nivel,
+                    temperatura=t.Temperatura.ToString("0.0"),
+                    fecha=t.FechaHora.ToString("dd/MM HH:mm"),
+                    clase=t.Clasificacion
+                });
             }
             catch (JsonException)
             {

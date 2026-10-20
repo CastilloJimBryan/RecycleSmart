@@ -56,7 +56,9 @@ namespace RecycleSmartDAL
         public DispositivoIoT? BuscarMAC(string mac)
         {
             using(var con=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand("SELECT Id,MacAddress,EstadoDispositivo,ContenedorId FROM DispositivoIoT " +
+            using(var cmd=new SqlCommand("SELECT DispositivoIoT.Id,MacAddress,EstadoDispositivo,ContenedorId,InstitucionCliente.EmpresaLogisticaId FROM DispositivoIoT " +
+                " INNER JOIN Contenedor ON Contenedor.Id=DispositivoIoT.ContenedorId " +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
                 " WHERE MacAddress=@Mac AND EstadoDispositivo <> 'Baja' ", con))
             {
                 cmd.Parameters.AddWithValue("@Mac", mac);
@@ -73,6 +75,7 @@ namespace RecycleSmartDAL
                             MacAdress = leer.GetString(1),
                             EstadoDispositivo = Enum.Parse<TipoEstado.EstadoDispositivo>(leer.GetString(2), true),
                             ContenedorId = leer.GetInt32(3),
+                            EmpresaLogisticaId=leer.GetInt32(leer.GetOrdinal("EmpresaLogisticaId"))
                         };
                     }
                 }

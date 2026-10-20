@@ -77,7 +77,7 @@ else
                         <th>Estado</th>
                         <th>Nivel</th>
                         <th>Umbrales</th>
-                        <th></th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -112,7 +112,7 @@ else
                             <td>
                                 <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
                             </td>
-                            <td>
+                                <td style="min-width: 180px;" data-nivel-contenedor="@item.Id">
                                 @if(lecturas.TryGetValue(item.Id,out var lectura))
                                 {
                                     umbral.TryGetValue(item.Id, out var umbralcont);
@@ -134,7 +134,7 @@ else
                                                     <span class="badge @color">@clase</span>
                                                 }
                                             </small>
-                                    }
+                                }
                                 else
                                 {
                                     <span class="text-muted">Sin Lecturas</span>
@@ -157,9 +157,50 @@ else
 
                         </tr>
                     }
+
                 </tbody>
             </table>
+               
+                }
         </div>
     </div>      
     }
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        const colores = {
+            "Critico": "bg-danger",
+            "Advertencia": "bg-warning",
+            "Sin datos": "bg-secondary",
+            "Normal": "bg-success"
+        };
+
+        const conexion = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/monitoreo")
+            .withAutomaticReconnect()
+            .build();
+
+        conexion.on("NuevaLectura", l => {
+            // ¿El contenedor está en esta pantalla? (puede ser de otra institución de la empresa)
+            const celda = document.querySelector(`[data-nivel-contenedor="${l.contenedorId}"]`);
+            if (!celda) return;
+
+            const color = colores[l.clase] ?? "bg-success";
+            const badge = l.clase !== "Normal" ? ` <span class="badge ${color}">${l.clase}</span>` : "";
+
+            celda.innerHTML =
+                `<div class="progress" style="height: 18px;">
+                             <div class="progress-bar ${color}" style="width: ${l.nivel}%">${l.nivel} %</div>
+                         </div>
+                         <small class="text-muted">${l.temperatura} °C · ${l.fecha}${badge}</small>`;
+
+            // Resaltar la celda un instante para que se note el cambio
+            celda.classList.add("table-info");
+            setTimeout(() => celda.classList.remove("table-info"), 1500);
+        });
+
+        conexion.start().catch(err => console.error("SignalR:", err));
+    </script>
 }

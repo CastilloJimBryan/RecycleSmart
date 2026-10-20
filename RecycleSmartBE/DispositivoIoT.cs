@@ -16,5 +16,6 @@ namespace RecycleSmartBE
         public DateTime? UltimaActualizacion {  get; set; }
         public TipoEstado.EstadoDispositivo EstadoDispositivo { get; set; }
         public int ContenedorId {  get; set; }
+        public int EmpresaLogisticaId { get; set; }
     }
 }

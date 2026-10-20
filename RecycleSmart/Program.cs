@@ -17,6 +17,7 @@ builder.Services.AddAuthentication(ManejosSesiones.esquema).AddCookie(ManejosSes
     });
 
 builder.Services.AddHostedService<RecycleSmart.Servicios.MotorIoT>();
+builder.Services.AddSignalR();
 var app=builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -32,6 +33,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<RecycleSmart.HUB.MonitoreoHubs>("/hubs/monitoreo");
 
 app.MapStaticAssets();
 

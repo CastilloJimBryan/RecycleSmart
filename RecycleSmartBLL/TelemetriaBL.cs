@@ -9,11 +9,13 @@ namespace RecycleSmartBLL
     public class TelemetriaBL
     {
         private readonly TelemetriaDAL _telemetriaDAl;
+        private readonly UmbralDAL _umbralDAL;
         private readonly DispositivoIoTDAL _dispositivoIoTDAL;
         public TelemetriaBL(string conectar)
         {
             _telemetriaDAl = new TelemetriaDAL(conectar);
             _dispositivoIoTDAL = new DispositivoIoTDAL(conectar);
+            _umbralDAL=new UmbralDAL(conectar);
         }
 
         public static void ValidarDatos(LecturaSensor l)
@@ -64,6 +66,9 @@ namespace RecycleSmartBLL
             };
 
             telemetria.Id = _telemetriaDAl.RegistrarLectura(telemetria);
+            telemetria.EmpresaLogisticaId = dispositivoIoT.EmpresaLogisticaId;
+            var umbral = _umbralDAL.BuscarxContenedor(telemetria.ContenedorId, dispositivoIoT.EmpresaLogisticaId);
+            telemetria.Clasificacion = UmbralBL.ClasificarLectura(telemetria, umbral);
             return telemetria;
         } 
 
