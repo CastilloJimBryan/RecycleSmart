@@ -11,14 +11,14 @@ namespace RecycleSmartDAL
         private readonly string _Conectar;
         public AlertaDAL(string conectar)
         {
-            _Conectar=conectar;
+            _Conectar = conectar;
         }
         public int CrearAlerta(Alerta a)
         {
-            using(var con=new SqlConnection(_Conectar))
-            using(var cmd=new SqlCommand("INSERT INTO Alerta (TipoAlerta,TipoSeveridad,EstadoAlerta,ValorDetectado,ValorUmbral,Mensaje,FechaCreacion,ResueltaAutomaticamente,ContenedorId) " +
+            using (var con = new SqlConnection(_Conectar))
+            using (var cmd = new SqlCommand("INSERT INTO Alerta (TipoAlerta,TipoSeveridad,EstadoAlerta,ValorDetectado,ValorUmbral,Mensaje,FechaCreacion,ResueltaAutomaticamente,ContenedorId) " +
                 " OUTPUT INSERTED.Id " +
-                " VALUES (@TipoAlerta,@TipoSeveridad,@EstadoAlerta,@ValorDetectado,@ValorUmbral,@Mensaje,@FechaCreacion,@Resuelta,@ContenedorId ) ",con))
+                " VALUES (@TipoAlerta,@TipoSeveridad,@EstadoAlerta,@ValorDetectado,@ValorUmbral,@Mensaje,@FechaCreacion,@Resuelta,@ContenedorId ) ", con))
             {
                 cmd.Parameters.AddWithValue("@TipoAlerta", a.TipoAlerta.ToString());
                 cmd.Parameters.AddWithValue("@TipoSeveridad", a.TipoSeveridad.ToString());
@@ -30,11 +30,11 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@Resuelta", a.ResueltaAutomaticamente);
                 cmd.Parameters.AddWithValue("@ContenedorId", a.ContenedorId);
                 con.Open();
-                return(int) cmd.ExecuteScalar();
+                return (int)cmd.ExecuteScalar();
             }
         }
 
-        public Alerta? BuscarAlertaActiva(int contendorId,TipoEstado.TipoAlerta tipo)
+        public Alerta? BuscarAlertaActiva(int contendorId, TipoEstado.TipoAlerta tipo)
         {
             using (var con = new SqlConnection(_Conectar))
             using (var cmd = new SqlCommand("SELECT Id,Mensaje,FechaCreacion,FechaActualizacion,FechaResolucion,TipoAlerta,TipoSeveridad,EstadoAlerta," +
@@ -42,11 +42,11 @@ namespace RecycleSmartDAL
                 " WHERE ContenedorId=@ContenedorId AND TipoAlerta=@TipoAlerta AND EstadoAlerta <> 'Resuelta' ", con))
             {
                 cmd.Parameters.AddWithValue("@TipoAlerta", tipo.ToString());
-                cmd.Parameters.AddWithValue("@ContenedorId",contendorId);
-               
+                cmd.Parameters.AddWithValue("@ContenedorId", contendorId);
+
                 con.Open();
 
-                using (var leer=cmd.ExecuteReader())
+                using (var leer = cmd.ExecuteReader())
                 {
                     if (leer.Read())
                     {
@@ -55,17 +55,17 @@ namespace RecycleSmartDAL
                             Id = leer.GetInt32(0),
                             Mensaje = leer.GetString(1),
                             FechaCreacion = leer.GetDateTime(2),
-                            FechaActualizacion =leer.IsDBNull(3)?null: leer.GetDateTime(3),
+                            FechaActualizacion = leer.IsDBNull(3) ? null : leer.GetDateTime(3),
                             FechaResolucion = leer.IsDBNull(4) ? null : leer.GetDateTime(4),
-                            TipoAlerta = Enum.Parse<TipoEstado.TipoAlerta>(leer.GetString(5),true),
-                            TipoSeveridad = Enum.Parse<TipoEstado.Severidad>(leer.GetString(6),true),
+                            TipoAlerta = Enum.Parse<TipoEstado.TipoAlerta>(leer.GetString(5), true),
+                            TipoSeveridad = Enum.Parse<TipoEstado.Severidad>(leer.GetString(6), true),
                             EstadoAlerta = Enum.Parse<TipoEstado.EstadoAlerta>(leer.GetString(7), true),
                             ValorDetectado = leer.GetDecimal(8),
                             ValorUmbral = leer.GetDecimal(9),
                             NotaResolucion = leer.IsDBNull(10) ? null : leer.GetString(10),
                             ResueltaAutomaticamente = leer.GetBoolean(11),
-                            ContenedorId=leer.GetInt32(12),
-                            UsuarioGestionId= leer.IsDBNull(13) ? null : leer.GetInt32(13),
+                            ContenedorId = leer.GetInt32(12),
+                            UsuarioGestionId = leer.IsDBNull(13) ? null : leer.GetInt32(13),
                         };
                     }
                 }
@@ -88,7 +88,7 @@ namespace RecycleSmartDAL
                 con.Open();
                 cmd.ExecuteNonQuery();
             }
-              
+
         }
 
         public void ResolucionAutomatica(int id)
@@ -98,6 +98,38 @@ namespace RecycleSmartDAL
                 " WHERE Id=@Id AND EstadoAlerta <> 'Resuelta' ", con))
             {
                 cmd.Parameters.AddWithValue("@Id", id);
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public List<Alerta> ListarxEmpresa(int empresaid, bool resuelta)
+        {
+
+        }
+
+        public Alerta? BuscarXId(int id, int empresaid)
+        {
+
+        }
+        
+        public int Tomar(int id,int usuarioid,int empresaid)
+        {
+
+        }
+
+        public int Resolver(int id,int usuarioid,string nota,int empresaid)
+        {
+            using (var con = new SqlConnection(_Conectar))
+            using (var cmd = new SqlCommand("UPDATE Alerta SET EstadoAlerta='Resuelta',FechaResolucion=GETDATE(),ResueltaAutomaticamente=0,UsuarioGestionId=@UsuarioId,NotaResolucion=@Nota " +
+                " INNER JOIN " +
+                "" +
+                "WHERE Id=@Id AND EstadoAlerta <> 'Resuelta' ", con))
+            {
+                cmd.Parameters.AddWithValue("@Id", id);
+                cmd.Parameters.AddWithValue("@UsuarioId", usuarioid);
+                cmd.Parameters.AddWithValue("@Nota", nota);
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
                 con.Open();
                 cmd.ExecuteNonQuery();
             }
