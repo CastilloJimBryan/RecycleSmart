@@ -26,6 +26,7 @@ namespace RecycleSmartBE
 
         public string ContenedorNombre {  get; set; }=string.Empty;
         public string InstitucionNombre { get; set; }=string.Empty;
+        public string UsuarioGestionNombre { get; set; }=string.Empty;
 
     }
 }

@@ -105,33 +105,122 @@ namespace RecycleSmartDAL
 
         public List<Alerta> ListarxEmpresa(int empresaid, bool resuelta)
         {
-
+            List<Alerta> listar=new List<Alerta>();
+            string Filtar = resuelta ? " AND EstadoAlerta = 'Resuelta' OrderBy FechaResolucion DESC " : " AND EstadoAlerta<>'Resuelta' ORDER BY CASE TipoSeveridad WHEN 'Critico' THEN 0 ELSE 1 END , FechaCreacion DESC ";
+            
+            using (var conec = new SqlConnection(_Conectar))
+            {
+                using (var cmd = new SqlCommand())
+                {
+                    cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                    conec.Open();
+                    using(var leer=cmd.ExecuteReader())
+                    {
+                        while (leer.Read())
+                        {
+                            listar.Add(new Alerta
+                            {
+                                Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                                Mensaje = leer.GetString(leer.GetOrdinal("Mensaje")),
+                                FechaCreacion = leer.GetDateTime(leer.GetOrdinal("FechaCreacion")),
+                                FechaActualizacion = leer.IsDBNull(leer.GetOrdinal("FechaActualizacion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaActualizacion")),
+                                FechaResolucion = leer.IsDBNull(leer.GetOrdinal("FechaResolucion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaResolucion")),
+                                TipoAlerta = Enum.Parse<TipoEstado.TipoAlerta>(leer.GetString(leer.GetOrdinal("TipoAlerta")), true),
+                                TipoSeveridad = Enum.Parse<TipoEstado.Severidad>(leer.GetString(leer.GetOrdinal("TipoSeveridad")), true),
+                                EstadoAlerta = Enum.Parse<TipoEstado.EstadoAlerta>(leer.GetString(leer.GetOrdinal("EstadoAlerta")), true),
+                                ValorDetectado = leer.GetDecimal(leer.GetOrdinal("ValorDetectado")),
+                                ValorUmbral = leer.GetDecimal(leer.GetOrdinal("ValorUmbral")),
+                                NotaResolucion = leer.IsDBNull(leer.GetOrdinal("NotaResolucion")) ? null : leer.GetString(leer.GetOrdinal("NotaResolucion")),
+                                ResueltaAutomaticamente = leer.GetBoolean(leer.GetOrdinal("ResueltaAutomaticamente")),
+                                ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
+                                ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
+                                InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
+                                InstitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre")),
+                                UsuarioGestionId = leer.IsDBNull(leer.GetOrdinal("UsuarioGestionId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioGestionId"))
+                            });
+                        }
+                    }
+                    return listar;
+                }
+            }
         }
 
         public Alerta? BuscarXId(int id, int empresaid)
         {
-
+            using (var conec = new SqlConnection(_Conectar))
+            {
+                using (var cmd = new SqlCommand("",conec))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                    conec.Open();
+                    using (var leer = cmd.ExecuteReader())
+                    {
+                        while (leer.Read())
+                        {
+                            return new Alerta
+                            {
+                                Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                                Mensaje = leer.GetString(leer.GetOrdinal("Mensaje")),
+                                FechaCreacion = leer.GetDateTime(leer.GetOrdinal("FechaCreacion")),
+                                FechaActualizacion = leer.IsDBNull(leer.GetOrdinal("FechaActualizacion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaActualizacion")),
+                                FechaResolucion = leer.IsDBNull(leer.GetOrdinal("FechaResolucion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaResolucion")),
+                                TipoAlerta = Enum.Parse<TipoEstado.TipoAlerta>(leer.GetString(leer.GetOrdinal("TipoAlerta")), true),
+                                TipoSeveridad = Enum.Parse<TipoEstado.Severidad>(leer.GetString(leer.GetOrdinal("TipoSeveridad")), true),
+                                EstadoAlerta = Enum.Parse<TipoEstado.EstadoAlerta>(leer.GetString(leer.GetOrdinal("EstadoAlerta")), true),
+                                ValorDetectado = leer.GetDecimal(leer.GetOrdinal("ValorDetectado")),
+                                ValorUmbral = leer.GetDecimal(leer.GetOrdinal("ValorUmbral")),
+                                NotaResolucion = leer.IsDBNull(leer.GetOrdinal("NotaResolucion")) ? null : leer.GetString(leer.GetOrdinal("NotaResolucion")),
+                                ResueltaAutomaticamente = leer.GetBoolean(leer.GetOrdinal("ResueltaAutomaticamente")),
+                                ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
+                                ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
+                                InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
+                                InstitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre")),
+                                UsuarioGestionId = leer.IsDBNull(leer.GetOrdinal("UsuarioGestionId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioGestionId"))
+                            };
+                        }
+                    }
+                    return null;
+                }
+            }
         }
         
         public int Tomar(int id,int usuarioid,int empresaid)
         {
 
+            using (var conec = new SqlConnection(_Conectar))
+            {
+                using (var cmd = new SqlCommand("UPDATE Alerta SET EstadoAlerta='EnGestion',UsuarioGestionId=@UsuarioId,FechaActualizacion=GETDATE() " +
+                    " FROM Alerta " +
+                    " INNER JOIN Contenedor ON Contenedor.Id=Alerta.ContenedorId " +
+                    " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                    " WHERE Alerta.Id=@Id AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND Alerta.EstadoAlerta='Activa'",conec))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@UsuarioId", usuarioid);
+                    cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                    conec.Open();
+                    
+                    return cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         public int Resolver(int id,int usuarioid,string nota,int empresaid)
         {
             using (var con = new SqlConnection(_Conectar))
             using (var cmd = new SqlCommand("UPDATE Alerta SET EstadoAlerta='Resuelta',FechaResolucion=GETDATE(),ResueltaAutomaticamente=0,UsuarioGestionId=@UsuarioId,NotaResolucion=@Nota " +
-                " INNER JOIN " +
-                "" +
-                "WHERE Id=@Id AND EstadoAlerta <> 'Resuelta' ", con))
+                " FROM Alerta " +
+                " INNER JOIN Contenedor ON Contenedor.Id= Alerta.ContenedorId " +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                " WHERE Alerta.Id=@Id AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND Alerta.EstadoAlerta <> 'Resuelta' ", con))
             {
                 cmd.Parameters.AddWithValue("@Id", id);
                 cmd.Parameters.AddWithValue("@UsuarioId", usuarioid);
                 cmd.Parameters.AddWithValue("@Nota", nota);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
                 con.Open();
-                cmd.ExecuteNonQuery();
+                return cmd.ExecuteNonQuery();
             }
         }
     }
