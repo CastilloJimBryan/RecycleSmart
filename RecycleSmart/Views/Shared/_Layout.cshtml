@@ -82,6 +82,7 @@
                             <a asp-controller="Alertas" asp-action="Index" class="sidebar-link">
                                 <i class='bx bx-bell'></i>
                                 <span>Alertas</span>
+                                @await Component.InvokeAsync("ContadorAlertas")
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -218,6 +219,16 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/sidebar.js" asp-append-version="true"></script>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="contenedor-avisos"></div>
+
+    ... tus scripts actuales (jquery, bootstrap, site.js) ...
+
+    @if (tipoCuenta == TipoDeCuenta.EmpresaLogistica)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+        <script src="~/js/monitoreo.js" asp-append-version="true"></script>
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

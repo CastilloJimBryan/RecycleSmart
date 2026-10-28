@@ -4,6 +4,7 @@ using MQTTnet.Client;
 using RecycleSmart.HUB;
 using RecycleSmartBE;
 using RecycleSmartBLL;
+using System.Numerics;
 using System.Text;
 using System.Text.Json;
 
@@ -14,6 +15,7 @@ namespace RecycleSmart.Servicios
         private readonly IConfiguration _config;
         private readonly ILogger<MotorIoT> _log;
         private readonly TelemetriaBL _telemetriabl;
+        private readonly AlertaBL _alerta;
 
         private static readonly JsonSerializerOptions _json = new() { PropertyNameCaseInsensitive = true };
         private readonly IHubContext<MonitoreoHubs> _hub;
@@ -23,6 +25,7 @@ namespace RecycleSmart.Servicios
             _log = log;
             _telemetriabl = new TelemetriaBL(confi.GetConnectionString("BDTFI")!);
             _hub = hub;
+            _alerta = new AlertaBL(confi.GetConnectionString("BDTFI")!);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellation)
@@ -67,7 +70,6 @@ namespace RecycleSmart.Servicios
         {
             try
             {
-                // recyclesmart/AA:BB:CC:DD:AA:12/telemetria → la MAC es la parte del medio
                 var partes = topic.Split('/');
                 if (partes.Length != 3)
                     throw new Exception($"Topic inválido: {topic}");
@@ -76,14 +78,9 @@ namespace RecycleSmart.Servicios
                               ?? throw new Exception("El mensaje está vacío.");
 
                 var t = _telemetriabl.ProcesarLectura(partes[1], lectura);
-                _log.LogInformation("Lectura {Id}: contenedor {Contenedor}, nivel {Nivel}%",
-                                    t.Id, t.ContenedorId, t.Nivel);
-
-                foreach (var a in t.ALertasNuevas)
-                    _log.LogWarning("ALERTA {Severidad} ({Tipo}) en contenedor {Contenedor}: {Mensaje}",
-                                    a.TipoSeveridad, a.TipoAlerta, a.ContenedorId, a.Mensaje);
-
-                await _hub.Clients.Group($"Empresa-{t.EmpresaLogisticaId}").SendAsync("NuevaLectura", new
+                _log.LogInformation("Lectura {Id}: contenedor {Contenedor}, nivel {Nivel}%",t.Id, t.ContenedorId, t.Nivel);
+                string grupo = $"empresa-{t.EmpresaLogisticaId}";
+                await _hub.Clients.Group(grupo).SendAsync("NuevaLectura", new
                 {
                     contenedorId=t.ContenedorId,
                     nivel=t.Nivel,
@@ -91,6 +88,24 @@ namespace RecycleSmart.Servicios
                     fecha=t.FechaHora.ToString("dd/MM HH:mm"),
                     clase=t.Clasificacion.ToString()
                 });
+                foreach (var a in t.ALertasNuevas)
+                {
+
+                    _log.LogWarning("ALERTA {Severidad} ({Tipo}) en contenedor {Contenedor}: {Mensaje}",
+                                        a.TipoSeveridad, a.TipoAlerta, a.ContenedorId, a.Mensaje);
+                    var completa = _alerta.BuscarxId(a.Id, t.EmpresaLogisticaId);
+                    if (completa == null) continue;
+                    await _hub.Clients.Group(grupo).SendAsync("NuevaAlerta", new
+                    {
+                        id = completa.Id,
+                        severidad = completa.TipoSeveridad.ToString(),
+                        tipo = completa.TipoAlerta.ToString(),
+                        mensaje = completa.Mensaje,
+                        contenedor = completa.ContenedorNombre,
+                        institucion = completa.InstitucionNombre
+                    });
+                }
+                await _hub.Clients.Group(grupo).SendAsync("AlertasAbiertas", _alerta.ContarAlertasAbiertas(t.EmpresaLogisticaId));
             }
             catch (JsonException)
             {
@@ -99,7 +114,6 @@ namespace RecycleSmart.Servicios
             catch (Exception ex)
             {
                 _log.LogWarning("{Mensaje}", ex.Message);
-               // _log.LogWarning(ex, "{Mensaje}", ex.Message);
             }
 
            

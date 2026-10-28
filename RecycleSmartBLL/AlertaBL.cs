@@ -29,7 +29,7 @@ namespace RecycleSmartBLL
             };
             decimal umbralnivel = setNivel == TipoEstado.Severidad.Critico ? u.NivelCritico : u.NivelAdvertencia;
             Procesar(t.ContenedorId, TipoEstado.TipoAlerta.Nivel, setNivel, t.Nivel, umbralnivel ,
-                $"Nivel de LLenado {t.Nivel}% (umbral{umbralnivel}%)",novedades);
+                $"Nivel de llenado {t.Nivel} % (umbral {umbralnivel}%)",novedades);
 
             TipoEstado.Severidad? sevtemp = null;
             if (t.Temperatura > u.TemperaturaMaxima + 5)
@@ -41,7 +41,7 @@ namespace RecycleSmartBLL
                 sevtemp = TipoEstado.Severidad.Advertencia; 
             }
             Procesar(t.ContenedorId, TipoEstado.TipoAlerta.Temperatura, sevtemp, t.Temperatura, u.TemperaturaMaxima,
-               $"Temperatura {t.Temperatura:0.0}°C (Maxima{u.TemperaturaMaxima:0.0}°C)", novedades);
+               $"Temperatura {t.Temperatura:0.0}°C (Maxima {u.TemperaturaMaxima: 0.0}°C)", novedades);
             return novedades;
         }
 
@@ -135,6 +135,10 @@ namespace RecycleSmartBLL
             {
                 throw new Exception("No se pudo resolver la alerta");
             }
+        }
+        public int ContarAlertasAbiertas(int empresaid)
+        {
+            return _alertaDAL.ContarAlertasAbiertas(empresaid);
         }
     }
 }

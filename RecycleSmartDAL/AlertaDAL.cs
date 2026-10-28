@@ -236,5 +236,21 @@ namespace RecycleSmartDAL
                 return cmd.ExecuteNonQuery();
             }
         }
+
+        public int ContarAlertasAbiertas(int empresaid)
+        {
+            using (var con = new SqlConnection(_Conectar))
+            using (var cmd = new SqlCommand(" SELECT COUNT(*) " +
+                " FROM Alerta " +
+                " INNER JOIN Contenedor ON Contenedor.Id= Alerta.ContenedorId " +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                " WHERE InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND Alerta.EstadoAlerta <> 'Resuelta' ", con))
+            {
+                
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                con.Open();
+                return (int) cmd.ExecuteScalar();
+            }
+        }
     }
 }

@@ -172,7 +172,6 @@ else
 }
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
     <script>
         const colores = {
             "Critico": "bg-danger",
@@ -180,12 +179,9 @@ else
             "Normal": "bg-success"
         };
 
-        const conexion = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/monitoreo")
-            .withAutomaticReconnect()
-            .build();
+       
 
-        conexion.on("NuevaLectura", l => {
+         conexionMonitoreo.on("NuevaLectura", l => {
             // ¿El contenedor está en esta pantalla? (puede ser de otra institución de la empresa)
             const celda = document.querySelector(`[data-nivel-contenedor="${l.contenedorId}"]`);
             if (!celda) return;
@@ -204,6 +200,5 @@ else
             setTimeout(() => celda.classList.remove("table-info"), 1500);
         });
 
-        conexion.start().catch(err => console.error("SignalR:", err));
     </script>
 }

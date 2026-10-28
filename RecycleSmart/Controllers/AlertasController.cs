@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using RecycleSmart.HUB;
 using RecycleSmartBE;
 using RecycleSmartBLL;
 
@@ -7,12 +9,13 @@ namespace RecycleSmart.Controllers
     public class AlertasController: Controller
     {
         private readonly AlertaBL _alertabl;
- 
 
-        public AlertasController(IConfiguration configuration)
+        private readonly IHubContext<MonitoreoHubs> _hub;
+        public AlertasController(IConfiguration configuration,IHubContext<MonitoreoHubs>hub)
         {
             string conectar = configuration.GetConnectionString("BDTFI")!;
             _alertabl=new AlertaBL(conectar);
+            _hub=hub;
        
         }
 
@@ -49,11 +52,12 @@ namespace RecycleSmart.Controllers
 
         [HttpPost]
 
-        public IActionResult Resolver(int id, string? nota)
+        public async Task<IActionResult> Resolver(int id, string? nota)
         {
             try
             {
                 _alertabl.Resolver(id,usuarioid,nota,empresaid) ;
+                await _hub.Clients.Group($"empresa-{empresaid}").SendAsync("AlertaAbiertas", _alertabl.ContarAlertasAbiertas(empresaid));
                 TempData["Mensaje"] = "Alerta Resuelta";
                 return RedirectToAction("Index");
             }

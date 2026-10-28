@@ -64,7 +64,7 @@ else
                             @item.ContenedorNombre
                         </td>
                         <td>
-                            @item.Mensaje
+                            @item.Mensaje 
                             <div> <small> Detectada @item.FechaCreacion.ToString("dd/MM HH:mm")</small> </div>
                             @if(resuelta)
                             {
@@ -111,6 +111,23 @@ else
                             }
                         </td>
                     </tr>
+                }
+                @section Scripts {
+                    @if (!resuelta)
+                    {
+                        <script>
+                                        // Cantidad de alertas abiertas que muestra esta tabla al cargar
+                                        let cantidadMostrada = @Model.Count;
+
+                                        // Se creó o se resolvió alguna → recargar
+                                        conexionMonitoreo.on("AlertasAbiertas", cantidad => {
+                                            if (cantidad !== cantidadMostrada) location.reload();
+                                        });
+
+                                        // Se escaló una alerta (misma cantidad, otra severidad) → recargar
+                                        conexionMonitoreo.on("NuevaAlerta", () => location.reload());
+                        </script>
+                    }
                 }
             </tbody>
         </table>
