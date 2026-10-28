@@ -86,5 +86,55 @@ namespace RecycleSmartBLL
                 novedades.Add(activa);
             }
         }
+
+        public Alerta BuscarxId(int id,int empresaid)
+        {
+            return _alertaDAL.BuscarXId(id, empresaid) ?? throw new Exception("La alerta no existe.");
+        }
+
+        public List<Alerta> ListarAlertasAbiertas(int empresaid)
+        {
+            return _alertaDAL.ListarxEmpresa(empresaid, false);
+        }
+
+        public List<Alerta>ListarAlertasResueltas(int empresaid)
+        {
+            return _alertaDAL.ListarxEmpresa(empresaid, false);
+        }
+
+        public void Tomar(int id,int usuarioid,int empresaid)
+        {
+            var alerta = BuscarxId(id, empresaid);
+            if (alerta.EstadoAlerta != TipoEstado.EstadoAlerta.Activa)
+            {
+                throw new Exception(alerta.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion
+                    ? $"Alerta Esta Siendo Gestionada Por {alerta.UsuarioGestionNombre}"
+                    : "Alerta Resuelta");
+            }
+            if(_alertaDAL.Tomar(id,usuarioid,empresaid)==0)
+            {
+                throw new Exception("No se Puede tomar alerta,ya la tomo otro usuario");
+            }
+
+        }
+
+        public void Resolver(int id,int usuarioid, string? nota,int empresaid)
+        {
+            var alerta = BuscarxId(id, empresaid);
+            if (alerta.EstadoAlerta == TipoEstado.EstadoAlerta.Resuelta)
+            {
+                throw new Exception("Alerta Resuelta");
+            }
+            nota=(nota??"").Trim();
+            if(nota.Length<10)
+            {
+                throw new Exception("La nota de resolucion debe tener un minimo de 10 caracteres");
+            }
+
+            if (_alertaDAL.Resolver(id, usuarioid, nota, empresaid) == 0)
+            {
+                throw new Exception("No se pudo resolver la alerta");
+            }
+        }
     }
 }
