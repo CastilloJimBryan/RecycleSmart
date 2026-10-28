@@ -1,0 +1,120 @@
+﻿@model List<Alerta>
+@{
+    ViewData["Title"] = "Centro de Alertas";
+
+    bool resuelta = (bool)ViewBag.Resuelta;
+
+    string Duracion(TimeSpan d) =>
+        d.TotalMinutes < 60 ? $"{(int)d.TotalMinutes} min"
+        : d.TotalHours < 24 ? $"{(int)d.TotalHours} h {d.Minutes} min"
+        : $"{(int)d.TotalDays} d {d.Hours} h";
+}
+
+<partial name="_Mensajes" />
+<h2>Centro de Alertas</h2>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a asp-action="Index" class="nav-link @(!resuelta ? "active" : "")">Abiertas</a>
+    </li>
+    <li class="nav-item">
+        <a asp-action="Index" class="nav-link @(resuelta ? "active" : "")" asp-route-resuelta="true">Resueltas</a>
+    </li>
+</ul>
+
+@if(Model.Count==0)
+{
+    <div class="alert alert-success">
+        @(resuelta? "Todavia no hay alertas Resueltas.":"No hay alertas Abiertas, Todo en orden")
+    </div>
+}
+else
+{
+    <div class="card shadow">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-success">
+                <tr>
+                    <th>Severidad</th>
+                    <th>Tipo Alerta</th>
+                    <th>Institucion</th>
+                    <th>Contenedor</th>
+                    <th>Detalle</th>
+                    <th>@(resuelta?"Duro":"Abierta hace ")</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    bool critico =item.TipoSeveridad==TipoEstado.Severidad.Critico;
+                    <tr class="@(critico && !resuelta ? "table-danger" : "")">
+                        <td>
+                            <div>
+                                <span class="badge @(critico ? "bg-danger" : "bg-warning text-dark")">@item.TipoSeveridad</span>
+                            </div>
+                        </td>
+                        <td>
+                            @item.TipoAlerta
+                        </td>
+                        <td>
+                            @item.InstitucionNombre
+                        </td>
+                        <td>
+                            @item.ContenedorNombre
+                        </td>
+                        <td>
+                            @item.Mensaje
+                            <div> <small> Detectada @item.FechaCreacion.ToString("dd/MM HH:mm")</small> </div>
+                            @if(resuelta)
+                            {
+                                <div>
+                                    <small>
+                                        @(item.ResueltaAutomaticamente ? "Se Normalizo sola " : $"Resolvio : {item.UsuarioGestionNombre}") 
+                                        @if (!string.IsNullOrEmpty(item.NotaResolucion)) { <text> .@item.NotaResolucion </text> }
+                                    </small>
+
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            @Duracion(item.Duracion)
+                        </td>
+                        <td>
+                            @switch (item.EstadoAlerta)
+                            {
+                                case TipoEstado.EstadoAlerta.Activa:
+                                   <span class="badge bg-danger">Activa</span>
+                                    break;
+                                case TipoEstado.EstadoAlerta.EnGestion:
+                                <span class="badge bg-light text-dark">En Gestion</span>
+                                <div>
+                                    <small class="text-muted">@item.UsuarioGestionNombre</small>
+                                </div>
+                                    break;
+                                default:
+                                <span class="badge bg-success">Resuelta</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end text-nowrap">
+                            @if(item.EstadoAlerta==TipoEstado.EstadoAlerta.Activa)
+                            {
+                                <form asp-action="Tomar" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn btn-outline-dark btn-sm">Tomar</button>
+                                </form>
+                            }
+                            @if(item.EstadoAlerta!=TipoEstado.EstadoAlerta.Resuelta)
+                            {
+                                <a asp-action="Resolver" asp-route-id="@item.Id" class="btn btn-outline-success btn-sm">Resolver</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+

@@ -106,11 +106,17 @@ namespace RecycleSmartDAL
         public List<Alerta> ListarxEmpresa(int empresaid, bool resuelta)
         {
             List<Alerta> listar=new List<Alerta>();
-            string Filtar = resuelta ? " AND EstadoAlerta = 'Resuelta' OrderBy FechaResolucion DESC " : " AND EstadoAlerta<>'Resuelta' ORDER BY CASE TipoSeveridad WHEN 'Critico' THEN 0 ELSE 1 END , FechaCreacion DESC ";
+            string Filtar = resuelta ? " AND EstadoAlerta = 'Resuelta' Order By FechaResolucion DESC " : " AND EstadoAlerta<>'Resuelta' ORDER BY CASE TipoSeveridad WHEN 'Critico' THEN 0 ELSE 1 END , FechaCreacion DESC ";
             
             using (var conec = new SqlConnection(_Conectar))
             {
-                using (var cmd = new SqlCommand())
+                using (var cmd = new SqlCommand("SELECT TOP 100 a.*, c.Nombre AS ContenedorNombre, i.Nombre AS InstitucionNombre, i.Id AS InstitucionId, " +
+        " u.Nombre + '  ' + u.Apellido AS UsuarioNombre " +
+        " FROM Alerta a " +
+        " INNER JOIN Contenedor c ON c.Id = a.ContenedorId " +
+        " INNER JOIN InstitucionCliente i ON i.Id = c.InstitucionId " +
+        " LEFT JOIN UsuarioEmpresaLogistica u ON u.Id = a.UsuarioGestionId " +
+        " WHERE i.EmpresaLogisticaId = @EmpresaId" + Filtar, conec))
                 {
                     cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
                     conec.Open();
@@ -136,7 +142,8 @@ namespace RecycleSmartDAL
                                 ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
                                 InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
                                 InstitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre")),
-                                UsuarioGestionId = leer.IsDBNull(leer.GetOrdinal("UsuarioGestionId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioGestionId"))
+                                UsuarioGestionId = leer.IsDBNull(leer.GetOrdinal("UsuarioGestionId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioGestionId")),
+                                UsuarioGestionNombre = leer.IsDBNull(leer.GetOrdinal("UsuarioNombre")) ? null : leer.GetString(leer.GetOrdinal("UsuarioNombre"))
                             });
                         }
                     }
@@ -149,7 +156,7 @@ namespace RecycleSmartDAL
         {
             using (var conec = new SqlConnection(_Conectar))
             {
-                using (var cmd = new SqlCommand(" SELECT Alerta.*, Contenedor.Nombre AS Contenedor,InstitucionCliente.Nombre AS Institucion,InstitucionCliente.Id AS InstitucionId,\r\nUsuarioEmpresaLogistica.Nombre+''+UsuarioEmpresaLogistica.Apellido AS UsuarioNombre " +
+                using (var cmd = new SqlCommand(" SELECT Alerta.*, Contenedor.Nombre AS Contenedor,InstitucionCliente.Nombre AS Institucion,InstitucionCliente.Id AS InstitucionId,UsuarioEmpresaLogistica.Nombre+'  '+UsuarioEmpresaLogistica.Apellido AS UsuarioNombre " +
                     " FROM Alerta " +
                     " INNER JOIN Contenedor ON Contenedor.Id=Alerta.ContenedorId" +
                     " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId" +
@@ -161,7 +168,7 @@ namespace RecycleSmartDAL
                     conec.Open();
                     using (var leer = cmd.ExecuteReader())
                     {
-                        while (leer.Read())
+                        if (leer.Read())
                         {
                             return new Alerta
                             {
@@ -181,7 +188,8 @@ namespace RecycleSmartDAL
                                 ContenedorNombre = leer.GetString(leer.GetOrdinal("Contenedor")),
                                 InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
                                 InstitucionNombre = leer.GetString(leer.GetOrdinal("Institucion")),
-                                UsuarioGestionId = leer.IsDBNull(leer.GetOrdinal("UsuarioNombre")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioGestionId"))
+                                UsuarioGestionId = leer.IsDBNull(leer.GetOrdinal("UsuarioGestionId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioGestionId")),
+                                UsuarioGestionNombre = leer.IsDBNull(leer.GetOrdinal("UsuarioNombre")) ? null : leer.GetString(leer.GetOrdinal("UsuarioNombre"))
                             };
                         }
                     }

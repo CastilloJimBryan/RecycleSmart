@@ -99,7 +99,7 @@ namespace RecycleSmartBLL
 
         public List<Alerta>ListarAlertasResueltas(int empresaid)
         {
-            return _alertaDAL.ListarxEmpresa(empresaid, false);
+            return _alertaDAL.ListarxEmpresa(empresaid, true);
         }
 
         public void Tomar(int id,int usuarioid,int empresaid)

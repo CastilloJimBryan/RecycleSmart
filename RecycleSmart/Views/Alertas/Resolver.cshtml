@@ -1,0 +1,42 @@
+﻿@model Alerta
+
+@{
+    ViewData["Title"] = "Resolver alerta";
+    bool critica = Model.TipoSeveridad == TipoEstado.Severidad.Critico;
+}
+
+<h2>Resolver Alerta</h2>
+
+<div class="card shadow-sm" style="max-width: 650px;">
+    <div class="card-body">
+        <partial name="_Error" />
+
+        <div class="mb-3">
+            <span class="badge @(critica ? "bg-danger" : "bg-warning text-dark")">@Model.TipoSeveridad</span>
+            <strong class="ms-1">@Model.InstitucionNombre · @Model.ContenedorNombre</strong>
+            <div>@Model.Mensaje</div>
+            <small class="text-muted">
+                Detectada @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                @if (Model.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion)
+                {
+                    <text> · En gestión: @Model.UsuarioGestionNombre</text>
+                }
+            </small>
+        </div>
+
+        <form asp-action="Resolver" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="mb-3">
+                <label class="form-label">¿Qué se hizo?</label>
+                <textarea name="nota" class="form-control" rows="4" maxlength="500" minlength="10" required
+                          placeholder="Ej: Se retiró el contenedor y se reemplazó por uno vacío.">@Model.NotaResolucion</textarea>
+                <div class="form-text">Mínimo 10 caracteres. Queda registrado con tu usuario y la hora.</div>
+            </div>
+            <div class="d-flex justify-content-between">
+
+            <button type="submit" class="btn btn-success">Marcar como resuelta</button>
+            <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
