@@ -17,6 +17,8 @@ namespace RecycleSmart.Servicios
         private readonly TelemetriaBL _telemetriabl;
         private readonly AlertaBL _alerta;
 
+        private IMqttClient? _mqttClient;
+        private readonly EventoAccesoBL _eventoAcceso;
         private static readonly JsonSerializerOptions _json = new() { PropertyNameCaseInsensitive = true };
         private readonly IHubContext<MonitoreoHubs> _hub;
         public MotorIoT(IConfiguration confi,ILogger<MotorIoT>log,IHubContext<MonitoreoHubs>hub)
@@ -26,6 +28,7 @@ namespace RecycleSmart.Servicios
             _telemetriabl = new TelemetriaBL(confi.GetConnectionString("BDTFI")!);
             _hub = hub;
             _alerta = new AlertaBL(confi.GetConnectionString("BDTFI")!);
+            _eventoAcceso = new EventoAccesoBL(confi.GetConnectionString("BDTFI")!);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellation)
@@ -33,9 +36,11 @@ namespace RecycleSmart.Servicios
             string host = _config["Mqtt:Host"]!;
             int port = int.Parse(_config["Mqtt:Port"]!);
             string topic = _config["Mqtt:TopicTelemetria"]!;
+            string topicrfid = _config["Mqtt:TopicRFID"]!;
 
             var factory = new MqttFactory();
             using var cliente = factory.CreateMqttClient();
+            _mqttClient = cliente;
 
             var opciones = new MqttClientOptionsBuilder()
                 .WithTcpServer(host, port)
@@ -54,8 +59,12 @@ namespace RecycleSmart.Servicios
                     if (!cliente.IsConnected)
                     {
                         await cliente.ConnectAsync(opciones, cancellation);
-                        await cliente.SubscribeAsync(topic, cancellationToken: cancellation);
-                        _log.LogInformation("Motor IoT conectado a {Host}, escuchando {Topic}", host, topic);
+
+                        var suscripcion=factory.CreateSubscribeOptionsBuilder()
+                            .WithTopicFilter(topic).WithTopicFilter(topicrfid).Build();
+
+                        await cliente.SubscribeAsync(suscripcion,cancellation);
+                        _log.LogInformation("Motor IoT conectado a {Host}, escuchando {Topic} y {TopicRFID}", host, topic,topicrfid);
                     }
                 }
                 catch (Exception ex) when (!cancellation.IsCancellationRequested)
@@ -70,42 +79,24 @@ namespace RecycleSmart.Servicios
         {
             try
             {
+                // recyclesmart/{mac}/{tipo}
                 var partes = topic.Split('/');
                 if (partes.Length != 3)
                     throw new Exception($"Topic inválido: {topic}");
 
-                var lectura = JsonSerializer.Deserialize<LecturaSensor>(json, _json)
-                              ?? throw new Exception("El mensaje está vacío.");
-
-                var t = _telemetriabl.ProcesarLectura(partes[1], lectura);
-                _log.LogInformation("Lectura {Id}: contenedor {Contenedor}, nivel {Nivel}%",t.Id, t.ContenedorId, t.Nivel);
-                string grupo = $"empresa-{t.EmpresaLogisticaId}";
-                await _hub.Clients.Group(grupo).SendAsync("NuevaLectura", new
+                string mac = partes[1];
+                switch (partes[2])
                 {
-                    contenedorId=t.ContenedorId,
-                    nivel=t.Nivel,
-                    temperatura=t.Temperatura.ToString("0.0"),
-                    fecha=t.FechaHora.ToString("dd/MM HH:mm"),
-                    clase=t.Clasificacion.ToString()
-                });
-                foreach (var a in t.ALertasNuevas)
-                {
-
-                    _log.LogWarning("ALERTA {Severidad} ({Tipo}) en contenedor {Contenedor}: {Mensaje}",
-                                        a.TipoSeveridad, a.TipoAlerta, a.ContenedorId, a.Mensaje);
-                    var completa = _alerta.BuscarxId(a.Id, t.EmpresaLogisticaId);
-                    if (completa == null) continue;
-                    await _hub.Clients.Group(grupo).SendAsync("NuevaAlerta", new
-                    {
-                        id = completa.Id,
-                        severidad = completa.TipoSeveridad.ToString(),
-                        tipo = completa.TipoAlerta.ToString(),
-                        mensaje = completa.Mensaje,
-                        contenedor = completa.ContenedorNombre,
-                        institucion = completa.InstitucionNombre
-                    });
+                    case "telemetria":
+                        await ProcesarTelemetria(mac, json);
+                        break;
+                    case "rfid":
+                        await ProcesarRFID(mac, json);
+                        break;
+                    default:
+                        _log.LogWarning("Topic no reconocido: {Topic}", topic);
+                        break;
                 }
-                await _hub.Clients.Group(grupo).SendAsync("AlertasAbiertas", _alerta.ContarAlertasAbiertas(t.EmpresaLogisticaId));
             }
             catch (JsonException)
             {
@@ -113,11 +104,89 @@ namespace RecycleSmart.Servicios
             }
             catch (Exception ex)
             {
-                _log.LogWarning("{Mensaje}", ex.Message);
+                _log.LogWarning(ex, "{Mensaje}", ex.Message);
             }
 
-           
-        }
 
+        }
+        private  async Task AvisarAlertas(List<Alerta> alertaList, int empresaId)
+        {
+            string grupo = $"empresa-{empresaId}";
+
+            foreach (var a in alertaList)
+            {
+
+                _log.LogWarning("ALERTA {Severidad} ({Tipo}) en contenedor {Contenedor}: {Mensaje}",
+                                    a.TipoSeveridad, a.TipoAlerta, a.ContenedorId, a.Mensaje);
+                var completa = _alerta.BuscarxId(a.Id, empresaId);
+                if (completa == null) continue;
+                await _hub.Clients.Group(grupo).SendAsync("NuevaAlerta", new
+                {
+                    id = completa.Id,
+                    severidad = completa.TipoSeveridad.ToString(),
+                    tipo = completa.TipoAlerta.ToString(),
+                    mensaje = completa.Mensaje,
+                    contenedor = completa.ContenedorNombre,
+                    institucion = completa.InstitucionNombre
+                });
+            }
+            await _hub.Clients.Group(grupo).SendAsync("AlertasAbiertas", _alerta.ContarAlertasAbiertas(empresaId));
+        }
+        private async Task ProcesarTelemetria(string mac,string json)
+        {
+            var lectura = JsonSerializer.Deserialize<LecturaSensor>(json, _json)
+                              ?? throw new Exception("El mensaje está vacío.");
+
+            var t = _telemetriabl.ProcesarLectura(mac, lectura);
+            _log.LogInformation("Lectura {Id}: contenedor {Contenedor}, nivel {Nivel}%", t.Id, t.ContenedorId, t.Nivel);
+            string grupo = $"empresa-{t.EmpresaLogisticaId}";
+            await _hub.Clients.Group(grupo).SendAsync("NuevaLectura", new
+            {
+                contenedorId = t.ContenedorId,
+                nivel = t.Nivel,
+                temperatura = t.Temperatura.ToString("0.0"),
+                fecha = t.FechaHora.ToString("dd/MM HH:mm"),
+                clase = t.Clasificacion.ToString()
+            });
+
+            await AvisarAlertas(t.ALertasNuevas, t.EmpresaLogisticaId);
+        }
+        private async Task ProcesarRFID(string mac,string json)
+        {
+            var lectura = JsonSerializer.Deserialize<LecturaRFID>(json, _json)
+              ?? throw new Exception("El mensaje está vacío.");
+
+            var e = _eventoAcceso.ProcesarAcceso(mac, lectura);
+            _log.LogInformation("Acceso {Resultado} en contenedor {Contenedor}: {Motivo} (UID {Uid})",
+                                e.EstadoAcceso, e.ContenedorId, e.Motivo, e.UIDLeido);
+
+            // 1) Responderle al lector: abrir (LED verde) o denegar (LED rojo)
+            var respuesta = JsonSerializer.Serialize(new
+            {
+                acceso = e.Permitido,
+                motivo = e.Motivo.ToString(),
+                usuario = e.Permitido ? e.UsuarioNombre : null
+            });
+            var mensaje = new MqttApplicationMessageBuilder()
+                .WithTopic($"recyclesmart/{mac}/rfid/respuesta")
+                .WithPayload(respuesta)
+                .Build();
+            if (_mqttClient != null && _mqttClient.IsConnected)
+                await _mqttClient.PublishAsync(mensaje);
+
+            // 2) Avisar a la pantalla
+            await _hub.Clients.Group($"empresa-{e.EmpresaLogisticaId}").SendAsync("NuevoAcceso", new
+            {
+                contenedorId = e.ContenedorId,
+                permitido = e.Permitido,
+                motivo = AlertaBL.MotivoText(e.Motivo),
+                usuario = e.UsuarioNombre,
+                uid = e.UIDLeido,
+                fecha = e.Fecha.ToString("dd/MM HH:mm:ss")
+            });
+
+            // 3) Si se denegó y se creó o escaló la alerta, aviso emergente y contador
+            await AvisarAlertas(e.AlertasNuevas, e.EmpresaLogisticaId);
+        }
     }
 }
