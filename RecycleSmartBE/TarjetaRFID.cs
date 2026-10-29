@@ -19,5 +19,8 @@ namespace RecycleSmartBE
         public int UsuarioInstitucionId {  get; set; }
         public List<int> ContenedoresId { get; set; } = new();
 
+        public TipoEstado.Estados EstadoUsuario {  get; set; }
+        public string? UsuarioNombre {  get; set; }=string.Empty;
+
     }
 }

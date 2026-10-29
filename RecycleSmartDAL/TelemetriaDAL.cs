@@ -105,5 +105,18 @@ namespace RecycleSmartDAL
             return listar;
         }
 
+        public int? UltimoNivelContenedor(int contenedorid)
+        {
+            using(var con=new SqlConnection(_Conectar))
+            using(var cmd= new SqlCommand("SELECT TOP 1 Nivel FROM Telemetria WHERE ContenedorId=@ContenedorId" +
+                " ORDER BY FechaHora DESC, Id DESC ",con))
+            {
+                cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
+                con.Open();
+
+                var resultado=cmd.ExecuteScalar();
+                return resultado == null ? null : Convert.ToInt32(resultado);
+            }
+        }
     }
 }

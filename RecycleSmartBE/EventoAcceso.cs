@@ -22,5 +22,7 @@ namespace RecycleSmartBE
         public int EmpresaLogisticaId { get; set; }
 
         public bool Permitido => EstadoAcceso == TipoEstado.EstadoAcceso.Permitido;
+
+        public List<Alerta> AlertasNuevas { get; set; } = new();
     }
 }

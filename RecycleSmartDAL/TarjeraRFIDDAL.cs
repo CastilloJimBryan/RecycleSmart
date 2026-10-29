@@ -2,8 +2,10 @@
 using RecycleSmartBE;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using static RecycleSmartBE.DiasSemana;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RecycleSmartDAL
 {
@@ -126,27 +128,38 @@ namespace RecycleSmartDAL
             }
         }
 
-        public TarjetaRFID? BuscarActivoxUID(string uid)
+        public TarjetaRFID? BuscarTarjetaxUID(string uid)
         {
             TarjetaRFID? tarjeta= null;
             using (var con = new SqlConnection(_conectar))
             {
                 con.Open();
-                using (var cmd = new SqlCommand("", con))
+                using (var cmd = new SqlCommand("SELECT TarjetaRFID .*, UsuarioInstitucion.Estado AS UsuarioEstado, UsuarioInstitucion.Apellido + ', ' + UsuarioInstitucion.Nombre AS UsuarioNombre "+
+                    " FROM TarjetaRFID  INNER JOIN UsuarioInstitucion  ON  UsuarioInstitucion.Id = TarjetaRFID.UsuarioInstitucionId "+
+                    " WHERE TarjetaRFID.UID = @UID AND TarjetaRFID.Estado<> 'Baja'", con))
                 {
-                    cmd.Parameters.AddWithValue("uid", uid);
+                    cmd.Parameters.AddWithValue("@UID", uid);
                     using (var leer = cmd.ExecuteReader())
                     {
-                        if (leer.Read())
+                        if (!leer.Read()) return null;
+                        tarjeta = new TarjetaRFID
                         {
-                            tarjeta = new TarjetaRFID
-                            {
+                            Id= leer.GetInt32(leer.GetOrdinal("Id")),
+                            UID=leer.GetString(leer.GetOrdinal("UID")),
+                            FechaVecimiento=leer.GetDateTime(leer.GetOrdinal("FechaVencimiento")),
+                            DiasHabilitados=(DiasSemana.DiaSemana)leer.GetInt32(leer.GetOrdinal("DiasHabilitados")),
+                            HoraInicio=leer.GetTimeSpan(leer.GetOrdinal("HoraInicio")),
+                            HoraFin=leer.GetTimeSpan(leer.GetOrdinal("HoraFin")),
+                            TipoEstado=Enum.Parse<TipoEstado.Estados>(leer.GetString(leer.GetOrdinal("Estado")),true),
+                            EstadoUsuario= Enum.Parse<TipoEstado.Estados>(leer.GetString(leer.GetOrdinal("UsuarioEstado")),true),
+                            UsuarioInstitucionId=leer.GetInt32(leer.GetOrdinal("UsuarioInstitucionId")),
+                            UsuarioNombre=leer.GetString(leer.GetOrdinal("UsuarioNombre"))
+                        };
 
-                            };
-                        }
                     }
 
-                    using (var cmds = new SqlCommand("", con))
+                    using (var cmds = new SqlCommand("SELECT ContenedorId FROM Contenedor_Tarjeta " +
+                        " WHERE TarjetaRFIDId=@TarjetaId ", con))
                     {
                         cmds.Parameters.AddWithValue("@TarjetaId", tarjeta.Id);
                         using (var leer = cmds.ExecuteReader())
@@ -158,7 +171,7 @@ namespace RecycleSmartDAL
                         }
                     }
                 }
-                return null;
+                return tarjeta;
             }
         }
     }

@@ -48,7 +48,6 @@ namespace RecycleSmartBLL
         private void Procesar(int contenedorId,TipoEstado.TipoAlerta tipoalerta,TipoEstado.Severidad?severidad,decimal valor,decimal valorumbral,string mensaje,List<Alerta> novedades)
         {
             var activa = _alertaDAL.BuscarAlertaActiva(contenedorId, tipoalerta);
-            //System.Diagnostics.Debug.WriteLine($"DEBUG contenedor={contenedorId} tipo={tipoalerta} abierta={(activa?.Id.ToString() ?? "NINGUNA")}");
             if (severidad is null)
             {
                 if(activa!=null)
@@ -140,5 +139,27 @@ namespace RecycleSmartBLL
         {
             return _alertaDAL.ContarAlertasAbiertas(empresaid);
         }
+
+        public List<Alerta> RegistrarAccesoDenegado(int contenedorid, TipoEstado.MotivoAcceso motivo, string uid)
+        {
+            var novedad = new List<Alerta>();
+
+            var severidad = motivo == TipoEstado.MotivoAcceso.TarjetaDesconocida ? TipoEstado.Severidad.Critico : TipoEstado.Severidad.Advertencia;
+
+            Procesar(contenedorid, TipoEstado.TipoAlerta.AccesoNoAutorizado, severidad, 0, 0,
+                $"Acceso Denegado: {MotivoText (motivo)} (UID {uid})", novedad);
+            return novedad;
+        }
+
+        public static string MotivoText(TipoEstado.MotivoAcceso m)
+            => m switch
+            {
+                TipoEstado.MotivoAcceso.TarjetaDesconocida=>"Tarjeta Desconocida",
+                TipoEstado.MotivoAcceso.TarjetaVencida=>"Tarjeta Vencida",
+                TipoEstado.MotivoAcceso.TarjetaInactiva=>"Tarjeta Inactiva",
+                TipoEstado.MotivoAcceso.FueraHorario=>"Fuera de Horario",
+                TipoEstado.MotivoAcceso.ContenedorNoHabilitado=>"Contenedor No Habilitado",
+                _=>"Acceso Permitido"
+            };
     }
 }

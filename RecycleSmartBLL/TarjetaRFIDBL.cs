@@ -38,7 +38,7 @@ namespace RecycleSmartBLL
             }
         }
 
-        private static string NormalizarUID(string? uid)
+        public static string NormalizarUID(string? uid)
         {
             var limpio = new string((uid ?? "").Where(c => !char.IsWhiteSpace(c) && c != ':' && c != '-').ToArray()).ToUpperInvariant();
             return limpio.Length == 8 && limpio.All(Uri.IsHexDigit) ? limpio : "";
