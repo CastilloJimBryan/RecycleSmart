@@ -58,7 +58,7 @@ namespace RecycleSmartBLL
             var tarjeta = uid == "" ? null : _tarjetarefidDAL.BuscarTarjetaxUID(uid);
             evento.Motivo = Validar(tarjeta, dispositivo.ContenedorId, fechaActual);
 
-            if(tarjeta!= null)
+            if (tarjeta != null)
             {
                 evento.TarjetaRfidId = tarjeta.Id;
                 evento.UsuarioInstitucionId = tarjeta.UsuarioInstitucionId;
@@ -67,24 +67,24 @@ namespace RecycleSmartBLL
 
             evento.EstadoAcceso = evento.Motivo == TipoEstado.MotivoAcceso.Autorizado ? TipoEstado.EstadoAcceso.Permitido : TipoEstado.EstadoAcceso.Denegado;
             evento.Id = _eventoAccesoDAL.Registrar(evento);
-            if(!evento.Permitido)
+            if (!evento.Permitido)
             {
                 evento.AlertasNuevas = _alertaBL.RegistrarAccesoDenegado(evento.ContenedorId, evento.Motivo, uidleida);
             }
             return evento;
         }
 
-        private static TipoEstado.MotivoAcceso Validar(TarjetaRFID? tarjeta,int contenedorid,DateTime actual)
+        private static TipoEstado.MotivoAcceso Validar(TarjetaRFID? tarjeta, int contenedorid, DateTime actual)
         {
             //aca se pregunta si existe
 
-            if(tarjeta == null)
+            if (tarjeta == null)
             {
                 return TipoEstado.MotivoAcceso.TarjetaDesconocida;
             }
             //si usuario y la tarjeta estan activas
 
-            if(tarjeta.TipoEstado!=TipoEstado.Estados.Activo || tarjeta.EstadoUsuario!=TipoEstado.Estados.Activo)
+            if (tarjeta.TipoEstado != TipoEstado.Estados.Activo || tarjeta.EstadoUsuario != TipoEstado.Estados.Activo)
             {
                 return TipoEstado.MotivoAcceso.TarjetaInactiva;
             }
@@ -97,14 +97,14 @@ namespace RecycleSmartBLL
 
             //sigue vigente
 
-            if(tarjeta.FechaVecimiento.Date<actual.Date)
+            if (tarjeta.FechaVecimiento.Date < actual.Date)
             {
                 return TipoEstado.MotivoAcceso.TarjetaVencida;
             }
 
             //horario permitido
 
-            if(!tarjeta.DiasHabilitados.HasFlag(DiaActual(actual))|| actual.TimeOfDay<tarjeta.HoraInicio ||
+            if (!tarjeta.DiasHabilitados.HasFlag(DiaActual(actual)) || actual.TimeOfDay < tarjeta.HoraInicio ||
                 actual.TimeOfDay > tarjeta.HoraFin)
             {
                 return TipoEstado.MotivoAcceso.FueraHorario;
@@ -115,13 +115,18 @@ namespace RecycleSmartBLL
         public static DiasSemana.DiaSemana DiaActual(DateTime fecha)
             => fecha.DayOfWeek switch
             {
-                DayOfWeek.Monday=>DiasSemana.DiaSemana.Lunes,
-                DayOfWeek.Tuesday=>DiasSemana.DiaSemana.Martes,
-                DayOfWeek.Wednesday=>DiasSemana.DiaSemana.Miercoles,
-                DayOfWeek.Thursday=>DiasSemana.DiaSemana.Jueves,
-                DayOfWeek.Friday=>DiasSemana.DiaSemana.Viernes,
-                DayOfWeek.Saturday=>DiasSemana.DiaSemana.Sabado,
-                _=>DiasSemana.DiaSemana.Domingo
+                DayOfWeek.Monday => DiasSemana.DiaSemana.Lunes,
+                DayOfWeek.Tuesday => DiasSemana.DiaSemana.Martes,
+                DayOfWeek.Wednesday => DiasSemana.DiaSemana.Miercoles,
+                DayOfWeek.Thursday => DiasSemana.DiaSemana.Jueves,
+                DayOfWeek.Friday => DiasSemana.DiaSemana.Viernes,
+                DayOfWeek.Saturday => DiasSemana.DiaSemana.Sabado,
+                _ => DiasSemana.DiaSemana.Domingo
             };
+
+        public List<EventoAcceso> ListarXEmpresa(int empresaid,int institucionid,bool solodenegados)
+        {
+            return _eventoAccesoDAL.ListarXEmpresa(empresaid, institucionid, solodenegados);
+        }
     }
 }
