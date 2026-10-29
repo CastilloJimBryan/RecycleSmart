@@ -125,5 +125,41 @@ namespace RecycleSmartDAL
 
             }
         }
+
+        public TarjetaRFID? BuscarActivoxUID(string uid)
+        {
+            TarjetaRFID? tarjeta= null;
+            using (var con = new SqlConnection(_conectar))
+            {
+                con.Open();
+                using (var cmd = new SqlCommand("", con))
+                {
+                    cmd.Parameters.AddWithValue("uid", uid);
+                    using (var leer = cmd.ExecuteReader())
+                    {
+                        if (leer.Read())
+                        {
+                            tarjeta = new TarjetaRFID
+                            {
+
+                            };
+                        }
+                    }
+
+                    using (var cmds = new SqlCommand("", con))
+                    {
+                        cmds.Parameters.AddWithValue("@TarjetaId", tarjeta.Id);
+                        using (var leer = cmds.ExecuteReader())
+                        {
+                            while (leer.Read())
+                            {
+                                tarjeta.ContenedoresId.Add(leer.GetInt32(0));
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+        }
     }
 }
