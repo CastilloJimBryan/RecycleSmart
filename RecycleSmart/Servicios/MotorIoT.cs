@@ -148,7 +148,10 @@ namespace RecycleSmart.Servicios
                 fecha = t.FechaHora.ToString("dd/MM HH:mm"),
                 clase = t.Clasificacion.ToString()
             });
-
+            if(t.CompletoAcceso)
+            {
+                await _hub.Clients.Group(grupo).SendAsync("NuevoAcceso", new { ContenedorId = t.ContenedorId });
+            }
             await AvisarAlertas(t.ALertasNuevas, t.EmpresaLogisticaId);
         }
         private async Task ProcesarRFID(string mac,string json)

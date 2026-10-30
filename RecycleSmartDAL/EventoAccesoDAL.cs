@@ -78,11 +78,50 @@ namespace RecycleSmartDAL
                             UsuarioInstitucionId=leer.IsDBNull("UsuarioInstitucionId")?null:leer.GetInt32(leer.GetOrdinal("UsuarioInstitucionId")),
                             UsuarioNombre=leer.IsDBNull("UsuarioNombre")?null:leer.GetString(leer.GetOrdinal("UsuarioNombre")),
                             InstitucionNombre=leer.GetString(leer.GetOrdinal("InstitucionNombre")),
-                            ContenedorNombre=leer.GetString(leer.GetOrdinal("ContenedorNombre"))
+                            ContenedorNombre=leer.GetString(leer.GetOrdinal("ContenedorNombre")),
+                            NivelPosterior=leer.IsDBNull("NivelPosterior")?null:leer.GetInt32(leer.GetOrdinal("NivelPosterior")),
+                            VolumenDepositado=leer.IsDBNull("VolumenDepositado")?null:leer.GetDecimal(leer.GetOrdinal("VolumenDepositado"))
                         });
                     }
                 }
                 return listar;
+            }
+        }
+
+        public (long Id, int NivelPrevio, int Capacidad)? BuscarPendienteDeCierre(int contenedorId, DateTime dateTime)
+        {
+            using (var con = new SqlConnection(_conectar))
+            using(var cmd=new SqlCommand("SELECT TOP 1 e.Id, e.NivelPrevio, c.CapacidadLitros FROM EventoAcceso e " +
+                " INNER JOIN Contenedor c ON c.Id = e.ContenedorId " +
+                " WHERE e.ContenedorId = @ContenedorId AND e.EstadoAcceso = 'Permitido' " +
+                " AND e.NivelPosterior IS NULL AND e.NivelPrevio IS NOT NULL AND e.Fecha >= @Inicio " +
+                " ORDER BY e.Fecha DESC", con))
+            {
+                cmd.Parameters.AddWithValue("@ContenedorId", contenedorId);
+                cmd.Parameters.AddWithValue("@Inicio", dateTime);
+                con.Open();
+
+                using(var leer=cmd.ExecuteReader())
+                {
+                    if (!leer.Read()) return null;
+                    return (Convert.ToInt64(leer["Id"]), leer.GetInt32(1), leer.GetInt32(2));
+                }
+            }
+        }
+
+        public void CompletarCierre(long id,int nivelposterior,decimal volumen)
+        {
+            using (var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand("UPDATE EventoAcceso" +
+                " SET NivelPosterior=@NivelPosterior , VolumenDepositado=@VolumenDepositado " +
+                " WHERE Id=@Id", con))
+            {
+                cmd.Parameters.AddWithValue("@Id",id);
+                cmd.Parameters.AddWithValue("@NivelPosterior",nivelposterior);
+                cmd.Parameters.AddWithValue("@VolumenDepositado",volumen);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
             }
         }
     }

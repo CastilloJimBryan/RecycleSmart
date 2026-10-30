@@ -18,6 +18,7 @@ namespace RecycleSmartBE
         public TipoEstado.ClasificacionLectura Clasificacion{  get; set; }
         public int EmpresaLogisticaId {  get; set; }
 
+        public bool CompletoAcceso {  get; set; }
         public List<Alerta> ALertasNuevas { get; set; } = new();
        
     }

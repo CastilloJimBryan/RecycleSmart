@@ -38,12 +38,13 @@ else
             <thead class="table-success">
                 <tr>
                     <th>Usuario</th>
-                    <th>TarjetaRFID</th>
                     <th>Institucion</th>
                     <th>Contenedor</th>
                     <th>Fecha</th>
                     <th>Motivo</th>
-                    <th>Nivel Previo</th>
+                    <th>Nivel Pre-Deposito</th>
+                    <th>Nivel Post-Deposito</th>
+                    <th>Volumen</th>
                     <th>Estado de Acceso</th>
                 </tr>
             </thead>
@@ -55,9 +56,9 @@ else
                     <tr class="@(desconocida ? "Table-Danger":"")">
                         <td>
                             @(item.UsuarioNombre??"Desconocido")
-                        </td>
-                        <td>
-                            <code>@item.UIDLeido</code>
+                            <div>
+                                <small class="text-muted"><code>@item.UIDLeido</code></small>
+                            </div>
                         </td>
                         <td>
                             @item.InstitucionNombre
@@ -65,17 +66,17 @@ else
                         <td>
                             @item.ContenedorNombre
                         </td>
-                        <td class="text-nowrap">
+                        <td>
                             @item.Fecha.ToString("dd/MM/yyyy HH:mm:ss")
                         </td>
                         <td>
                             @(permitido?"-": AlertaBL.MotivoText(item.Motivo))
                         </td>
-                        <td style="min-height: 110px;">
+                        <td style="min-width: 110px;">
                             @if (item.NivelPrevio.HasValue)
                             {
                                 <div class="progress" style="height:16px;">
-                                    <div class="progress-bar bg-opacity-5 bg-secondary" style="width:@item.NivelPrevio %">
+                                    <div class="progress-bar bg-secondary" style="width:@(item.NivelPrevio)% ">
                                         @item.NivelPrevio %
                                     </div>
                                 </div>
@@ -85,6 +86,41 @@ else
                                 <span>-</span>
                             }
 
+                        </td>
+                        <td style="min-width:110px">
+                            @if (item.NivelPosterior.HasValue)
+                            {
+                                <div class="progress" style="height:16px">
+                                    <div class="progress-bar bg-primary" style="width:@(item.NivelPosterior)%">
+                                        @item.NivelPosterior %
+                                    </div>
+                                </div>
+                            }
+                            else if(item.EstadoAcceso==TipoEstado.EstadoAcceso.Permitido && item.NivelPrevio.HasValue)
+                            {
+                                <small class="text-muted">....Esperando Lectura.</small>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td class="text-nowrap">
+                            @if(item.VolumenDepositado.HasValue)
+                            {
+                                var volumen = item.VolumenDepositado.Value;
+                                <span class="@(volumen>=0?"text-success":"text-danger")">
+                                    @(volumen>=0?$"+{volumen:0.0}L": $"-{-volumen:0.0}L")
+                                </span>
+                                <div>
+                                    <small class="text-muted">@(volumen>=0 ?"Depositado":"Retirados")</small>
+                                </div>                        
+                                
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
                         </td>
                         <td>
                             <span class="badge @(permitido?"bg-success":"bg-danger")">@item.EstadoAcceso</span>

@@ -14,6 +14,8 @@ namespace RecycleSmartBE
         public TipoEstado.MotivoAcceso Motivo { get; set; }
         public TipoEstado.EstadoAcceso EstadoAcceso { get; set; }
         public int? NivelPrevio { get; set; }
+        public int? NivelPosterior {  get; set; }
+        public decimal? VolumenDepositado {  get; set; }
         public DateTime Fecha { get; set; }
 
         public string ContenedorNombre { get; set; } = "";
