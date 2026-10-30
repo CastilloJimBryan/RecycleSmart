@@ -165,7 +165,48 @@ namespace RecycleSmartDAL
                 return (int)cmd.ExecuteScalar();
             }
         }
-
-        
+        public void MarcarOffline(int dispositivoId)
+        {
+            using(var con = new SqlConnection(_conectar))
+            using(var cmd=new SqlCommand("UPDATE DispositivoIoT SET EstadoDispositivo = 'Offline'" +
+                " WHERE Id = @Id AND EstadoDispositivo = 'Activo'", con))
+            {
+                cmd.Parameters.AddWithValue("@Id", dispositivoId);
+                con.Open ();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public List<(int DispositivoId, int ContenedorId, int EmpresaId, bool Activo, int MinutosSinDatos, int MinutosLimite)> BuscarSinConexion()
+        {
+            var lista = new List<(int, int, int, bool, int, int)>();
+            using (var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand(
+                "SELECT d.Id, d.ContenedorId, i.EmpresaLogisticaId, d.EstadoDispositivo, " +
+                "       DATEDIFF(MINUTE, d.UltimaActualizacion, GETDATE()) AS MinutosSinDatos, " +
+                "       ISNULL(u.MinutosSinConexion, 30) AS MinutosLimite " +
+                " FROM DispositivoIoT d " +
+                " INNER JOIN Contenedor c ON c.Id = d.ContenedorId " +
+                " INNER JOIN InstitucionCliente i ON i.Id = c.InstitucionId " +
+                " LEFT JOIN Umbral u ON u.ContenedorId = d.ContenedorId " +
+                " WHERE d.EstadoDispositivo IN ('Activo', 'Offline') AND d.UltimaActualizacion IS NOT NULL " +
+                "   AND DATEDIFF(MINUTE, d.UltimaActualizacion, GETDATE()) > ISNULL(u.MinutosSinConexion, 30)", con))
+            {
+                con.Open();
+                using (var leer = cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                    {
+                        lista.Add((
+                            leer.GetInt32(0),
+                            leer.GetInt32(1),
+                            leer.GetInt32(2),
+                            leer.GetString(3) == "Activo",
+                            leer.GetInt32(4),
+                            leer.GetInt32(5)));
+                    }
+                }
+            }
+            return lista;
+        }
     }
 }

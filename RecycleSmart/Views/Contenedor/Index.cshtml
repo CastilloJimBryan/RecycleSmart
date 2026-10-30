@@ -95,7 +95,7 @@ else
                                 @if(dispositivo.TryGetValue(item.Id,out var dispositivos))
                                 {
                                     var estadoDispositivo = dispositivos.EstadoDispositivo.ToString();
-                                    <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)">@estadoDispositivo</span>
+                                    <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)" data-dispositivo-contenedor="@item.Id" >@estadoDispositivo</span>
                                     <small>@dispositivos.MacAdress</small>
                                 }
                                 else if(PuedeGestionaar&&estado!="Baja")
@@ -188,6 +188,12 @@ else
 
             const color = colores[l.clase] ?? "bg-success";
             const badge = l.clase !== "Normal" ? ` <span class="badge ${color}">${l.clase}</span>` : "";
+
+            const badgeDisp = document.querySelector(`[data-dispositivo-contenedor="${l.contenedorId}"]`);
+            if (badgeDisp) {
+                badgeDisp.textContent = "Activo";
+                badgeDisp.className = "badge bg-success";
+            }
 
             celda.innerHTML =
                 `<div class="progress" style="height: 18px;">

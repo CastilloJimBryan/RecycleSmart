@@ -2,6 +2,7 @@
 using RecycleSmartDAL;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace RecycleSmartBLL
@@ -29,7 +30,7 @@ namespace RecycleSmartBLL
             };
             decimal umbralnivel = setNivel == TipoEstado.Severidad.Critico ? u.NivelCritico : u.NivelAdvertencia;
             Procesar(t.ContenedorId, TipoEstado.TipoAlerta.Nivel, setNivel, t.Nivel, umbralnivel ,
-                $"Nivel de llenado {t.Nivel} % (umbral {umbralnivel}%)",novedades);
+                $"Nivel de llenado {t.Nivel}% (umbral {umbralnivel}%)",novedades);
 
             TipoEstado.Severidad? sevtemp = null;
             if (t.Temperatura > u.TemperaturaMaxima + 5)
@@ -41,7 +42,8 @@ namespace RecycleSmartBLL
                 sevtemp = TipoEstado.Severidad.Advertencia; 
             }
             Procesar(t.ContenedorId, TipoEstado.TipoAlerta.Temperatura, sevtemp, t.Temperatura, u.TemperaturaMaxima,
-               $"Temperatura {t.Temperatura:0.0}°C (Maxima {u.TemperaturaMaxima: 0.0}°C)", novedades);
+               $"Temperatura {t.Temperatura:0.0}°C (Maxima {u.TemperaturaMaxima:0.0}°C)", novedades);
+            Procesar(t.ContenedorId, TipoEstado.TipoAlerta.SinConexion, null, 0, 0, "", novedades);
             return novedades;
         }
 
@@ -150,7 +152,14 @@ namespace RecycleSmartBLL
                 $"Acceso Denegado: {MotivoText (motivo)} (UID {uid})", novedad);
             return novedad;
         }
-
+        public List<Alerta> RegistroSinConexion(int contenedorId,int minutosSinDatos,int minutosLimite)
+        {
+            var novedad=new List<Alerta>();
+            var severidad = minutosSinDatos>minutosLimite *2 ? TipoEstado.Severidad.Critico : TipoEstado.Severidad.Advertencia;
+            Procesar(contenedorId, TipoEstado.TipoAlerta.SinConexion, severidad, minutosSinDatos, minutosLimite,
+                $"Sensor Sin Conexion hace {minutosSinDatos} min (maximo{minutosLimite} min)", novedad);
+            return novedad;
+        }
         public static string MotivoText(TipoEstado.MotivoAcceso m)
             => m switch
             {

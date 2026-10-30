@@ -50,7 +50,7 @@ namespace RecycleSmart.Servicios
 
             // Qué hacer con cada mensaje que llega
             cliente.ApplicationMessageReceivedAsync += e => ProcesarMensaje(e.ApplicationMessage.Topic, Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment));
-
+            var ultimaRevision = DateTime.MinValue;
             // Bucle de conexión: si se corta, reintenta cada 5 segundos
             while (!cancellation.IsCancellationRequested)
             {
@@ -71,7 +71,23 @@ namespace RecycleSmart.Servicios
                 {
                     _log.LogWarning("Motor IoT sin conexión al broker: {Mensaje}. Reintento en 5 s.", ex.Message);
                 }
+                if((DateTime.Now-ultimaRevision).TotalSeconds>=60)
+                {
+                    ultimaRevision= DateTime.Now;
+                    try
+                    {
+                        foreach (var (empresaId, alertas) in _telemetriabl.RevisarSensoresSinConexion())
+                            await AvisarAlertas(alertas, empresaId);
+                    }
+                    catch(Exception ex)
+                    {
+                        _log.LogWarning(ex, "Error al revisar sensores sin conexión: {Mensaje}", ex.Message);
+                    }
+                }
+                else
+                {
 
+                }
                 await Task.Delay(5000, cancellation);
             }
         }
