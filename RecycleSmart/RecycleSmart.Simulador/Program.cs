@@ -10,8 +10,8 @@ var sensores = new List<Sensor>
     // new Sensor { Mac = "AA:BB:CC:DD:AA:13", Nivel = 50 },
 };
 string uidTarjeta = "12345678";
-int segundosEntreLecturas = 5;
-// ================================tiempo==============================
+int segundosEntreLecturas = 3;
+// ================================tiempo====son 10 segundos pero para el ejemplo es de 3 seg ==========================
 
 var rnd = new Random();
 var factory = new MqttFactory();
@@ -34,7 +34,7 @@ await cliente.ConnectAsync(opciones);
 await cliente.SubscribeAsync(factory.CreateSubscribeOptionsBuilder()
     .WithTopicFilter("recyclesmart/+/rfid/respuesta").Build());
 
-Console.WriteLine("Simulador conectado. Teclas:");
+Console.WriteLine("Simulador conectado.... Teclas:");
 Console.WriteLine("  1-9 elegir sensor | V vaciar | T calor on/off | C cortar/reconectar | R pasar tarjeta | Q salir");
 
 int elegido = 0;
@@ -61,7 +61,7 @@ while (true)
                     break;
                 case 'T':
                     s.Calor = !s.Calor;
-                    Console.WriteLine($"[{s.Mac}] Calor {(s.Calor ? "ACTIVADO" : "desactivado")}");
+                    Console.WriteLine($"[{s.Mac}] Calor {(s.Calor ? "ACTIVADO" : "Desactivado")}");
                     break;
                 case 'C':
                     s.Conectado = !s.Conectado;
