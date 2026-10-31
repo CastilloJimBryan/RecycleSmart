@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using RecycleSmart.Filters;
 using RecycleSmart.HUB;
 using RecycleSmartBE;
 using RecycleSmartBLL;
@@ -9,6 +10,7 @@ using Servicio;
 namespace RecycleSmart.Controllers
 {
     [Authorize]
+    [RequiereTipoCuenta(TipoDeCuenta.EmpresaLogistica)]
     public class AlertasController: Controller
     {
         private readonly AlertaBL _alertabl;
