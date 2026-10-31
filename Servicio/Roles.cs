@@ -14,5 +14,7 @@ namespace Servicio
         public static readonly string[] Todos = {Administrador, Operario, Responsable,Auditor};
 
         public const string Gestion = Administrador + "," + Responsable;
+        public const string Operacion = Administrador + "," + Responsable + "," + Operario;
+        public const string Control = Administrador + "," + Responsable + "," + Auditor;
     }
 }

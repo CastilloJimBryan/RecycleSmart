@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Servicio;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,8 +15,9 @@ builder.Services.AddAuthentication(ManejosSesiones.esquema).AddCookie(ManejosSes
         options.AccessDeniedPath = "/Login/AccesoDenegado";
         options.Cookie.Name = "RecycleSmart.Auth";
         options.Cookie.HttpOnly = true;
-    });
+        options.AccessDeniedPath = "/Home/AccesoDenegado";
 
+    });
 builder.Services.AddHostedService<RecycleSmart.Servicios.MotorIoT>();
 builder.Services.AddSignalR();
 var app=builder.Build();

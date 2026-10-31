@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RecycleSmart.Filters;
 using RecycleSmartBE;
 using RecycleSmartBLL;
+using Servicio;
 
 
 namespace RecycleSmart.Controllers
@@ -58,6 +59,7 @@ namespace RecycleSmart.Controllers
 
             return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
         }
+        [Authorize(Roles =Roles.Administrador)]
 
         public IActionResult Registrar(int institucionId=0)
         {
