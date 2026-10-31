@@ -9,7 +9,7 @@ using Servicio;
 namespace RecycleSmart.Controllers
 {
     [Authorize]
-    //[RequiereTipoCuenta(TipoDeCuenta.EmpresaLogistica)]
+    [RequiereTipoCuenta(TipoDeCuenta.EmpresaLogistica)]
     public class ContenedorController : Controller
     {
         readonly ContenedorBL _contenedorBL;
@@ -59,8 +59,8 @@ namespace RecycleSmart.Controllers
 
             return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
         }
-        [Authorize(Roles =Roles.Administrador)]
 
+        [Authorize(Roles =Roles.Administrador)]
         public IActionResult Registrar(int institucionId=0)
         {
             var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid)
@@ -74,8 +74,8 @@ namespace RecycleSmart.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [Authorize(Roles = Roles.Administrador)]
+        [ValidateAntiForgeryToken]
 
         public IActionResult Registrar(int InstitucionId,string?nombre,string?tiporesiduo,int?capacidad,int?piso,string?sector)
         {

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RecycleSmartBE;
 using RecycleSmartBLL;
+using Servicio;
 
 namespace RecycleSmart.Controllers
 {
+    [Authorize(Roles =Roles.Control)]
     public class UsuarioInstitucionController : Controller
     {
         private readonly UsuarioInstitucionBL _usuarioInstitucionBL;
@@ -36,6 +39,8 @@ namespace RecycleSmart.Controllers
             return View(usuarios);
         }
 
+        [Authorize(Roles = Roles.Gestion)]
+
         public IActionResult RegistrarUsuario(int institucionid)
         {
             var institucion = _institucionClienteBLL.BuscarInstitucionXId(institucionid, empresaId);
@@ -52,6 +57,7 @@ namespace RecycleSmart.Controllers
 
         [HttpPost]
 
+        [Authorize(Roles = Roles.Gestion)]
         public IActionResult RegistrarUsuario(string? nombre,string? apellido,string? dni,string? rol,string ? sector,int institucionid)
         {
             var usuario = new UsuarioInstitucion

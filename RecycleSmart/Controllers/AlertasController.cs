@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using RecycleSmart.HUB;
 using RecycleSmartBE;
 using RecycleSmartBLL;
+using Servicio;
 
 namespace RecycleSmart.Controllers
 {
+    [Authorize]
     public class AlertasController: Controller
     {
         private readonly AlertaBL _alertabl;
@@ -31,6 +34,7 @@ namespace RecycleSmart.Controllers
 
         }
 
+        [Authorize(Roles = Roles.Operacion)]
         public IActionResult Resolver(int id)
         {
             try
@@ -51,7 +55,7 @@ namespace RecycleSmart.Controllers
         }
 
         [HttpPost]
-
+        [Authorize(Roles = Roles.Operacion)]
         public async Task<IActionResult> Resolver(int id, string? nota)
         {
             try
@@ -79,7 +83,7 @@ namespace RecycleSmart.Controllers
             }
         }
         [HttpPost]
-
+        [Authorize(Roles = Roles.Operacion)]
         public IActionResult Tomar(int id)
         {
             try

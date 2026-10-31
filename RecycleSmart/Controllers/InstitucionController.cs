@@ -36,7 +36,7 @@ namespace RecycleSmart.Controllers
             return View(institucion);
         }
 
-        //[Authorize(Roles=Roles.Gestion)]
+        [Authorize(Roles=Roles.Administrador)]
         public IActionResult Registrar()
         {
             ViewBag.Tipos = InstitucionClienteBLL.Tipos;
@@ -44,6 +44,8 @@ namespace RecycleSmart.Controllers
         }
         
         [HttpPost]
+        [Authorize(Roles = Roles.Administrador)]
+
         [ValidateAntiForgeryToken]
 
         public IActionResult Registrar(string? nombre, string? cuit, string? direccion, string? tipo)

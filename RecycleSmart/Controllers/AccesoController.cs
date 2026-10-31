@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RecycleSmartBE;
 using RecycleSmartBLL;
+using Servicio;
 
 namespace RecycleSmart.Controllers
 {
+    [Authorize]
     public class AccesoController:Controller
     {
         private readonly EventoAccesoBL _evoAccesoBL;
@@ -17,6 +20,7 @@ namespace RecycleSmart.Controllers
 
         int empresaid => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
 
+        [Authorize(Roles = Roles.Control)]
         public IActionResult Index(int institucionId = 0, bool denegados = false)
         {
             ViewBag.Instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid)

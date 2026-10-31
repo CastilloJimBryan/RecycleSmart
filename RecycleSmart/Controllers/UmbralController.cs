@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RecycleSmartBE;
 using RecycleSmartBLL;
+using Servicio;
 using System.Globalization;
 
 namespace RecycleSmart.Controllers
@@ -14,12 +16,13 @@ namespace RecycleSmart.Controllers
         public UmbralController(IConfiguration config)
         {
             string conectar = config.GetConnectionString("BDTFI")!;
-            _UmbralBL= new UmbralBL(conectar);
-            _ContenedorBL=new ContenedorBL(conectar);
+            _UmbralBL = new UmbralBL(conectar);
+            _ContenedorBL = new ContenedorBL(conectar);
         }
+        [Authorize(Roles = Roles.Control)]
         public IActionResult RegistrarUmbral(int contenedorid)
         {
-            if(_ContenedorBL.BuscarContenedorXId(contenedorid,empresaid) is not Contenedor contenedor)
+            if (_ContenedorBL.BuscarContenedorXId(contenedorid, empresaid) is not Contenedor contenedor)
             {
                 return NotFound();
             }
@@ -31,12 +34,12 @@ namespace RecycleSmart.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
-                return RedirectToAction("Index", "Contenedor", new {institucionId=contenedor.InstitucionId });
+                return RedirectToAction("Index", "Contenedor", new { institucionId = contenedor.InstitucionId });
             }
         }
-         
-        [HttpPost]
 
+        [HttpPost]
+        [Authorize(Roles=Roles.Gestion)]
         public IActionResult RegistrarUmbral(int contenedorid,int? nivelcritico,int?niveladvertencia,string?tempmaxima,int?humedad,int?minutosinconexion)
         {
             if(_ContenedorBL.BuscarContenedorXId(contenedorid,empresaid) is not Contenedor contenedor)

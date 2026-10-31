@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RecycleSmartBE;
 using RecycleSmartBLL;
+using Servicio;
 using static RecycleSmartBE.DiasSemana;
 
 namespace RecycleSmart.Controllers
@@ -23,6 +25,9 @@ namespace RecycleSmart.Controllers
             ViewBag.Usuario = ui;
             ViewBag.Contenedores = _tarjetaRFIDBL.ContenedoresDisponibles(ui.InstitucionId, empresaid);
         }
+
+
+        [Authorize(Roles = Roles.Gestion)]
         public IActionResult Asignar(int usuarioid)
         {
             try
@@ -50,6 +55,7 @@ namespace RecycleSmart.Controllers
 
         [HttpPost]
 
+        [Authorize(Roles = Roles.Gestion)]
         public IActionResult Asignar(int usuarioinstitucionId,string ? uid,DateTime? fechavencimiento, int[]? dias,TimeSpan?horainicio,TimeSpan? horafin, int[]?contenedores )
         {
             /* return Content($"DEBUG: usuarioId={usuarioinstitucionId} empresaId={empresaid}");*/

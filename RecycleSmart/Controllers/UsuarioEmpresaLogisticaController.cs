@@ -8,7 +8,7 @@ using Servicio;
 namespace RecycleSmart.Controllers
 {
     [Authorize]
-    //[Authorize(Roles=Roles.Administrador)]
+    [Authorize(Roles=Roles.Administrador)]
     [RequiereTipoCuenta(TipoDeCuenta.EmpresaLogistica)]
     public class UsuarioEmpresaLogisticaController : Controller
     {

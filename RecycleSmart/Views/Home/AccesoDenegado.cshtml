@@ -1,5 +1,11 @@
-﻿<div class="text-center py-5">
+﻿@{
+    ViewData["Title"] = "Acceso Denegado";
+    Layout = "_Layout";
+}
+
+<div class="text-center py-5">
     <h2>No tenés permiso para esta sección</h2>
     <p class="text-muted">Tu rol no permite acceder a esta pantalla. Si creés que es un error, consultá con el administrador de tu empresa.</p>
-    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Volver al inicio</a>
+    <button type="button" class="btn btn-outline-dark" onclick="history.back()">Volver</button>
+    <a class="btn btn-success" asp-controller="Dashboard" asp-action="Index">Volver al inicio</a>
 </div>
