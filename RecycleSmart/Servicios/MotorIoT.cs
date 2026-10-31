@@ -76,8 +76,18 @@ namespace RecycleSmart.Servicios
                     ultimaRevision= DateTime.Now;
                     try
                     {
-                        foreach (var (empresaId, alertas) in _telemetriabl.RevisarSensoresSinConexion())
-                            await AvisarAlertas(alertas, empresaId);
+                        foreach (var r in _telemetriabl.RevisarSensoresSinConexion())
+                        {
+                            if(r.Pasooffline)
+                            {
+                                await _hub.Clients.Group($"empresa-{r.empresaid}").SendAsync("DispositivoOffline", new { contenedorId = r.contenedorid });
+                            }
+                            if(r.Alertas.Count>0)
+                            {
+
+                                await AvisarAlertas(r.Alertas, r.empresaid);
+                            }
+                        }
                     }
                     catch(Exception ex)
                     {

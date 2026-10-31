@@ -89,19 +89,22 @@ namespace RecycleSmartBLL
         {
             return _telemetriaDAl.UltimasLecturasxInstitucion(institucionId, empresaId).ToDictionary(t => t.ContenedorId);
         }
-        public List<(int empresaid,List<Alerta> Alertas)> RevisarSensoresSinConexion()
+        public List<(int empresaid,int contenedorid,bool Pasooffline,List<Alerta> Alertas)> RevisarSensoresSinConexion()
         {
-            var resultado = new List<(int, List<Alerta>)>();
+            var resultado = new List<(int,int,bool, List<Alerta>)>();
             foreach (var item in _dispositivoIoTDAL.BuscarSinConexion())
             {
+                bool pasoOffline = false;
                 if (item.Activo)
                 {
                     _dispositivoIoTDAL.MarcarOffline(item.DispositivoId);
+                    pasoOffline = true;
                 }
                 var alerta = _alertaBL.RegistroSinConexion(item.ContenedorId, item.MinutosSinDatos, item.MinutosLimite);
-                if(alerta.Count> 0)
+
+                if(alerta.Count> 0 || pasoOffline)
                 {
-                    resultado.Add((item.EmpresaId, alerta));
+                    resultado.Add((item.EmpresaId,item.ContenedorId,pasoOffline, alerta));
                 }
             }
             return resultado;

@@ -206,5 +206,13 @@ else
             setTimeout(() => celda.classList.remove("table-info"), 1500);
         });
 
+        conexionMonitoreo.on("DispositivoOffline", d => {
+            const badgeDisp = document.querySelector(`[data-dispositivo-contenedor="${d.contenedorId}"]`);
+            if (badgeDisp) {
+                badgeDisp.textContent = "Offline";
+                badgeDisp.className = "badge bg-secondary";
+            }
+        });
+
     </script>
 }
