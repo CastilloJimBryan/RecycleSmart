@@ -11,7 +11,7 @@ var sensores = new List<Sensor>
 };
 string uidTarjeta = "12345678";
 int segundosEntreLecturas = 5;
-// ==============================================================
+// ================================tiempo==============================
 
 var rnd = new Random();
 var factory = new MqttFactory();
@@ -92,15 +92,14 @@ while (true)
                 Temperatura = Math.Round(s.Temperatura, 1),
                 Humedad = (int)Math.Round(s.Humedad),
                 Bateria = (int)Math.Round(s.Bateria),
-                Senal = s.Senal
+                NivelConexion = s.NivelConexion
             });
-            Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {s.Mac} → nivel {s.Nivel:0}% · {s.Temperatura:0.0}°C · bat {s.Bateria:0}% · señal {s.Senal}");
+            Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {s.Mac} → nivel {s.Nivel:0}% · {s.Temperatura:0.0}°C ·hum {s.Humedad:0}%· bat {s.Bateria:0}% · señal {s.NivelConexion}");
         }
     }
 
     await Task.Delay(200);
 }
-
 // Publica un objeto como JSON; si se cortó la conexión con el broker, reconecta
 async Task Publicar(string topic, object datos)
 {
@@ -125,22 +124,36 @@ class Sensor
 {
     public string Mac { get; set; } = "";
     public double Nivel { get; set; }
+    public int LecturaLLeno {  get; set; }
     public double Temperatura { get; set; } = 22;
     public double Humedad { get; set; } = 55;
     public double Bateria { get; set; } = 100;
-    public int Senal { get; set; } = -60;
+    public int NivelConexion { get; set; } = -60;
     public bool Calor { get; set; }
     public bool Conectado { get; set; } = true;
 
     // Un "paso" de simulación: cómo cambian los valores entre una lectura y la siguiente
     public void Avanzar(Random rnd)
     {
-        Nivel = Math.Min(100, Nivel + rnd.NextDouble() * 3);                 // se va llenando
-        Temperatura = Calor
-            ? Temperatura + 1 + rnd.NextDouble()                              // sube rápido
-            : Temperatura + (22 - Temperatura) * 0.3 + (rnd.NextDouble() - 0.5); // vuelve a ~22
+        if (Nivel >= 100)
+        {
+            LecturaLLeno++;
+            if(LecturaLLeno>=6)
+            {
+                Nivel = rnd.Next(0, 5);
+                LecturaLLeno = 0;
+            }
+        }
+        else
+        {
+            Nivel = Math.Min(100, Nivel + rnd.NextDouble() * 3);
+        }
+        // Temperatura: se acerca al objetivo y oscila alrededor (±0,5 °C)
+        double objetivo = Calor ? 45 : 22;
+        Temperatura += (objetivo - Temperatura) * 0.15 + (rnd.NextDouble() - 0.5);
+
         Humedad = Math.Clamp(Humedad + (rnd.NextDouble() - 0.5) * 4, 40, 75);
-        Bateria = Math.Max(0, Bateria - 0.05);                               // baja muy lento
-        Senal = rnd.Next(-75, -54);
+        Bateria = Math.Max(0, Bateria - 0.05);
+        NivelConexion = rnd.Next(-75, -54);
     }
 }
