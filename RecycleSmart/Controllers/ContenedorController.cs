@@ -75,6 +75,7 @@ namespace RecycleSmart.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = Roles.Administrador)]
 
         public IActionResult Registrar(int InstitucionId,string?nombre,string?tiporesiduo,int?capacidad,int?piso,string?sector)
         {

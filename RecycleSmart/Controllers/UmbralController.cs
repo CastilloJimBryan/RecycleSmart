@@ -5,6 +5,7 @@ using System.Globalization;
 
 namespace RecycleSmart.Controllers
 {
+
     public class UmbralController : Controller
     {
         private readonly UmbralBL _UmbralBL;
