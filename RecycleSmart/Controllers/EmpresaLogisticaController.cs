@@ -36,6 +36,7 @@ namespace RecycleSmart.Controllers
         }
 
         [HttpPost]
+
         [ValidateAntiForgeryToken]
         public IActionResult Registrar(string? nombre, string? cuit, string? direccion, int planId)
         {

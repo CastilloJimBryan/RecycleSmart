@@ -5,7 +5,7 @@
 
     var tarjetas = ViewBag.Tarjetas as Dictionary<int, TarjetaRFID> ?? new();
     int instiId = ViewBag.InstitucionesId??0;
-    bool puedegestionar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
+    bool puedegestionar = User.TieneRol(Roles.Gestion);
 }
 
 <partial name="_Mensajes"/>
@@ -35,10 +35,12 @@ else
     else
     {
         <div class="d-flex justify-content-end mb-2 ">
-            @if (puedegestionar)
+            @if (User.TieneRol(Roles.Gestion))
             {
-
-                <a asp-action="RegistrarUsuario" asp-route-institucionId="@instiId" class="btn btn-success ">Registrar Usuario</a>
+                @if (puedegestionar)
+                {
+                    <a asp-action="RegistrarUsuario" asp-route-institucionId="@instiId" class="btn btn-success ">Registrar Usuario</a>
+                }
             }
         </div>
         @if (Model.Count == 0)
@@ -74,18 +76,20 @@ else
                                 <td>@item.Rol</td>
                                 <td>@item.Sector</td>
                                 <td>
-                                    @if(tarjetas.TryGetValue(item.Id, out var tarjeta))
+                                        @if (tarjetas.TryGetValue(item.Id, out var tarjeta))
                                         {
-                                            var estadoTarjeta = tarjeta.FechaVecimiento.Date<DateTime.Now ? "Vencida" : tarjeta.TipoEstado.ToString();
-                                           <code>@tarjeta.UID</code>
-                                           <span class="badge @EstadosColor.EstadoBadge(estadoTarjeta)">@estadoTarjeta</span>
-                                           <div>
-                                               <small class="text-muted">Vence @tarjeta.FechaVecimiento.ToString("dd/MM/yyyy")</small>
-                                           </div>
+                                            var estadoTarjeta = tarjeta.FechaVecimiento.Date < DateTime.Today ? "Vencida" : tarjeta.TipoEstado.ToString();
+                                            <code>@tarjeta.UID</code>
+                                            <span class="badge @EstadosColor.EstadoBadge(estadoTarjeta)">@estadoTarjeta</span>
+                                            <div>
+                                                <small class="text-muted">Vence @tarjeta.FechaVecimiento.ToString("dd/MM/yyyy")</small>
+                                            </div>
                                         }
-                                        else if(puedegestionar && estado=="Activo")
+                                        else if (puedegestionar && estado == "Activo")
                                         {
-                                             <a asp-controller="TarjetaRFID" asp-action="Asignar" asp-route-usuarioId="@item.Id"  class="btn btn-outline-dark btn-sm">Asignar Tarjeta</a>
+
+                                            <a asp-controller="TarjetaRFID" asp-action="Asignar" asp-route-usuariointitucionId="@item.Id"  class="btn btn-outline-dark btn-sm">Asignar Tarjeta</a>
+
                                         }
                                         else
                                         {

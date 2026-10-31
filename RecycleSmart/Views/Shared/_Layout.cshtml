@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    bool esAdmin = User.IsInRole(Roles.Administrador);
+    bool verControl = User.TieneRol(Roles.Control);
+}
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +18,7 @@
         var tipoCuenta = Servicio.ManejosSesiones.ObtenerTipoCuenta(User);
         var controllerActual = ViewContext.RouteData.Values["Controller"]?.ToString();
         string Activo(string c) => controllerActual == c ? "activo" : "";
-    }
+    } 
     <div class="wrapper">
         @if (User.Identity?.IsAuthenticated == true)
         {
@@ -38,28 +42,31 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#miempresa" aria-expanded="false" aria-controls="miempresa">
-                                <i class='bx bx-building-house'></i>
-                                <span>Mi Empresa</span>
-                            </a>
-                        <ul id="miempresa" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                        @if(esAdmin)
+                        {
+                                
                             <li class="sidebar-item">
-                                <a asp-controller="UsuarioEmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("UsuarioEmpresaLogistica")">
-                                    <i class='bx bx-user'></i>
-                                        <span>Usuario y Roles</span>
+                                <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#miempresa" aria-expanded="false" aria-controls="miempresa">
+                                    <i class='bx bx-building-house'></i>
+                                    <span>Mi Empresa</span>
                                 </a>
-                            </li>
+                            <ul id="miempresa" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <li class="sidebar-item">
+                                    <a asp-controller="UsuarioEmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("UsuarioEmpresaLogistica")">
+                                        <i class='bx bx-user'></i>
+                                            <span>Usuario y Roles</span>
+                                    </a>
+                                </li>
 
-                            <li class="sidebar-item">
-                                <a asp-controller="Suscripcion" asp-action="Index" class="sidebar-link @Activo("Suscripcion")">
-                                    <i class='bx bx-wallet-alt'></i>
-                                        <span>Suscripción / Plan</span>
-                                </a>
-                            </li>
-                        </ul>
-                         </li>
-
+                                <li class="sidebar-item">
+                                    <a asp-controller="Suscripcion" asp-action="Index" class="sidebar-link @Activo("Suscripcion")">
+                                        <i class='bx bx-wallet-alt'></i>
+                                            <span>Suscripción / Plan</span>
+                                    </a>
+                                </li>
+                            </ul>
+                             </li>
+                         }
                         <li class="sidebar-item">
                             <a asp-controller="Institucion" asp-action="Index" class="sidebar-link @Activo("Institucion")">
                                 <i class='bx bxs-institution'></i>
@@ -85,64 +92,76 @@
                                 @await Component.InvokeAsync("ContadorAlertas")
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#rfid" aria-expanded="false" aria-controls="rfid">
-                                <i class='bx bx-rfid'></i>
-                                <span>RFID</span>
-                            </a>
-                            <ul id="rfid" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                                <li class="sidebar-item">
-                                    <a asp-controller="UsuarioInstitucion" asp-action="Index" class="sidebar-link @Activo("UsuarioInstitucion")">
-                                        <i class='bx bx-id-card'></i>
-                                        <span>Tarjetas</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a asp-controller="Acceso" asp-action="Index" class="sidebar-link @Activo("Evento")">
-                                        <i class='bx bx-log-in-circle'></i>
-                                        <span>Log de Accesos</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        @if(verControl)
+                        {   
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#rfid" aria-expanded="false" aria-controls="rfid">
+                                    <i class='bx bx-rfid'></i>
+                                    <span>RFID</span>
+                                </a>
+                                <ul id="rfid" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                    <li class="sidebar-item">
+                                        <a asp-controller="UsuarioInstitucion" asp-action="Index" class="sidebar-link @Activo("UsuarioInstitucion")">
+                                            <i class='bx bx-id-card'></i>
+                                            <span>Tarjetas</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a asp-controller="Acceso" asp-action="Index" class="sidebar-link @Activo("Evento")">
+                                            <i class='bx bx-log-in-circle'></i>
+                                            <span>Log de Accesos</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            
+                        }
                         <li class="sidebar-item">
                             <a href="#" class="sidebar-link">
                                 <i class='bx bx-line-chart'></i>
                                 <span>Trazabilidad</span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#reporte" aria-expanded="false" aria-controls="reporte">
-                                <i class='bx bxs-report'></i>
-                                <span>Reportes</span>
-                            </a>
-                            <ul id="reporte" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                                <li class="sidebar-item">
-                                    <a href="#" class="sidebar-link">
-                                        <i class='bx bx-task'></i>
-                                        <span>Auditoria</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a href="#" class="sidebar-link">
-                                        <i class='bx bx-file'></i>
-                                        Historial de Eventos
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a href="#" class="sidebar-link">
-                                        <i class='bx bx-clipboard'></i>
-                                        Mensual
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link">
-                                <i class='bx bx-bar-chart-square'></i>
-                                <span>Compliance</span>
-                            </a>
-                        </li>
+                        @if(verControl)
+                        {
+                                
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#reporte" aria-expanded="false" aria-controls="reporte">
+                                    <i class='bx bxs-report'></i>
+                                    <span>Reportes</span>
+                                </a>
+                                <ul id="reporte" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                    <li class="sidebar-item">
+                                        <a href="#" class="sidebar-link">
+                                            <i class='bx bx-task'></i>
+                                            <span>Auditoria</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a href="#" class="sidebar-link">
+                                            <i class='bx bx-file'></i>
+                                            Historial de Eventos
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a href="#" class="sidebar-link">
+                                            <i class='bx bx-clipboard'></i>
+                                            Mensual
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        @if(verControl)
+                        {
+                                
+                            <li class="sidebar-item">
+                                <a href="#" class="sidebar-link">
+                                    <i class='bx bx-bar-chart-square'></i>
+                                    <span>Compliance</span>
+                                </a>
+                            </li>
+                        }
 
                     }
                     else

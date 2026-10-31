@@ -3,9 +3,7 @@
     ViewData["Title"] = "Centro de Alertas";
 
     bool resuelta = (bool)ViewBag.Resuelta;
-    bool puedeGestionar = User.IsInRole(Roles.Administrador)
-                       || User.IsInRole(Roles.Responsable)
-                       || User.IsInRole(Roles.Operario);
+    bool puedeGestionar = User.TieneRol(Roles.Operacion);
     string Duracion(TimeSpan d) =>
         d.TotalMinutes < 60 ? $"{(int)d.TotalMinutes} min"
         : d.TotalHours < 24 ? $"{(int)d.TotalHours} h {d.Minutes} min"

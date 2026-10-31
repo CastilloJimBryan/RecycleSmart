@@ -80,17 +80,21 @@ else
     </div>
 }
 <div class="d-flex justify-content-between align-items-center mt-3">
-    @if (limiteAlcanzado)
+    @if (User.IsInRole(Roles.Administrador))
     {
-        <button class="btn btn-success" disabled title="Alcanzó el límite de su plan">
-            <i class='bx bx-plus'></i> Registrar institución
-        </button>
-    }
-    else
-    {
-        <a asp-action="Registrar" class="btn btn-success">
-           Registrar institución
-        </a>
+
+        if (limiteAlcanzado)
+        {
+            <button class="btn btn-success" disabled title="Alcanzó el límite de su plan">
+                <i class='bx bx-plus'></i> Registrar institución
+            </button>
+        }
+        else
+        {
+            <a asp-action="Registrar" class="btn btn-success">
+                Registrar institución
+            </a>
+        }
     }
 </div>
 
