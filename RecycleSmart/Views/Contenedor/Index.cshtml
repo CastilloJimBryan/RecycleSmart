@@ -95,12 +95,12 @@ else
                                 @if(dispositivo.TryGetValue(item.Id,out var dispositivos))
                                 {
                                     var estadoDispositivo = dispositivos.EstadoDispositivo.ToString();
+                                        <code> <small>@dispositivos.MacAdress</small></code>
                                     <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)" data-dispositivo-contenedor="@item.Id" >@estadoDispositivo</span>
-                                    <small>@dispositivos.MacAdress</small>
                                 }
                                 else if(PuedeGestionaar&&estado!="Baja")
                                 {
-                                    <a asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@item.Id">
+                                    <a class="btn btn-outline-dark btn-sm" asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@item.Id">
                                         Vincular
                                     </a>
                                 }
@@ -128,7 +128,7 @@ else
                                             <div class ="progress-bar @color" style="width: @lectura.Nivel%" >@lectura.Nivel %</div>
                                         </div>
                                             <small class="text-muted">
-                                                @lectura.Temperatura °C - @lectura.FechaHora.ToString("dd/MM HH:mm")
+                                                @lectura.Temperatura °C - @lectura.FechaHora.ToString("dd/MM/yyyy - HH:mm:ss")
                                                 @if (clase != TipoEstado.ClasificacionLectura.Normal)
                                                 {
                                                     <span class="badge @color">@clase</span>
