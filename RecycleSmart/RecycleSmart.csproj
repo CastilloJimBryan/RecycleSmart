@@ -19,4 +19,10 @@
     <ProjectReference Include="..\Servicio\Servicio.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Compile Remove="RecycleSmart.Simulador\**" />
+		<Content Remove="RecycleSmart.Simulador\**" />
+		<EmbeddedResource Remove="RecycleSmart.Simulador\**" />
+		<None Remove="RecycleSmart.Simulador\**" />
+	</ItemGroup>
 </Project>

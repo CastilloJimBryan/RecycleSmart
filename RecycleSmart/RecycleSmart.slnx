@@ -4,4 +4,5 @@
   <Project Path="../RecycleSmartDAL/RecycleSmartDAL.csproj" />
   <Project Path="../Servicio/Servicio.csproj" />
   <Project Path="RecycleSmart.csproj" />
+  <Project Path="RecycleSmart.Simulador/RecycleSmart.Simulador.csproj" />
 </Solution>
