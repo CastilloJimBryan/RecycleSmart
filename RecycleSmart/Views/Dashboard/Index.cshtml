@@ -66,7 +66,8 @@
             <div class="card h-100 shadow-sm" style="border-top:4px solid var(--bs-success)">
                 <div class="card-body text-center">
                     <div class="fs-2 fw-semibold" id="kpi-acceso">@Model.ResumenDashboard.AccesosHoy</div>
-                    <div class="text-muted small">Accesos Hoy - <span id="kpi-denegado">@Model.ResumenDashboard.AccesosDenegadosHoy</span> Denegados</div>
+                    <div class="text-muted small">Accesos Hoy  -  
+                    <span id="kpi-denegado"> @Model.ResumenDashboard.AccesosDenegadosHoy </span>Denegados</div>
                 </div>
             </div>
         </div>
@@ -79,38 +80,38 @@
             </div>
         </div>
     </div>
-    //Atencion
-    <div>
-        <div>
-            <div>
-                <h5>Necesitan Atencion</h5>
+    <div class=" card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+                <h5 class="text-uppercase text-muted small fw-semibold mb-0">Necesitan Atencion</h5>
                 @if(Model.Cola.Count>0)
                 {
-                    
+                    <span class="text-muted small">@Model.Cola.Count Pendientes</span>
                 }
             </div>
             @if(Model.Cola.Count==0)
             {
-                <div>Todo en Orden</div>
+                <div class="text-success fw-semibold text-center py-3">Todo en Orden</div>
             }
             @foreach (var item in grupos)
             {
                 if(Model.InstitucionId==0)
                 {
-                    <div>
+                    <div class="d-flex justify-content-between border-bottom pb-1 mb-2 mt-3">
                         <strong>@item.Key.InstitucionNombre</strong>
-                        <span>@item.Count() Pendientes</span>
+                        <span class="text-muted small">@item.Count() Pendientes</span>
                     </div>
                 }
                 @foreach (var items in item.Take(3))
                 {
                     bool critico = items.TipoSeveridad == TipoEstado.Severidad.Critico;
-                    <div>
-                        <div>
-                            <div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 border rounded p-2 mb-2" style="border-left: 5px solid @(critico?"var(--bg-danger)":"var(--bg-warning)")!important">
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">
                                 @items.ContenedorNombre
+                                <span class="badge @(critico?"bg-danger":"bg-warning text-dark")">@items.TipoAlerta - @items.TipoSeveridad</span>
                             </div>
-                            <div>
+                            <div class="text-muted small">
                                 @items.Mensaje - Abierta Hace @Duracion(items.Duracion)
                                 @if (items.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion)
                                 {
@@ -118,39 +119,78 @@
                                 }
                             </div>
                         </div>
-                        <div>
+                        <div class=" d-flex gap-1">
                             @if(puedeGestionar&&items.EstadoAlerta==TipoEstado.EstadoAlerta.Activa)
                             {
-                                <form asp-controller="Alerta" asp-action="Tomar" method="post">
+                                <form asp-controller="Alertas" asp-action="Tomar" method="post" class="d-inline">
                                     <input type="hidden" name="id" value="@items.Id"/>
-                                    <button type="submit" class="btn btn-sm" >Tomar</button>
+                                    <button type="submit" class="btn btn-sm btn-theme-success" >Tomar</button>
                                 </form>
                             }
                             @if(puedeGestionar)
                             {
-                                <a asp-controller="Alertas" asp-action="Resolver" asp-route-id="@items.Id">Resolver</a>
+                                <a asp-controller="Alertas" asp-action="Resolver" asp-route-id="@items.Id" class="btn btn-outline-success btn-sm">Resolver</a>
                             }
                             @if(items.TipoAlerta==TipoEstado.TipoAlerta.AccesoNoAutorizado && VerAcceso)
                             {
                                 
-                                <a asp-controller="Acceso" asp-action="Index" asp-route-institucionid="@items.InstitucionId">Ver Acceso</a>
+                                <a asp-controller="Acceso" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-secondary btn-sm">Ver Accesos</a>
                             }
                             else if(items.TipoAlerta!=TipoEstado.TipoAlerta.AccesoNoAutorizado)
                             {   
-                                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionid="@items.InstitucionId">Ver Contenedor</a>
+                                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-dark btn-sm">Ver Contenedores</a>
                             }
                         </div>
                     </div>
                 }
                 if(item.Count()>3)
                 {
-                    <a asp-controller="Alertas" asp-action="Index">Ver @item.Count() Alertas</a>
+                    <a asp-controller="Alertas" asp-action="Index" class="small">Ver @item.Count() Alertas</a>
                 }
             }
             @if(Model.InstitucionId==0&&Model.Cola.Count>0 && sinPendiente>0)
             {
-                <div>@sinPendiente Instituciones Sin Pendientes</div>
+                <div class="alert alert-success py-2 mt-3 mb-0">@sinPendiente Instituciones Sin Pendientes</div>
             }
         </div>
     </div>
 </div>
+
+@section Scripts{
+    <script>
+        const tablero = document.getElementById("dashboard");
+        const institucionId = Number(tablero.dataset.institucion);
+        const abiertasAlCargar = Number(tablero.dataset.abiertas);
+
+        // Pide los números al servidor y actualiza las tarjetas (sin recargar la página)
+        async function actualizarResumen() {
+            const resp = await fetch(`/Dashboard/Resumen?institucionId=${institucionId}`);
+            if (!resp.ok) return;
+            const r = await resp.json();
+            document.getElementById("kpi-criticos").textContent = r.contenedoresCriticos;
+            document.getElementById("kpi-alertas").textContent = r.alertasAbiertas;
+            document.getElementById("kpi-offline").textContent = r.sensoresOffline;
+            document.getElementById("kpi-acceso").textContent = r.accesosHoy;
+            document.getElementById("kpi-denegado").textContent = r.accesosDenegadosHoy;
+            document.getElementById("kpi-litros").textContent =
+                r.litrosHoy.toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " L";
+        }
+
+        // Si llegan varios mensajes seguidos, se actualiza una sola vez
+        let espera = null;
+        function programarActualizacion() {
+            clearTimeout(espera);
+            espera = setTimeout(actualizarResumen, 1500);
+        }
+
+        conexionMonitoreo.on("NuevoAcceso", programarActualizacion);
+        conexionMonitoreo.on("DispositivoOffline", programarActualizacion);
+        conexionMonitoreo.on("NuevaLectura", programarActualizacion);
+
+        // Cambió la cola de alertas → recargar la página (es lo que más importa ver)
+        conexionMonitoreo.on("AlertasAbiertas", total => {
+            if (total !== abiertasAlCargar) location.reload();
+        });
+        conexionMonitoreo.on("NuevaAlerta", () => location.reload());
+    </script>
+}
