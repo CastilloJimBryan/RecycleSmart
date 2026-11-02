@@ -6,7 +6,9 @@
     var p = Model.usoPlan;
     bool puedeGestionar = User.TieneRol(Roles.Operacion);
     bool VerAcceso = User.TieneRol(Roles.Control);
+
     var hoy = DateTime.Now.ToString("dddd d 'de' MMMM ", new CultureInfo("es-AR"));
+    hoy = char.ToUpper(hoy[0]) + hoy.Substring(1);
 
     string Duracion(TimeSpan d) => d.TotalMinutes < 60 ? $"{(int)d.TotalMinutes} min"
     : d.TotalHours < 24 ? $"{(int)d.TotalHours} h{d.Minutes} min"
@@ -29,7 +31,6 @@
         <div>
             <h2 class="mb-0">Dashboard</h2>
             <div class="d-flex flex-wrap align-items-center gap-3 small text-muted mt-1">
-                <span>Plan: <strong>@p.PlanNombre</strong></span>
                 <span class="d-flex align-items-center gap-1">
                     <span class="progress" style="width:60px;height:6px">
                         <span class="progress-bar bg-success" style="@($"width:{porcion(p.Instituciones, p.MaxInstituciones)}%")"></span>
@@ -68,7 +69,7 @@
             <div class="card h-100 shadow-sm" style="border-top:4px solid var(--bs-warning)">
                 <div class="card-body text-center">
                     <div class="fs-2 fw-semibold" id="kpi-alertas">@Model.ResumenDashboard.AlertasAbiertas</div>
-                    <div class="text-muted small">Alertar Abiertas</div>
+                    <div class="text-muted small">Alertas Abiertas</div>
                 </div>
             </div>
         </div>
@@ -92,7 +93,7 @@
         <div class="col">
             <div class="card h-100 shadow-sm" style="border-top:4px solid var(--bs-black)">
                 <div class="card-body text-center">
-                    <div class="fs-2 fw-semibold" id="kpi-litros">@Model.ResumenDashboard.LitrosHoy.ToString("0.#")</div>
+                    <div class="fs-2 fw-semibold" id="kpi-litros">@Model.ResumenDashboard.LitrosHoy.ToString("0.#") L</div>
                     <div class="text-muted small">Depositado Hoy</div>
                 </div>
             </div>
