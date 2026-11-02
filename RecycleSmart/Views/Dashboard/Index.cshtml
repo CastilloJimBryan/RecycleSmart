@@ -1,1 +1,156 @@
-﻿<h2>Soy el Dashboard</h2>
+﻿@using System.Globalization
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    bool puedeGestionar = User.TieneRol(Roles.Operacion);
+    bool VerAcceso = User.TieneRol(Roles.Control);
+    var hoy = DateTime.Now.ToString("dddd d 'de' MMMM ", new CultureInfo("es-AR"));
+
+    string Duracion(TimeSpan d) => d.TotalMinutes < 60 ? $"{(int)d.TotalMinutes} min"
+    : d.TotalHours < 24 ? $"{(int)d.TotalHours} h{d.Minutes} min"
+    : $"{(int)d.TotalDays}  d{d.Hours} h";
+
+    //orden primero las criticas
+
+    var grupos = Model.Cola.GroupBy(a => new { a.InstitucionId, a.InstitucionNombre }).OrderByDescending(
+    g => g.Any(a => a.TipoSeveridad == TipoEstado.Severidad.Critico)).ThenByDescending(g => g.Count()).ToList();
+
+    int sinPendiente = Model.InstitucionClientes.Count(i => !Model.Cola.Any(a => a.InstitucionId == i.Id));
+}
+
+<div id="dashboard" data-intitucion="@Model.InstitucionId" data-abierta="@Model.AlertasAbiertaXEmpresa">
+    <span class="text-capitalize text-muted">@hoy</span>
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+            <h2 class="mb-0">Dashboard</h2>
+            <span class="text-capitalize text-muted">@hoy</span>
+        </div>
+        <form asp-action="Index" method="get">
+            <label class="form-label small text-muted mb-1" for="institucionId">Institucion</label>
+            <select class="form-select" id="institucionId" name="institucionId" onchange="this.form.submit()">
+                <option value="0">Todas Las Instituciones (@Model.InstitucionClientes.Count) </option>
+                @foreach (var item in Model.InstitucionClientes)
+                    {
+                        <option value="@item.Id" selected="@(item.Id==Model.InstitucionId)">@item.Nombre</option>
+                    }
+            </select>
+        </form>
+    </div>
+    <div class="row row-cols-2 row-cols-lg-5 g-3 mb-4">
+        <div class="col">
+            <div class="card h-100 shadow-sm " style="border-top:4px solid var(--bs-danger)">
+                <div class="card-body text-center">
+                    <div class="fs-2 fw-semibold" id="kpi-criticos">@Model.ResumenDashboard.ContenedorCriticos</div>
+                    <div class="text-muted small">Contenedores Criticos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm" style="border-top:4px solid var(--bs-warning)">
+                <div class="card-body text-center">
+                    <div class="fs-2 fw-semibold" id="kpi-alertas">@Model.ResumenDashboard.AlertasAbiertas</div>
+                    <div class="text-muted small">Alertar Abiertas</div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm" style="border-top:4px solid var(--bs-secondary)">
+                <div class="card-body text-center">
+                    <div class="fs-2 fw-semibold" id="kpi-offline">@Model.ResumenDashboard.SensoresOffline</div>
+                    <div class="text-muted small">Sensores Sin Conexion</div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm" style="border-top:4px solid var(--bs-success)">
+                <div class="card-body text-center">
+                    <div class="fs-2 fw-semibold" id="kpi-acceso">@Model.ResumenDashboard.AccesosHoy</div>
+                    <div class="text-muted small">Accesos Hoy - <span id="kpi-denegado">@Model.ResumenDashboard.AccesosDenegadosHoy</span> Denegados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm" style="border-top:4px solid var(--bs-black)">
+                <div class="card-body text-center">
+                    <div class="fs-2 fw-semibold" id="kpi-litros">@Model.ResumenDashboard.LitrosHoy.ToString("0.#")</div>
+                    <div class="text-muted small">Depositado Hoy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    //Atencion
+    <div>
+        <div>
+            <div>
+                <h5>Necesitan Atencion</h5>
+                @if(Model.Cola.Count>0)
+                {
+                    
+                }
+            </div>
+            @if(Model.Cola.Count==0)
+            {
+                <div>Todo en Orden</div>
+            }
+            @foreach (var item in grupos)
+            {
+                if(Model.InstitucionId==0)
+                {
+                    <div>
+                        <strong>@item.Key.InstitucionNombre</strong>
+                        <span>@item.Count() Pendientes</span>
+                    </div>
+                }
+                @foreach (var items in item.Take(3))
+                {
+                    bool critico = items.TipoSeveridad == TipoEstado.Severidad.Critico;
+                    <div>
+                        <div>
+                            <div>
+                                @items.ContenedorNombre
+                            </div>
+                            <div>
+                                @items.Mensaje - Abierta Hace @Duracion(items.Duracion)
+                                @if (items.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion)
+                                {
+                                    <text>En Gestion por @items.UsuarioGestionNombre</text>
+                                }
+                            </div>
+                        </div>
+                        <div>
+                            @if(puedeGestionar&&items.EstadoAlerta==TipoEstado.EstadoAlerta.Activa)
+                            {
+                                <form asp-controller="Alerta" asp-action="Tomar" method="post">
+                                    <input type="hidden" name="id" value="@items.Id"/>
+                                    <button type="submit" class="btn btn-sm" >Tomar</button>
+                                </form>
+                            }
+                            @if(puedeGestionar)
+                            {
+                                <a asp-controller="Alertas" asp-action="Resolver" asp-route-id="@items.Id">Resolver</a>
+                            }
+                            @if(items.TipoAlerta==TipoEstado.TipoAlerta.AccesoNoAutorizado && VerAcceso)
+                            {
+                                
+                                <a asp-controller="Acceso" asp-action="Index" asp-route-institucionid="@items.InstitucionId">Ver Acceso</a>
+                            }
+                            else if(items.TipoAlerta!=TipoEstado.TipoAlerta.AccesoNoAutorizado)
+                            {   
+                                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionid="@items.InstitucionId">Ver Contenedor</a>
+                            }
+                        </div>
+                    </div>
+                }
+                if(item.Count()>3)
+                {
+                    <a asp-controller="Alertas" asp-action="Index">Ver @item.Count() Alertas</a>
+                }
+            }
+            @if(Model.InstitucionId==0&&Model.Cola.Count>0 && sinPendiente>0)
+            {
+                <div>@sinPendiente Instituciones Sin Pendientes</div>
+            }
+        </div>
+    </div>
+</div>
