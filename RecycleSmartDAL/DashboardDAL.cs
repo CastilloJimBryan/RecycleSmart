@@ -27,7 +27,7 @@ namespace RecycleSmartDAL
                 " (SELECT COUNT (*) FROM Alerta WHERE Alerta.ContenedorId IN (SELECT Id FROM CONT) " +
                 " AND Alerta.EstadoAlerta<>'Resuelta') AS AlertasAbiertas," +
                 " (SELECT COUNT (*) FROM DispositivoIoT WHERE DispositivoIoT.ContenedorId IN (SELECT Id FROM CONT)" +
-                " AND DispositivoIoT.EstadoDispositivo<>'Offline') AS SensoresOffline," +
+                " AND DispositivoIoT.EstadoDispositivo='Offline') AS SensoresOffline," +
                 " (SELECT COUNT (*) FROM EventoAcceso WHERE EventoAcceso.ContenedorId IN (SELECT Id FROM CONT)" +
                 " AND EventoAcceso.Fecha>=CAST(GETDATE() AS DATE )) AS AccesoHoy," +
                 " (SELECT COUNT (*) FROM EventoAcceso WHERE EventoAcceso.ContenedorId IN (SELECT Id FROM CONT)" +

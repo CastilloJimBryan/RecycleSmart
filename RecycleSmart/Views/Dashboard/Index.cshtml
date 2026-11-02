@@ -167,13 +167,13 @@
             const resp = await fetch(`/Dashboard/Resumen?institucionId=${institucionId}`);
             if (!resp.ok) return;
             const r = await resp.json();
-            document.getElementById("kpi-criticos").textContent = r.contenedoresCriticos;
-            document.getElementById("kpi-alertas").textContent = r.alertasAbiertas;
-            document.getElementById("kpi-offline").textContent = r.sensoresOffline;
-            document.getElementById("kpi-acceso").textContent = r.accesosHoy;
-            document.getElementById("kpi-denegado").textContent = r.accesosDenegadosHoy;
+            document.getElementById("kpi-criticos").textContent = r.ContenedoresCriticos;
+            document.getElementById("kpi-alertas").textContent = r.AlertasAbiertas;
+            document.getElementById("kpi-offline").textContent = r.SensoresOffline;
+            document.getElementById("kpi-acceso").textContent = r.AccesosHoy;
+            document.getElementById("kpi-denegado").textContent = r.AccesosDenegadosHoy;
             document.getElementById("kpi-litros").textContent =
-                r.litrosHoy.toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " L";
+                r.LitrosHoy.toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " L";
         }
 
         // Si llegan varios mensajes seguidos, se actualiza una sola vez

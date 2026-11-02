@@ -47,7 +47,7 @@ namespace RecycleSmart.Controllers
 
         public IActionResult Resumen(int institucionId=0)
         {
-            int empresaid = Servicio.ManejosSesiones.ObtenerUsuarioEmpresaLogistica(User);
+            int empresaid = Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
             return Json(_dashboardBL.ObtenerResumen(empresaid, institucionId));
         }
     }
