@@ -10,6 +10,7 @@ namespace RecycleSmart.Models
         public int InstitucionId {  get; set; }
         public int AlertasAbiertaXEmpresa { get; set; }
         public UsoPlan usoPlan{  get; set; }=new UsoPlan();
+        public LitrosxHora LitrosHora { get; set; } = new LitrosxHora();
 
     }
 }

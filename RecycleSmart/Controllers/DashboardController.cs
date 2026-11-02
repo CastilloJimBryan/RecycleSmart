@@ -47,6 +47,7 @@ namespace RecycleSmart.Controllers
                 Cola = _dashboardBL.Atencion(empresaid, institucionId),
                 AlertasAbiertaXEmpresa = _alertaBL.ContarAlertasAbiertas(empresaid),
 
+                LitrosHora = _dashboardBL.LitrosPorHora(empresaid, institucionId),
 
                 usoPlan = new UsoPlan()
                 {
@@ -64,6 +65,13 @@ namespace RecycleSmart.Controllers
         {
             int empresaid = Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
             return Json(_dashboardBL.ObtenerResumen(empresaid, institucionId));
+
+        }
+
+        public IActionResult Litros(int institucionid=0)
+        {
+            int empresaid = Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
+            return Json(_dashboardBL.LitrosPorHora(empresaid, institucionid));
         }
     }
 }

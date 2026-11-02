@@ -30,5 +30,9 @@ namespace RecycleSmartBLL
             }
             return alertas;
         }
+        public LitrosxHora LitrosPorHora(int empresaid,int intitucionid)
+        {
+            return _dashboarDAL.LitrosPorHora(empresaid, intitucionid);
+        }
     }
 }

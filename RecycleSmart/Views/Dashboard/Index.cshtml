@@ -25,7 +25,7 @@
     int sinPendiente = Model.InstitucionClientes.Count(i => !Model.Cola.Any(a => a.InstitucionId == i.Id));
 }
 
-<div id="dashboard" data-intitucion="@Model.InstitucionId" data-abierta="@Model.AlertasAbiertaXEmpresa">
+<div id="dashboard" data-intitucion="@Model.InstitucionId" data-abiertas="@Model.AlertasAbiertaXEmpresa">
     <span class="text-capitalize text-muted">@hoy</span>
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
@@ -99,83 +99,109 @@
             </div>
         </div>
     </div>
-    <div class=" card shadow-sm">
-        <div class="card-body">
-            <div class="d-flex justify-content-between mb-3">
-                <h5 class="text-uppercase text-muted small fw-semibold mb-0">Necesitan Atencion</h5>
-                @if(Model.Cola.Count>0)
-                {
-                    <span class="text-muted small">@Model.Cola.Count Pendientes</span>
-                }
-            </div>
-            @if(Model.Cola.Count==0)
-            {
-                <div class="text-success fw-semibold text-center py-3">Todo en Orden</div>
-            }
-            @foreach (var item in grupos)
-            {
-                if(Model.InstitucionId==0)
-                {
-                    <div class="d-flex justify-content-between border-bottom pb-1 mb-2 mt-3">
-                        <strong>@item.Key.InstitucionNombre</strong>
-                        <span class="text-muted small">@item.Count() Pendientes</span>
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class=" card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5 class="text-uppercase text-muted small fw-semibold mb-0">Necesitan Atencion</h5>
+                        @if(Model.Cola.Count>0)
+                        {
+                            <span class="text-muted small">@Model.Cola.Count Pendientes</span>
+                        }
                     </div>
-                }
-                @foreach (var items in item.Take(3))
-                {
-                    bool critico = items.TipoSeveridad == TipoEstado.Severidad.Critico;
-                    <div class="d-flex flex-wrap align-items-center gap-2 border rounded p-2 mb-2" style="border-left: 5px solid @(critico?"var(--bg-danger)":"var(--bg-warning)")!important">
-                        <div class="flex-grow-1">
-                            <div class="fw-semibold">
-                                @items.ContenedorNombre
-                                <span class="badge @(critico?"bg-danger":"bg-warning text-dark")">@items.TipoAlerta - @items.TipoSeveridad</span>
+                    @if(Model.Cola.Count==0)
+                    {
+                        <div class="text-success fw-semibold text-center py-3">Todo en Orden</div>
+                    }
+                    @foreach (var item in grupos)
+                    {
+                        if(Model.InstitucionId==0)
+                        {
+                            <div class="d-flex justify-content-between border-bottom pb-1 mb-2 mt-3">
+                                <strong>@item.Key.InstitucionNombre</strong>
+                                <span class="text-muted small">@item.Count() Pendientes</span>
                             </div>
-                            <div class="text-muted small">
-                                @items.Mensaje - Abierta Hace @Duracion(items.Duracion)
-                                @if (items.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion)
-                                {
-                                    <text>En Gestion por @items.UsuarioGestionNombre</text>
-                                }
-                            </div>
-                        </div>
-                        <div class=" d-flex gap-1">
-                            @if(puedeGestionar&&items.EstadoAlerta==TipoEstado.EstadoAlerta.Activa)
-                            {
-                                <form asp-controller="Alertas" asp-action="Tomar" method="post" class="d-inline">
-                                    <input type="hidden" name="id" value="@items.Id"/>
-                                    <button type="submit" class="btn btn-sm btn-theme-success" >Tomar</button>
-                                </form>
-                            }
-                            @if(puedeGestionar)
-                            {
-                                <a asp-controller="Alertas" asp-action="Resolver" asp-route-id="@items.Id" class="btn btn-outline-success btn-sm">Resolver</a>
-                            }
-                            @if(items.TipoAlerta==TipoEstado.TipoAlerta.AccesoNoAutorizado && VerAcceso)
-                            {
+                        }
+                        foreach (var items in item.Take(3))
+                        {
+                            bool critico = items.TipoSeveridad == TipoEstado.Severidad.Critico;
+                            <div class="d-flex flex-wrap align-items-center gap-2 border rounded p-2 mb-2" style="border-left: 5px solid @(critico?"var(--bs-danger)":"var(--bs-warning)")!important">
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">
+                                        @items.ContenedorNombre
+                                        <span class="badge @(critico?"bg-danger":"bg-warning text-dark")">@items.TipoAlerta - @items.TipoSeveridad</span>
+                                    </div>
+                                    <div class="text-muted small">
+                                        @items.Mensaje - Abierta Hace @Duracion(items.Duracion)
+                                        @if (items.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion)
+                                        {
+                                            <text> En Gestion por @items.UsuarioGestionNombre</text>
+                                        }
+                                    </div>
+                                </div>
+                                <div class=" d-flex gap-1">
+                                    @if(puedeGestionar&&items.EstadoAlerta==TipoEstado.EstadoAlerta.Activa)
+                                    {
+                                        <form asp-controller="Alertas" asp-action="Tomar" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@items.Id"/>
+                                            <button type="submit" class="btn btn-sm btn-theme-success" >Tomar</button>
+                                        </form>
+                                    }
+                                    @if(puedeGestionar)
+                                    {
+                                        <a asp-controller="Alertas" asp-action="Resolver" asp-route-id="@items.Id" class="btn btn-outline-success btn-sm">Resolver</a>
+                                    }
+                                    @if(items.TipoAlerta==TipoEstado.TipoAlerta.AccesoNoAutorizado && VerAcceso)
+                                    {
                                 
-                                <a asp-controller="Acceso" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-secondary btn-sm">Ver Accesos</a>
-                            }
-                            else if(items.TipoAlerta!=TipoEstado.TipoAlerta.AccesoNoAutorizado)
-                            {   
-                                <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-dark btn-sm">Ver Contenedores</a>
-                            }
-                        </div>
+                                        <a asp-controller="Acceso" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-secondary btn-sm">Ver Accesos</a>
+                                    }
+                                    else if(items.TipoAlerta!=TipoEstado.TipoAlerta.AccesoNoAutorizado)
+                                    {   
+                                        <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-dark btn-sm">Ver Contenedores</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        if(item.Count()>3)
+                        {
+                            <a asp-controller="Alertas" asp-action="Index" class="small">Ver @item.Count() Alertas</a>
+                        }
+                    }
+                    @if(Model.InstitucionId==0&&Model.Cola.Count>0 && sinPendiente>0)
+                    {
+                        <div class="alert alert-success py-2 mt-3 mb-0">@sinPendiente Instituciones Sin Pendientes</div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="text-uppercase text-muted small fw-semibold">Litros Depositados Por Hora</h5>
+                    <div class="d-flex justify-content-between align-items-baseline mb-2">
+                        <span class="fs-4 fw-semibold " id="litros-total"></span>
+                        <span class="small" id="litros-comparacion"></span>
                     </div>
-                }
-                if(item.Count()>3)
-                {
-                    <a asp-controller="Alertas" asp-action="Index" class="small">Ver @item.Count() Alertas</a>
-                }
-            }
-            @if(Model.InstitucionId==0&&Model.Cola.Count>0 && sinPendiente>0)
-            {
-                <div class="alert alert-success py-2 mt-3 mb-0">@sinPendiente Instituciones Sin Pendientes</div>
-            }
+                    <div style="height:200px">
+                        <canvas id="grafico-litros" data-hoy="@Json.Serialize(Model.LitrosHora.Hoy)" data-ayer="@Json.Serialize(Model.LitrosHora.Ayer)"></canvas>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted border-top pt-2 mt-2">
+                        <span id="litros-pico"></span>
+                        @if(User.TieneRol(Roles.Control))
+                        {
+                            <a asp-controller="Acceso" asp-action="Index" asp-route-intitucionid="@Model.InstitucionId">Ver Log de Accesos</a>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
         const tablero = document.getElementById("dashboard");
         const institucionId = Number(tablero.dataset.institucion);
@@ -186,13 +212,14 @@
             const resp = await fetch(`/Dashboard/Resumen?institucionId=${institucionId}`);
             if (!resp.ok) return;
             const r = await resp.json();
-            document.getElementById("kpi-criticos").textContent = r.ContenedoresCriticos;
-            document.getElementById("kpi-alertas").textContent = r.AlertasAbiertas;
-            document.getElementById("kpi-offline").textContent = r.SensoresOffline;
-            document.getElementById("kpi-acceso").textContent = r.AccesosHoy;
-            document.getElementById("kpi-denegado").textContent = r.AccesosDenegadosHoy;
-            document.getElementById("kpi-litros").textContent =
-                r.LitrosHoy.toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " L";
+            document.getElementById("kpi-criticos").textContent = r.contenedoresCriticos;
+            document.getElementById("kpi-alertas").textContent = r.alertasAbiertas;
+            document.getElementById("kpi-offline").textContent = r.sensoresOffline;
+            document.getElementById("kpi-acceso").textContent = r.accesosHoy;
+            document.getElementById("kpi-denegado").textContent = r.accesosDenegadosHoy;
+            document.getElementById("kpi-litros").textContent = r.litrosHoy.toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " L";
+            
+            actualizarLitros();
         }
 
         // Si llegan varios mensajes seguidos, se actualiza una sola vez
@@ -211,5 +238,76 @@
             if (total !== abiertasAlCargar) location.reload();
         });
         conexionMonitoreo.on("NuevaAlerta", () => location.reload());
+
+        //Grafico litros
+
+        const canvas = document.getElementById("grafico-litros");
+        const horas = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0"));
+        const horaActual = new Date().getHours();
+
+        // Hoy: las horas que todavía no llegaron van en null (no se dibujan)
+        const soloHastaAhora = datos => datos.map((v, h) => h > horaActual ? null : v);
+
+        const grafico = new Chart(canvas, {
+            data: {
+                labels: horas,
+                datasets: [
+                    {
+                        type: "bar", label: "Hoy",
+                        data: soloHastaAhora(JSON.parse(canvas.dataset.hoy)),
+                        backgroundColor: horas.map((_, h) => h === horaActual ? "rgba(25,135,84,.5)" : "rgb(25,135,84)"),
+                        borderRadius: 2
+                    },
+                    {
+                        type: "line", label: "Ayer",
+                        data: JSON.parse(canvas.dataset.ayer),
+                        borderColor: "#6c757d", borderDash: [4, 3], borderWidth: 1.5,
+                        pointRadius: 0, tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: "bottom", labels: { boxWidth: 12 } } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => v + " L" } },
+                    x: { ticks: { maxTicksLimit: 8 } }
+                }
+            }
+        });
+
+        function resumirLitros() {
+            const hoy = grafico.data.datasets[0].data.map(v => v ?? 0);
+            const ayer = grafico.data.datasets[1].data;
+            const total = hoy.reduce((a, b) => a + b, 0);
+            const ayerHastaAhora = ayer.slice(0, horaActual + 1).reduce((a, b) => a + b, 0);
+            const pico = hoy.indexOf(Math.max(...hoy));
+
+            document.getElementById("litros-total").textContent =
+                total.toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " L";
+
+            const comp = document.getElementById("litros-comparacion");
+            if (ayerHastaAhora > 0) {
+                const dif = Math.round((total / ayerHastaAhora - 1) * 100);
+                comp.innerHTML = `<span class="${dif >= 0 ? "text-success" : "text-warning"}">${dif >= 0 ? "▲" : "▼"} ${Math.abs(dif)} %</span> vs. ayer a esta hora`;
+            } else {
+                comp.textContent = "";
+            }
+
+            document.getElementById("litros-pico").textContent =
+                total > 0 ? `Pico: ${horas[pico]} h · ${hoy[pico].toLocaleString("es-AR")} L` : "Sin depósitos hoy";
+        }
+        resumirLitros();
+
+        async function actualizarLitros() {
+            const resp = await fetch(`/Dashboard/Litros?institucionId=${institucionId}`);
+            if (!resp.ok) return;
+            const l = await resp.json();
+            grafico.data.datasets[0].data = soloHastaAhora(l.hoy);
+            grafico.data.datasets[1].data = l.ayer;
+            grafico.update();
+            resumirLitros();
+        }
+
     </script>
 }
