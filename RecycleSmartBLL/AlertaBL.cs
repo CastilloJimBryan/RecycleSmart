@@ -157,7 +157,7 @@ namespace RecycleSmartBLL
             var novedad=new List<Alerta>();
             var severidad = minutosSinDatos>minutosLimite *2 ? TipoEstado.Severidad.Critico : TipoEstado.Severidad.Advertencia;
             Procesar(contenedorId, TipoEstado.TipoAlerta.SinConexion, severidad, minutosSinDatos, minutosLimite,
-                $"Sensor Sin Conexion hace {minutosSinDatos} min (maximo{minutosLimite} min)", novedad);
+                $"Sensor Sin Conexion hace {minutosSinDatos} min (maximo {minutosLimite} min)", novedad);
             return novedad;
         }
         public static string MotivoText(TipoEstado.MotivoAcceso m)

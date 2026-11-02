@@ -9,6 +9,7 @@ namespace RecycleSmart.Models
         public List<InstitucionCliente> InstitucionClientes { get; set; } = new List<InstitucionCliente>();
         public int InstitucionId {  get; set; }
         public int AlertasAbiertaXEmpresa { get; set; }
+        public UsoPlan usoPlan{  get; set; }=new UsoPlan();
 
     }
 }
