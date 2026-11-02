@@ -138,7 +138,7 @@ class Sensor
         if (Nivel >= 100)
         {
             LecturaLLeno++;
-            if(LecturaLLeno>=6)
+            if(LecturaLLeno>=5)
             {
                 Nivel = rnd.Next(0, 5);
                 LecturaLLeno = 0;
