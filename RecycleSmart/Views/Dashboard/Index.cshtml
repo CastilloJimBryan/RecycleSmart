@@ -25,7 +25,7 @@
     int sinPendiente = Model.InstitucionClientes.Count(i => !Model.Cola.Any(a => a.InstitucionId == i.Id));
 }
 
-<div id="dashboard" data-intitucion="@Model.InstitucionId" data-abiertas="@Model.AlertasAbiertaXEmpresa">
+<div id="dashboard" data-institucion="@Model.InstitucionId" data-abiertas="@Model.AlertasAbiertaXEmpresa">
     <span class="text-capitalize text-muted">@hoy</span>
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
