@@ -1,0 +1,203 @@
+﻿@using RecycleSmartBLL
+@model ContenedorDetalleViewModel
+
+@{
+    ViewData["Title"] = "Detalle Contenedor";
+
+    var c = Model.Contenedor;
+    var d = Model.Dispositivos;
+    var t = Model.Telemetria;
+    var u = Model.Umbral;
+
+    bool esAdmin = User.IsInRole(Roles.Administrador);
+    bool PuedeGestionar = User.IsInRole(Roles.Operacion);
+    bool tieneAlertas = Model.AlertasAbiertas.Count > 0;
+
+    string colorNivel = "bg-success";
+    if(t!=null)
+    {
+        var clase = UmbralBL.ClasificarLectura(t, u);
+        colorNivel = clase == TipoEstado.ClasificacionLectura.Critico ? "bg-danger"
+        : clase == TipoEstado.ClasificacionLectura.Advertencia ? "bg-warning" : "bg-success";
+    };
+
+}
+
+<partial name="_Mensajes" />
+
+<div class="small text-muted mb-1">
+    <a asp-action="Index" asp-route-institucionId="@c.InstitucionId">Contenedores</a> › @c.Nombre
+</div>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+    <div>
+        <h2 class="mb-0">@c.Nombre <span class="badge @EstadosColor.EstadoBadge(c.Estado.ToString()) fs-6 align-middle">@c.Estado</span></h2>
+        <span class="text-muted">@Model.InstitucionNombre · Piso @c.Piso · @c.Sector</span>
+    </div>
+    @if (esAdmin)
+    {
+        <div class="d-flex gap-2">
+            <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-outline-dark">Editar</a>
+            @if (tieneAlertas)
+            {
+                <button class="btn btn-outline-danger" disabled title="Tiene alertas abiertas: resolvelas antes de dar de baja">Dar de baja</button>
+            }
+            else
+            {
+                <a asp-action="Baja" asp-route-id="@c.Id" class="btn btn-outline-danger">Dar de baja</a>
+            }
+        </div>
+    }
+</div>
+
+<div class="row g-3 mb-3">
+    @* ---------- Datos ---------- *@
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted small fw-semibold">Datos</h6>
+                <dl class="row small mb-0">
+                    <dt class="col-7">Tipo de residuo</dt>
+                    <dd class="col-5">@c.TipoResiduo</dd>
+                    <dt class="col-7">Capacidad</dt>
+                    <dd class="col-5">@c.CapacidadLitros L</dd>
+                    <dt class="col-7">Piso</dt>
+                    <dd class="col-5">@c.Piso</dd>
+                    <dt class="col-7">Sector</dt>
+                    <dd class="col-5">@c.Sector</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    @* ---------- Dispositivo ---------- *@
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted small fw-semibold">Dispositivo IoT</h6>
+                @if (d == null)
+                {
+                    <p class="text-muted small">Sin dispositivo vinculado.</p>
+                    if (esAdmin)
+                    {
+                        <a asp-controller="DispositivoIoT" asp-action="Vincular" asp-route-contenedorId="@c.Id" class="btn btn-outline-dark btn-sm">Vincular</a>
+                    }
+                }
+                else
+                {
+                    <dl class="row small mb-0">
+                        <dt class="col-5">MAC</dt>
+                        <dd class="col-7"><code>@d.MacAdress</code></dd>
+                        <dt class="col-5">Estado</dt>
+                        <dd class="col-7"><span class="badge @EstadosColor.EstadoBadge(d.EstadoDispositivo.ToString())">@d.EstadoDispositivo</span></dd>
+                        <dt class="col-5">Firmware</dt>
+                        <dd class="col-7">@d.Firmware</dd>
+                        <dt class="col-5">Último dato</dt>
+                        <dd class="col-7">@(d.UltimaActualizacion?.ToString("dd/MM HH:mm") ?? "—")</dd>
+                    </dl>
+                }
+            </div>
+        </div>
+    </div>
+
+    @* ---------- Última lectura ---------- *@
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted small fw-semibold">Última lectura</h6>
+                @if (t == null)
+                {
+                    <p class="text-muted small mb-0">Sin lecturas todavía.</p>
+                }
+                else
+                {
+                    <div class="progress mb-1" style="height:18px">
+                        <div class="progress-bar @colorNivel" style="@($"width:{t.Nivel}%")">@t.Nivel %</div>
+                    </div>
+                    <dl class="row small mb-0 mt-2">
+                        <dt class="col-6">Temperatura</dt>
+                        <dd class="col-6">@t.Temperatura.ToString("0.0") °C</dd>
+                        <dt class="col-6">Humedad</dt>
+                        <dd class="col-6">@t.Humedad %</dd>
+                        <dt class="col-6">Batería</dt>
+                        <dd class="col-6">@t.Bateria %</dd>
+                        <dt class="col-6">Señal</dt>
+                        <dd class="col-6">@t.NivelConexion dBm</dd>
+                        <dt class="col-6">Fecha</dt>
+                        <dd class="col-6">@t.FechaHora.ToString("dd/MM HH:mm")</dd>
+                    </dl>
+                }
+            </div>
+        </div>
+    </div>
+
+    @* ---------- Umbral ---------- *@
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted small fw-semibold">Umbrales</h6>
+                @if (u == null)
+                {
+                    <p class="text-muted small">Sin configurar (se usan los valores por defecto).</p>
+                }
+                else
+                {
+                    <dl class="row small">
+                        <dt class="col-7">Advertencia</dt>
+                        <dd class="col-5">@u.NivelAdvertencia %</dd>
+                        <dt class="col-7">Crítico</dt>
+                        <dd class="col-5">@u.NivelCritico %</dd>
+                        <dt class="col-7">Temp. máxima</dt>
+                        <dd class="col-5">@u.TemperaturaMaxima.ToString("0.0") °C</dd>
+                        <dt class="col-7">Sin conexión</dt>
+                        <dd class="col-5">@u.MinutosSinConexion min</dd>
+                    </dl>
+                }
+                @if (User.TieneRol(Roles.Control))
+                {
+                    <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorid="@c.Id" class="btn btn-outline-dark btn-sm">
+                        @(User.TieneRol(Roles.Gestion) ? (u == null ? "Configurar" : "Editar") : "Ver")
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ---------- Alertas abiertas ---------- *@
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <h6 class="text-uppercase text-muted small fw-semibold">Alertas abiertas</h6>
+        @if (!tieneAlertas)
+        {
+            <p class="text-success small mb-0">✓ Sin alertas abiertas.</p>
+        }
+        @foreach (var a in Model.AlertasAbiertas)
+        {
+            bool critico = a.TipoSeveridad == TipoEstado.Severidad.Critico;
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border rounded p-2 mb-2"
+                 style="@($"border-left:5px solid var(--bs-{(critico ? "danger" : "warning")}) !important")">
+                <div>
+                    <span class="badge @(critico ? "bg-danger" : "bg-warning text-dark")">@a.TipoAlerta · @a.TipoSeveridad</span>
+                    <span class="small">@a.Mensaje</span>
+                </div>
+                @if (PuedeGestionar)
+                {
+                    <a asp-controller="Alerta" asp-action="Resolver" asp-route-id="@a.Id" class="btn btn-outline-success btn-sm">Resolver</a>
+                }
+            </div>
+        }
+        @if (tieneAlertas && esAdmin)
+        {
+            <p class="small text-muted mb-0">Para dar de baja el contenedor, primero hay que resolver sus alertas.</p>
+        }
+    </div>
+</div>
+
+@* ---------- Lotes (con Trazabilidad) ---------- *@
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h6 class="text-uppercase text-muted small fw-semibold">Lotes activos</h6>
+        <p class="text-muted small mb-0">Disponible cuando esté implementada la trazabilidad.</p>
+    </div>
+</div>

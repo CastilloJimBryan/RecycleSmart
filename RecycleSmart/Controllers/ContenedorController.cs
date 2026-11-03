@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecycleSmart.Filters;
+using RecycleSmart.Models;
 using RecycleSmartBE;
 using RecycleSmartBLL;
 using Servicio;
@@ -17,6 +18,7 @@ namespace RecycleSmart.Controllers
         readonly InstitucionClienteBLL _institucionClienteBLL;
         readonly UmbralBL _usmbralBL;
         readonly TelemetriaBL _telemetriaBL;
+        readonly AlertaBL _alertaBL;
         private int empresaid => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
 
         public ContenedorController(IConfiguration configuracion)
@@ -28,6 +30,7 @@ namespace RecycleSmart.Controllers
             _dispositivoIoT = new DispositivoIoTBL(conectar);
             _usmbralBL=new UmbralBL(conectar);
             _telemetriaBL=new TelemetriaBL(conectar);
+            _alertaBL=new AlertaBL(conectar);
         }
 
         public IActionResult Index(int institucionId = 0)
@@ -58,6 +61,29 @@ namespace RecycleSmart.Controllers
 
 
             return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
+        }
+        public IActionResult Detalle(int id)
+        {
+            int empresaid = Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
+            var contenedor = _contenedorBL.BuscarContenedorXId(id, empresaid);
+
+            var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid);
+            var institucion = contenedor == null ? null : instituciones.FirstOrDefault(i => i.Id == contenedor.InstitucionId);
+            if(contenedor==null || institucion==null)
+            {
+                TempData["Error"] = "El Contenedor NO Existe";
+                return RedirectToAction("Index");
+            }
+            var cd = new ContenedorDetalleViewModel()
+            {
+                Contenedor= contenedor,
+                InstitucionNombre=institucion.Nombre,
+                Dispositivos=_dispositivoIoT.BuscarXContenedor(contenedor.Id,empresaid),
+                Telemetria=_telemetriaBL.UltimasLecturas(institucion.Id,empresaid).GetValueOrDefault(contenedor.Id),
+                Umbral=_usmbralBL.Obtener(contenedor.Id, empresaid),
+                AlertasAbiertas=_alertaBL.ListarAlertasAbiertas(empresaid).Where(c=>c.ContenedorId==id).ToList(),
+            };
+            return View(cd);
         }
 
         [Authorize(Roles =Roles.Administrador)]

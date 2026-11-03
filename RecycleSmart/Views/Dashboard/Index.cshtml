@@ -16,7 +16,7 @@
     var p = Model.usoPlan;
     bool puedeGestionar = User.TieneRol(Roles.Operacion);
     bool VerAcceso = User.TieneRol(Roles.Control);
-    int maxInstituciones = 4;
+    int maxInstituciones = 3;
     var hoy = DateTime.Now.ToString("dddd d 'de' MMMM ", new CultureInfo("es-AR"));
     hoy = char.ToUpper(hoy[0]) + hoy.Substring(1);
 
@@ -187,7 +187,7 @@
             </div>
         </div>
         <div class="col-lg-4">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm ">
                 <div class="card-body">
                     <h5 class="text-uppercase text-muted small fw-semibold">Litros Depositados Por Hora</h5>
                     <div class="d-flex justify-content-between align-items-baseline mb-2">
@@ -212,7 +212,6 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-2">
                     <h5 class="text-uppercase text-muted small fw-semibold mb-0">Linea de Tiempo Hoy</h5>
-                    <span class="small text-muted">tocar algun punto</span>
                 </div>
                 <div class="linea-tiempo">
                     <div class="lt-eje"></div>
