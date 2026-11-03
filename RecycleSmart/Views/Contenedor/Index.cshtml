@@ -9,7 +9,7 @@
     int maximo = ViewBag.Maximo ?? 0;
     var dispositivo = ViewBag.Dispositivos as Dictionary<int, DispositivoIoT> ?? new();
     bool limiteAlcanzado = maximo != 0 && usada >= maximo;
-    bool PuedeGestionaar = User.IsInRole(Roles.Administrador) || User.IsInRole(Roles.Responsable);
+    bool PuedeGestionaar = User.IsInRole(Roles.Gestion);
     var umbral = ViewBag.Umbrales as Dictionary<int, Umbral> ?? new();
     var lecturas = ViewBag.Lecturas as Dictionary<int, Telemetria> ?? new();
 }
@@ -76,7 +76,6 @@ else
                         <th>DispositivoIoT</th>
                         <th>Estado</th>
                         <th>Nivel</th>
-                        <th>Umbrales</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -140,24 +139,12 @@ else
                                             </small>
                                 }
                                 else
-                                {
+                                { 
                                     <span class="text-muted">Sin Lecturas</span>
 
                                 }
                             </td>
-                            <td>
-                                @if(PuedeGestionaar && estado!="Baja")
-                                {
-                                    bool tiene = umbral.ContainsKey(item.Id);
-                                    <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorId="@item.Id"
-                                     class=" btn btn-sm btn-outline-dark">@(tiene ? "Editar":"Configurar")
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">@(umbral.ContainsKey(item.Id) ? "Configurado" : "-")</span>
-                                }
-                            </td>
+                           
                             <td>
                                     <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-sm btn-theme-success">Ver Detalle</a>
                             </td>

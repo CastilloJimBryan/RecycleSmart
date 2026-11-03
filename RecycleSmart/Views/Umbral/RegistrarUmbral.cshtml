@@ -75,7 +75,7 @@
            
             <div class="mb-3 d-flex justify-content-between">
             <button type="submit" class="btn btn-outline-success">@(nuevo?"Guardar Configuracion":"Guardar")</button>
-            <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionId="@contenedores?.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
+            <a asp-controller="Contenedor" asp-action="Detalle" asp-route-institucionId="@contenedores?.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
             </div>
         </form>
     </div>
