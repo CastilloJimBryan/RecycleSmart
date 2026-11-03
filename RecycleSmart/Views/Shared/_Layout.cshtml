@@ -207,29 +207,17 @@
             <main class="app-main">
                 @RenderBody()
             </main>
-
-            <footer class="footer">
-                <div class="container-fluid">
-                    <div class="row text-body-secondary">
-                        <div class="col-6 text-start">
-                            <a href="#" class="text-body-secondary">
-                                <strong>Empresa Cliente</strong>
-                            </a>
-                        </div>
-                        <div class="col-6 text-end text-body-secondary d-none d-md-block">
-                            <ul class="list-inline mb-0">
-                                <li class="list-inline-item">
-                                    <a href="#" class="text-body-secondary">_Contact</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a href="#" class="text-body-secondary">_Contact</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a href="#" class="text-body-secondary">_Contact</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+            @{
+                    string pie = "";
+                    if(User.Identity?.IsAuthenticated==true)
+                    {
+                        pie = tipoCuenta == "EmpresaLogistica" ? ManejosSesiones.ObtenerEmpresaNombre(User) : "Panel Recycle Smart";
+                    }
+                }
+            <footer class="footer small text-muted">
+                <div class="d-flex flex-wrap justify-content-between gap-2">
+                    <span>@pie</span>
+                    <span>Recycle Smart © @DateTime.Now.Year</span>
                 </div>
             </footer>
         </div>

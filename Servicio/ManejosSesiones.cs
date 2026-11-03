@@ -12,8 +12,9 @@ namespace Servicio
         public const string esquema = CookieAuthenticationDefaults.AuthenticationScheme;
         private const string ClaimEmpresa = "EmpresaLogisticaId";
         private const string ClaimTipoCuenta = "TipoCuenta";
+        private const string ClaimEmpresaNombre = "EmpresaNombre";
 
-        public static async Task IniciarSesionEmpresa(HttpContext contex, UsuarioEmpresaLogistica usuarioEmpresaLogistica)
+        public static async Task IniciarSesionEmpresa(HttpContext contex, UsuarioEmpresaLogistica usuarioEmpresaLogistica,string empresanombre)
         {
             var claim = new List<Claim>
             {
@@ -21,6 +22,7 @@ namespace Servicio
                 new Claim(ClaimTypes.Name, $"{usuarioEmpresaLogistica.Nombre} {usuarioEmpresaLogistica.Apellido}"),
                 new Claim(ClaimTypes.Role, usuarioEmpresaLogistica.Rol),
                 new Claim(ClaimEmpresa , usuarioEmpresaLogistica.EmpresaLogisticaId.ToString()),
+                new Claim(ClaimEmpresaNombre , empresanombre),
                 new Claim(ClaimTipoCuenta, TipoDeCuenta.EmpresaLogistica)
             };
             await Firmar(contex, claim);
@@ -51,6 +53,11 @@ namespace Servicio
         {
             var claim = user.FindFirst(ClaimEmpresa);
             return claim != null ? int.Parse(claim.Value) : 0;
+        }
+        public static string ObtenerEmpresaNombre(ClaimsPrincipal user)
+        {
+
+            return user.FindFirst(ClaimEmpresaNombre)?.Value ?? "";
         }
         public static string ObtenerTipoCuenta(ClaimsPrincipal user)
         {

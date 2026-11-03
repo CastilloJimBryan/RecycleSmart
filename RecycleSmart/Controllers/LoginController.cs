@@ -8,10 +8,12 @@ namespace RecycleSmart.Controllers
     public class LoginController : Controller
     {
         private readonly LoginBLL _loginBL;
+        private readonly EmpresaLogisticaBLL _empresabl;
         public LoginController(IConfiguration config)
         {
             string conexion = config.GetConnectionString("BDTFI")!;
             _loginBL = new LoginBLL(conexion);
+            _empresabl = new EmpresaLogisticaBLL(conexion);
         }
 
         public IActionResult Index(string? returnUrl)
@@ -39,7 +41,8 @@ namespace RecycleSmart.Controllers
                 var resultado = _loginBL.Autenticar(correo, clave);
                 if(resultado?.usuarioEmpresaLogistica is UsuarioEmpresaLogistica usuarioempresa)
                 {
-                    await ManejosSesiones.IniciarSesionEmpresa(HttpContext, usuarioempresa);
+                    var empresa = _empresabl.BuscarXId(usuarioempresa.EmpresaLogisticaId);
+                    await ManejosSesiones.IniciarSesionEmpresa(HttpContext, usuarioempresa,empresa?.Nombre??"");
                     return Volver(returnUrl, "Dashboard");
                 }
                 if(resultado?.usuarioRecycleSmart is UsuarioRecycleSmart usuarioRecycleSmart)
