@@ -9,6 +9,7 @@ var sensores = new List<Sensor>
     new Sensor { Mac = "AA:BB:CC:DD:AA:12", Nivel = 10 },
     new Sensor { Mac = "BB:CC:AA:01:00:DD", Nivel = 20 },
     new Sensor { Mac = "DD:DD:AA:11:FF:EF", Nivel = 5 },
+    new Sensor { Mac = "FF:12:DD:A1:B2:EE", Nivel = 5 },
 
     // new Sensor { Mac = "AA:BB:CC:DD:AA:13", Nivel = 50 },
 };
