@@ -81,7 +81,7 @@ namespace RecycleSmartDAL
                     while(leer.Read())
                     {
                         int hora = leer.GetInt32(leer.GetOrdinal("Hora"));
-                        decimal litros = leer.GetInt32(leer.GetOrdinal("Litros"));
+                        decimal litros = leer.GetDecimal(leer.GetOrdinal("Litros"));
                         if(leer.GetInt32(leer.GetOrdinal("EsHoy"))==1)
                         {
                             r.Hoy[hora] = litros;
