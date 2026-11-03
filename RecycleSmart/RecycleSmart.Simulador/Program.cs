@@ -6,7 +6,10 @@ using MQTTnet.Client;
 // ===== Configuración: poné tus MAC y una tarjeta asignada =====
 var sensores = new List<Sensor>
 {
-    new Sensor { Mac = "AA:BB:CC:DD:AA:12", Nivel = 20 },
+    new Sensor { Mac = "AA:BB:CC:DD:AA:12", Nivel = 10 },
+    new Sensor { Mac = "BB:CC:AA:01:00:DD", Nivel = 20 },
+    new Sensor { Mac = "DD:DD:AA:11:FF:EF", Nivel = 5 },
+
     // new Sensor { Mac = "AA:BB:CC:DD:AA:13", Nivel = 50 },
 };
 string uidTarjeta = "12345678";
@@ -46,6 +49,7 @@ while (true)
     if (Console.KeyAvailable)
     {
         var tecla = Console.ReadKey(true).KeyChar;
+        Console.WriteLine($"DEBUG tecla: '{tecla}' ({(int)tecla})");
         var s = sensores[elegido];
 
         if (char.IsDigit(tecla) && tecla != '0' && tecla - '1' < sensores.Count)

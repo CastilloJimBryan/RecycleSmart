@@ -39,7 +39,7 @@ else
             {
                 @if (puedegestionar)
                 {
-                    <a asp-action="RegistrarUsuario" asp-route-institucionId="@instiId" class="btn btn-success ">Registrar Usuario</a>
+                    <a asp-action="RegistrarUsuario" asp-route-institucionid="@instiId" class="btn btn-success ">Registrar Usuario</a>
                 }
             }
         </div>
@@ -88,7 +88,7 @@ else
                                         else if (puedegestionar && estado == "Activo")
                                         {
 
-                                            <a asp-controller="TarjetaRFID" asp-action="Asignar" asp-route-usuariointitucionId="@item.Id"  class="btn btn-outline-dark btn-sm">Asignar Tarjeta</a>
+                                            <a asp-controller="TarjetaRFID" asp-action="Asignar" asp-route-usuarioinstitucionId="@item.Id"  class="btn btn-outline-dark btn-sm">Asignar Tarjeta</a>
 
                                         }
                                         else

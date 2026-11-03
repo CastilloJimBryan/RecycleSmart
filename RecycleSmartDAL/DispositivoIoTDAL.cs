@@ -114,6 +114,7 @@ namespace RecycleSmartDAL
                             UltimaActualizacion = leer.IsDBNull(7) ? null : leer.GetDateTime(7),
                             EstadoDispositivo = Enum.Parse<TipoEstado.EstadoDispositivo>(leer.GetString(8), true),
                             ContenedorId = leer.GetInt32(9),
+                            
                         });
                     }
                 }

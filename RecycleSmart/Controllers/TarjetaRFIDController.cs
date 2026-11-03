@@ -28,17 +28,17 @@ namespace RecycleSmart.Controllers
 
 
         [Authorize(Roles = Roles.Gestion)]
-        public IActionResult Asignar(int usuarioid)
+        public IActionResult Asignar(int usuarioinstitucionId)
         {
             try
             {
-                var usuario = _tarjetaRFIDBL.ObtnerUsuario(usuarioid, empresaid);
+                var usuario = _tarjetaRFIDBL.ObtnerUsuario(usuarioinstitucionId, empresaid);
 
                 CargarFormulario(usuario);
 
                 return View(new TarjetaRFID
                 {
-                    UsuarioInstitucionId = usuarioid,
+                    UsuarioInstitucionId = usuarioinstitucionId,
                     FechaVecimiento = DateTime.Today,
                     HoraInicio=new TimeSpan(5,0,0),
                     HoraFin=new TimeSpan(23,0,0),
@@ -58,7 +58,6 @@ namespace RecycleSmart.Controllers
         [Authorize(Roles = Roles.Gestion)]
         public IActionResult Asignar(int usuarioinstitucionId,string ? uid,DateTime? fechavencimiento, int[]? dias,TimeSpan?horainicio,TimeSpan? horafin, int[]?contenedores )
         {
-            /* return Content($"DEBUG: usuarioId={usuarioinstitucionId} empresaId={empresaid}");*/
            var tarjeta = new TarjetaRFID
             {
                 UID = uid ?? "",
