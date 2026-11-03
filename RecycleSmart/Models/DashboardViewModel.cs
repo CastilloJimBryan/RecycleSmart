@@ -7,6 +7,9 @@ namespace RecycleSmart.Models
         public ResumenDashboard ResumenDashboard { get; set; }=new ResumenDashboard();
         public List<Alerta> Cola {  get; set; } = new List<Alerta>();
         public List<InstitucionCliente> InstitucionClientes { get; set; } = new List<InstitucionCliente>();
+
+        public List<EventoLineaTiempo> Linea {  get; set; }=new List<EventoLineaTiempo>();
+
         public int InstitucionId {  get; set; }
         public int AlertasAbiertaXEmpresa { get; set; }
         public UsoPlan usoPlan{  get; set; }=new UsoPlan();

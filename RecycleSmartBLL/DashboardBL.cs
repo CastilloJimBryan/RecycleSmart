@@ -34,5 +34,10 @@ namespace RecycleSmartBLL
         {
             return _dashboarDAL.LitrosPorHora(empresaid, intitucionid);
         }
+
+        public List<EventoLineaTiempo> LineaTiempo(int empresaid,int institucionid)
+        {
+            return _dashboarDAL.LineaTiempo(empresaid,institucionid);
+        }
     }
 }

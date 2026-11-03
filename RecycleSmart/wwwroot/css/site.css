@@ -1,3 +1,81 @@
+
+.linea-tiempo {
+    position: relative;
+    height: 70px;
+    margin: 8px 10px 0;
+}
+
+.lt-eje {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 30px;
+    border-top: 2px solid #dee2e6;
+}
+
+.lt-pasado {
+    position: absolute;
+    left: 0;
+    top: 29px;
+    height: 4px;
+    background: #d1e7dd;
+}
+
+.lt-punto {
+    position: absolute;
+    top: 23px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transform: translateX(-50%);
+    padding: 0;
+    cursor: pointer;
+}
+
+.lt-Critico {
+    background: var(--bs-danger);
+}
+
+.lt-Advertencia {
+    background: var(--bs-warning);
+}
+
+.lt-SinConexion {
+    background: var(--bs-secondary);
+}
+
+.lt-Resuelta {
+    background: var(--bs-success);
+}
+
+.lt-ahora {
+    position: absolute;
+    top: 6px;
+    height: 44px;
+    border-left: 2px solid var(--bs-success);
+}
+
+    .lt-ahora span {
+        position: absolute;
+        top: -6px;
+        left: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--bs-success);
+    }
+
+.lt-horas {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 46px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #6c757d;
+}
+
 html {
     font-size: 14px;
 }

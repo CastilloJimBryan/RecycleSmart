@@ -3,6 +3,16 @@
 
 @{
     ViewData["Title"] = "Dashboard";
+    string posicion(DateTime f) => (f.TimeOfDay.TotalMinutes / 1440 * 100).ToString("0.##", CultureInfo.InvariantCulture);
+
+    string textopropio(string t) => t switch
+    {
+        "Critico" => "Critico",
+        "Advertencia" => "Advertencia",
+        "SinConexion" => "Sin Conexion",
+        _ => "Resuelta"
+    };
+
     var p = Model.usoPlan;
     bool puedeGestionar = User.TieneRol(Roles.Operacion);
     bool VerAcceso = User.TieneRol(Roles.Control);
@@ -197,6 +207,47 @@
                 </div>
             </div>
         </div>
+
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="text-uppercase text-muted small fw-semibold mb-0">Linea de Tiempo Hoy</h5>
+                    <span class="small text-muted">tocar algun punto</span>
+                </div>
+                <div class="linea-tiempo">
+                    <div class="lt-eje"></div>
+                    <div class="lt-pasado" style="width:@(posicion(DateTime.Now))%"></div>
+                    @foreach (var item in Model.Linea)
+                    {
+                        <button type="button" class="lt-punto lt-@item.Tipo" style="@($"left:{posicion(@item.Fecha)}%")"
+                         title="@item.Fecha.ToString("HH:mm") - @textopropio(item.Tipo)"
+                        data-texto="@item.Fecha.ToString("HH:mm") - @textopropio(item.Tipo) - @item.Contenedor - @item.Mensaje"></button>
+                    }
+                    <div class="lt-ahora" style="left:@(posicion(DateTime.Now))%">
+                        <span>@DateTime.Now.ToString("HH:mm")</span>
+                    </div>
+                    <div class="lt-horas">
+                        <span>00</span>
+                        <span>04</span>
+                        <span>08</span>
+                        <span>12</span>
+                        <span>16</span>
+                        <span>20</span>
+                        <span>24</span>
+                    </div>
+                </div>
+                <div class="small mt-2" id="lt-detalle">
+                    @(Model.Linea.Count==0?"Sin Eventos Hoy.":"")
+                </div>
+                <div class="d-flex flex-wrap gap-3 small text-muted mt-2">
+                    <span><span class="badge rounded-pill bg-danger">&nbsp;</span> Critica</span>
+                    <span><span class="badge rounded-pill bg-warning">&nbsp;</span> Advertencia</span>
+                    <span><span class="badge rounded-pill bg-secondary">&nbsp;</span> Sin Conexion</span>
+                    <span><span class="badge rounded-pill bg-success">&nbsp;</span> Resuelta</span>
+                    
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -308,6 +359,16 @@
             grafico.update();
             resumirLitros();
         }
-
+        // ---------- Línea de tiempo ----------
+        const detalle = document.getElementById("lt-detalle");
+        const puntos = document.querySelectorAll(".lt-punto");
+        puntos.forEach(p => {
+            const mostrar = () => detalle.textContent = p.dataset.texto;
+            p.addEventListener("mouseenter", mostrar);
+            p.addEventListener("focus", mostrar);
+            p.addEventListener("click", mostrar);
+        });
+        // Al cargar, se muestra el último evento del día
+        if (puntos.length > 0) detalle.textContent = puntos[puntos.length - 1].dataset.texto;
     </script>
 }

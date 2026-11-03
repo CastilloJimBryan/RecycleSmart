@@ -17,7 +17,7 @@ namespace RecycleSmartDAL
         { 
             var r=new ResumenDashboard();
             using(var conec=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand(@" WITH CONT AS (SELECT Contenedor.Id " +
+            using(var cmd=new SqlCommand(@"WITH CONT AS (SELECT Contenedor.Id " +
                 " FROM Contenedor" +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId" +
                 " WHERE InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND (@InstitucionId=0 OR InstitucionCliente.Id=@InstitucionId)) " +
@@ -63,7 +63,7 @@ namespace RecycleSmartDAL
         {
             var r= new LitrosxHora();
             using (var conect = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("WITH CONT AS(SELECT Contenedor.Id FROM Contenedor " +
+            using (var cmd = new SqlCommand(@"WITH CONT AS(SELECT Contenedor.Id FROM Contenedor " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId" +
                 " WHERE InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND (@InstitucionId=0 OR InstitucionCliente.Id=@InstitucionId))" +
                 " SELECT CASE WHEN EventoAcceso.Fecha>=CAST (GETDATE() AS DATE ) THEN 1 ELSE 0 END AS EsHoy,DATEPART(HOUR,EventoAcceso.Fecha) AS Hora," +
@@ -94,6 +94,44 @@ namespace RecycleSmartDAL
                 }
             }
             return r;
+        }
+
+        public List<EventoLineaTiempo> LineaTiempo(int empresaid,int institucionid)
+        {
+            var list=new List<EventoLineaTiempo>();
+            using(var con=new SqlConnection(_conectar))
+            using(var cmd=new  SqlCommand(@"WITH CONT AS(SELECT Contenedor.Id FROM Contenedor INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId" +
+                " WHERE InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND(@InstitucionId=0 OR InstitucionCliente.Id=@InstitucionId))" +
+                " SELECT Alerta.FechaCreacion AS Fecha,CASE WHEN Alerta.TipoAlerta='SinConexion' THEN 'SinConexion' ElSE Alerta.TipoSeveridad END AS Tipo," +
+                " Contenedor.Nombre AS Contenedor,Alerta.Mensaje FROM Alerta" +
+                " INNER JOIN Contenedor ON Contenedor.Id=Alerta.ContenedorId WHERE Alerta.ContenedorId IN (SELECT Id FROM CONT)" +
+                " AND Alerta.FechaCreacion>= CAST(GETDATE() AS DATE)" +
+                " UNION ALL" +
+                " SELECT Alerta.FechaResolucion AS Fecha,'Resuelta' AS Tipo,Contenedor.Nombre AS Contenedor, Alerta.Mensaje" +
+                " FROM Alerta" +
+                " INNER JOIN Contenedor ON Contenedor.Id = Alerta.ContenedorId WHERE Alerta.ContenedorId IN(SELECT Id FROM CONT)" +
+                " AND Alerta.FechaResolucion>=CAST(GETDATE() AS DATE)" +
+                " ORDER BY Fecha ", con))
+            {
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                cmd.Parameters.AddWithValue("@InstitucionId", institucionid);
+                con.Open();
+
+                using(var leer=cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                    {
+                        list.Add(new EventoLineaTiempo
+                        {
+                            Contenedor=leer.GetString(leer.GetOrdinal("Contenedor")),
+                            Mensaje=leer.GetString(leer.GetOrdinal("Mensaje")),
+                            Tipo=leer.GetString(leer.GetOrdinal("Tipo")),
+                            Fecha=leer.GetDateTime(leer.GetOrdinal("Fecha")),
+                        });
+                    }
+                }
+            }
+            return list;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace RecycleSmart.Controllers
                 InstitucionClientes = instituciones,
                 Cola = _dashboardBL.Atencion(empresaid, institucionId),
                 AlertasAbiertaXEmpresa = _alertaBL.ContarAlertasAbiertas(empresaid),
-
+                Linea = _dashboardBL.LineaTiempo(empresaid, institucionId),
                 LitrosHora = _dashboardBL.LitrosPorHora(empresaid, institucionId),
 
                 usoPlan = new UsoPlan()
