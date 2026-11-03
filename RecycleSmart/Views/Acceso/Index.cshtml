@@ -1,7 +1,7 @@
 ﻿@using RecycleSmartBLL
 @model List<EventoAcceso>
 @{
-    ViewData["Tile"] = "Log de Accesos";
+    ViewData["Title"] = "Log de Accesos";
     var instituciones = ViewBag.Instituciones as List<InstitucionCliente> ?? new();
     int instiId = ViewBag.InstitucionId ?? 0;
     bool denegado = ViewBag.Denegados ?? false;

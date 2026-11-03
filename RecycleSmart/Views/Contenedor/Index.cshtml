@@ -65,11 +65,11 @@ else
     {     
     <div class="card shadow">
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped align-middle">
                 <thead class="table table-success ">
                     <tr>
                         <th>Nombre</th>
-                        <th>Tipo Residuo</th>
+                        <th class="text-nowrap">Tipo Residuo</th>
                         <th>Capacidad</th>
                         <th>Piso</th>
                         <th>Sector</th>
@@ -87,14 +87,14 @@ else
                         <tr>
                             <td>@item.Nombre</td>
                             <td>@item.TipoResiduo</td>
-                            <td>@item.CapacidadLitros L</td>
-                            <td>@piso</td>
+                            <td class="text-nowrap">@item.CapacidadLitros L</td>
+                            <td class="text-nowrap">@piso</td>
                             <td>@item.Sector</td>
-                            <td>
+                            <td class="text-nowrap">
                                 @if(dispositivo.TryGetValue(item.Id,out var dispositivos))
                                 {
                                     var estadoDispositivo = dispositivos.EstadoDispositivo.ToString();
-                                        <code> <small>@dispositivos.MacAdress</small></code>
+                                        <code><small>@dispositivos.MacAdress</small></code>
                                     <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)" data-dispositivo-contenedor="@item.Id" >@estadoDispositivo</span>
                                 }
                                 else if(PuedeGestionaar&&estado!="Baja")
@@ -126,8 +126,10 @@ else
                                         <div class="progress" style="height: 18px; @(viejo ? "opacity:0.5;":"")">
                                             <div class ="progress-bar @color" style="width: @lectura.Nivel%" >@lectura.Nivel %</div>
                                         </div>
-                                            <small class="text-muted">
-                                                @lectura.Temperatura °C - @lectura.FechaHora.ToString("dd/MM/yyyy - HH:mm:ss")
+                                            <small class="text-muted d-block">
+                                                @lectura.Temperatura.ToString("0.0") °C - @lectura.FechaHora.ToString("dd/MM/yyyy - HH:mm:ss")
+                                            </small>
+                                            <div class="d-flex flex-wrap gap-1 mt-1 small">
                                                 @if (clase != TipoEstado.ClasificacionLectura.Normal)
                                                 {
                                                     <span class="badge @color">@clase</span>
@@ -136,7 +138,7 @@ else
                                                 {
                                                     <span class="badge bg-secondary">Sin Datos Recientes</span>
                                                 }
-                                            </small>
+                                            </div>
                                 }
                                 else
                                 { 
@@ -145,8 +147,8 @@ else
                                 }
                             </td>
                            
-                            <td>
-                                    <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-sm btn-theme-success">Ver Detalle</a>
+                            <td class="text-nowrap">
+                                    <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-theme-success btn-sm">Ver Detalle</a>
                             </td>
                         </tr>
                     }
@@ -188,7 +190,8 @@ else
                 `<div class="progress" style="height: 18px;">
                              <div class="progress-bar ${color}" style="width: ${l.nivel}%">${l.nivel} %</div>
                          </div>
-                         <small class="text-muted">${l.temperatura} °C · ${l.fecha}${badge}</small>`;
+                         <small class="text-muted d-block">${l.temperatura} °C · ${l.fecha}</small>;
+                                 <div class="d-flex flex-wrap gap-1 mt-1">${badge}</div>`
 
             // Resaltar la celda un instante para que se note el cambio
             celda.classList.add("table-info");
