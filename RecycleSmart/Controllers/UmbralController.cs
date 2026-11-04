@@ -63,7 +63,7 @@ namespace RecycleSmart.Controllers
                 TempData["Mensaje"] = creado ? $"Umbrales Configurados para contenedor {contenedor.Nombre} " :
                     $"Umbrales de {contenedor.Nombre} Actualizado.";
 
-                return RedirectToAction("Detalle", "Contenedor", new { institucionId = contenedor.InstitucionId });
+                return RedirectToAction("Detalle", "Contenedor", new { Id = contenedor.Id });
             }
             catch (Exception ex)
             {

@@ -81,9 +81,9 @@
                         @if (d == null)
                         {
                             <p class="text-muted small">Sin dispositivo vinculado.</p>
-                            if (esAdmin)
+                            if (esAdmin) 
                             {
-                                <a asp-controller="DispositivoIoT" asp-action="Vincular" asp-route-contenedorId="@c.Id" class="btn btn-outline-dark btn-sm">Vincular</a>
+                                <a asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@c.Id" class="btn btn-outline-dark btn-sm">Vincular</a>
                             }
                         }
                         else

@@ -53,7 +53,7 @@ namespace RecycleSmart.Controllers
             {
                 int id = _usuarioEmpresaLogisticaBL.AgregarUsuarioEmpresa(usuario, clave);
                 TempData["Mensaje"] = $"Usuario : {usuario.Nombre} {usuario.Apellido} creado Correctamente";
-                return RedirectToAction("Detalle", new { id });
+                return RedirectToAction("Index", new { id });
             }
             catch (Exception ex)
             {
