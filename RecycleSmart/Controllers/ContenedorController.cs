@@ -66,7 +66,7 @@ namespace RecycleSmart.Controllers
         {
             int empresaid = Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
             var contenedor = _contenedorBL.BuscarContenedorXId(id, empresaid);
-
+             
             var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid);
             var institucion = contenedor == null ? null : instituciones.FirstOrDefault(i => i.Id == contenedor.InstitucionId);
             if(contenedor==null || institucion==null)
@@ -128,6 +128,38 @@ namespace RecycleSmart.Controllers
                 .FirstOrDefault(i => i.Id == InstitucionId)?.Nombre ?? "";
 
                 ViewBag.InstitucionNombre = instituciones;
+                ViewBag.Tipos = ContenedorBL.TiposResiduo;
+                return View(contenedor);
+            }
+        }
+
+        [Authorize(Roles = Roles.Administrador)]
+        public IActionResult Editar(int id)
+        {
+            var contenedor = _contenedorBL.BuscarContenedorXId(id, empresaid);
+            if(contenedor== null)
+            {
+                TempData["Error"] = "El Contenedor No Existe";
+                return RedirectToAction("Index");
+            }
+            ViewBag.Tipos = ContenedorBL.TiposResiduo;
+            return View(contenedor);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = Roles.Administrador)]
+
+        public IActionResult Editar(Contenedor contenedor)
+        {
+            try
+            {
+                _contenedorBL.ModificarContenedor(contenedor, empresaid);
+                TempData["Mensaje"] = "Contenedor Actualizado";
+                return RedirectToAction("Detalle", new {id=contenedor.Id});
+            }
+            catch(Exception e)
+            {
+                ModelState.AddModelError("", e.Message);
                 ViewBag.Tipos = ContenedorBL.TiposResiduo;
                 return View(contenedor);
             }

@@ -2,7 +2,7 @@
 @model Umbral
 
 @{
-    ViewData["Title"] = "Configuracion de  Umbral";
+    ViewData["Title"] = "Configuracion de Umbral";
     var contenedores = ViewBag.Contenedor as Contenedor;
     bool nuevo = Model.Id == 0;
     var estadosync = Model.EstadoSync.ToString();
@@ -75,7 +75,7 @@
            
             <div class="mb-3 d-flex justify-content-between">
             <button type="submit" class="btn btn-outline-success">@(nuevo?"Guardar Configuracion":"Guardar")</button>
-            <a asp-controller="Contenedor" asp-action="Detalle" asp-route-institucionId="@contenedores?.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
+            <a asp-controller="Contenedor" asp-action="Detalle" asp-route-id="@ViewBag.Contenedor.Id" class="btn btn-outline-danger">Cancelar</a>
             </div>
         </form>
     </div>

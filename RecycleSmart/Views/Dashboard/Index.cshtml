@@ -201,7 +201,7 @@
                         <span id="litros-pico"></span>
                         @if(User.TieneRol(Roles.Control))
                         {
-                            <a asp-controller="Acceso" asp-action="Index" asp-route-intitucionid="@Model.InstitucionId">Ver Log de Accesos</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Acceso" asp-action="Index" asp-route-intitucionid="@Model.InstitucionId">Ver Log de Accesos</a>
                         }
                     </div>
                 </div>

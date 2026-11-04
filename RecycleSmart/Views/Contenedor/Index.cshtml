@@ -9,7 +9,7 @@
     int maximo = ViewBag.Maximo ?? 0;
     var dispositivo = ViewBag.Dispositivos as Dictionary<int, DispositivoIoT> ?? new();
     bool limiteAlcanzado = maximo != 0 && usada >= maximo;
-    bool PuedeGestionaar = User.IsInRole(Roles.Gestion);
+    bool PuedeGestionaar = User.IsInRole(Roles.Administrador);
     var umbral = ViewBag.Umbrales as Dictionary<int, Umbral> ?? new();
     var lecturas = ViewBag.Lecturas as Dictionary<int, Telemetria> ?? new();
 }
@@ -47,7 +47,7 @@ else
 
         @if (PuedeGestionaar)
         {
-            @if (limiteAlcanzado)
+            if (limiteAlcanzado)
             {
                 <button class="btn btn-success" disabled title="Alcanzo el Limite del Plan">Registrar Contenedor</button>
             }
@@ -155,10 +155,9 @@ else
 
                 </tbody>
             </table>
-               
-                
         </div>
     </div>      
+                
     }
 }
 
@@ -190,7 +189,7 @@ else
                 `<div class="progress" style="height: 18px;">
                              <div class="progress-bar ${color}" style="width: ${l.nivel}%">${l.nivel} %</div>
                          </div>
-                         <small class="text-muted d-block">${l.temperatura} °C · ${l.fecha}</small>;
+                         <small class="text-muted d-block">${l.temperatura} °C · ${l.fecha}</small>
                                  <div class="d-flex flex-wrap gap-1 mt-1">${badge}</div>`
 
             // Resaltar la celda un instante para que se note el cambio

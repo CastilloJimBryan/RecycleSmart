@@ -147,13 +147,15 @@
                 {
                     <dl class="row small">
                         <dt class="col-7">Advertencia</dt>
-                        <dd class="col-5">@u.NivelAdvertencia %</dd>
+                        <dd class="col-5">@u?.NivelAdvertencia %</dd>
                         <dt class="col-7">Crítico</dt>
-                        <dd class="col-5">@u.NivelCritico %</dd>
-                        <dt class="col-7">Temp. máxima</dt>
-                        <dd class="col-5">@u.TemperaturaMaxima.ToString("0.0") °C</dd>
+                        <dd class="col-5">@u?.NivelCritico %</dd>
+                        <dt class="col-7">Temp. Maxima</dt>
+                        <dd class="col-5">@u?.TemperaturaMaxima.ToString("0.0") °C</dd>
+                        <dt class="col-7">Hum. Maxima</dt>
+                        <dd class="col-5">@u?.HumedadMaxima %</dd>
                         <dt class="col-7">Sin conexión</dt>
-                        <dd class="col-5">@u.MinutosSinConexion min</dd>
+                        <dd class="col-5">@u?.MinutosSinConexion min</dd>
                     </dl>
                 }
                 @if (User.TieneRol(Roles.Control))

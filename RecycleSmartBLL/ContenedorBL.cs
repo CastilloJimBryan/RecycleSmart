@@ -64,6 +64,8 @@ namespace RecycleSmartBLL
             {
                 throw new Exception("Ya existe ese contenedor");
             }
+            
+           
         }
 
         private void VerificarLimitePlan(int empresaId)
@@ -120,12 +122,13 @@ namespace RecycleSmartBLL
         public void ModificarContenedor(Contenedor c,int empresaId)
         {
             var actual = ObtenerContenedores(c.Id, empresaId);
+            if (actual == null) throw new Exception("No Existe Contenedor");
             c.InstitucionId = actual.InstitucionId;
             ValidarCampos(c);
 
-            if (_contenedorDAL.ModificarContenedor(c, empresaId)==0)
+            if (!_contenedorDAL.ModificarContenedor(c, empresaId))
             {
-                throw new Exception("No se Puede guardar el Contenedor");
+                throw new Exception("No Existe Contenedor");
             }
         }
 
