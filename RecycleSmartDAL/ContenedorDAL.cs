@@ -140,7 +140,53 @@ namespace RecycleSmartDAL
 
             }
         }
+        public bool BajaContenedor(int contenedorid,int empresaid,TipoEstado.MotivoBaja baja,string? observacion,int usuarioid)
+        {
+            using (var con = new SqlConnection(_contectar))
+            {
+                con.Open();
+                using(var tran=con.BeginTransaction())
+                {
+                    try
+                    {
+                        int filas;
+                        using (var cmd = new SqlCommand("", con, tran))
+                        {
+                            cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
+                            cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                            cmd.Parameters.AddWithValue("@Motivo", baja);
+                            cmd.Parameters.AddWithValue("@Observacion", (object)observacion ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@UsuarioId", usuarioid);
 
+                            filas = cmd.ExecuteNonQuery();
+                        }
+                        if (filas != 1)
+                        {
+                            tran.Rollback();
+                            return false;
+                        }
+                        using (var cmd = new SqlCommand("", con, tran))
+                        {
+                            cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
+                            cmd.ExecuteNonQuery();
+                        }
+                        using (var cmd = new SqlCommand("", con, tran))
+                        {
+
+                            cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
+                            cmd.ExecuteNonQuery();
+                        }
+                        tran.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        tran.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
         public bool ModificarContenedor(Contenedor c ,int empresaId)
         {
             using (var con = new SqlConnection(_contectar))
@@ -162,24 +208,6 @@ namespace RecycleSmartDAL
 
             }
         }
-
-        
-        public int CambiarEstado(int id,string estado,int empresaid)
-        {
-            using (var con = new SqlConnection(_contectar))
-            using (var cmd = new SqlCommand("UPDATE SET Contenedor.Estado=@Estado " +
-                " FROM Contenedor " +
-                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
-                " WHERE Contenedor.Id=@Id AND InstitucionCliente.EmpresaLogisticaId=@EmpresaLogistica ", con))
-            {
-                cmd.Parameters.AddWithValue("@Id", id);
-                cmd.Parameters.AddWithValue("@Estado",estado);
-                cmd.Parameters.AddWithValue("@EmpresaLogistica", empresaid);
-                con.Open();
-
-                return cmd.ExecuteNonQuery();
-
-            }
-        }
+ 
     }
 }

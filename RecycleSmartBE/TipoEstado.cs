@@ -17,5 +17,7 @@
 
         public enum EstadoAcceso { Permitido,Denegado}
         public enum MotivoAcceso { Autorizado,TarjetaDesconocida,TarjetaVencida,FueraHorario,TarjetaInactiva,ContenedorNoHabilitado}
+
+        public enum MotivoBaja { FallaEquipo, Reemplazo, CierreArea, Otro }
     }
 }

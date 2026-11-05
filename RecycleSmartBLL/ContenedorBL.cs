@@ -12,12 +12,14 @@ namespace RecycleSmartBLL
         private readonly EmpresaLogisticaDAL _empresaLogisticaDAL;
         private readonly InstitucionClienteDAL _institucionClienteDAL;
         private readonly PlanDAL _planDAL;
+        private readonly AlertaBL _alertaBL;
         public ContenedorBL(string conectar)
         {
             _contenedorDAL = new ContenedorDAL(conectar);
             _empresaLogisticaDAL = new EmpresaLogisticaDAL(conectar);
             _institucionClienteDAL=new InstitucionClienteDAL(conectar);
             _planDAL=new PlanDAL(conectar);
+            _alertaBL= new AlertaBL(conectar);
         }
         public static readonly string[] TiposResiduo ={ "Patogénico", "Cortopunzante", "Anatomopatológico", "Farmacéutico", "Químico" };
 
@@ -131,18 +133,26 @@ namespace RecycleSmartBLL
                 throw new Exception("No Existe Contenedor");
             }
         }
-
-        public void CambiarEstado(int id,int empresaid,TipoEstado.Estados estado)
+        public void BajaContenedor(int contenedorid, int empresaid, TipoEstado.MotivoBaja motivo, string? observacion, int usuarioid)
         {
-            var actual=ObtenerContenedores(id, empresaid);
-            if (actual.Estado == estado)
+            var actual=ObtenerContenedores(contenedorid, empresaid);
+            if (actual == null) throw new Exception("No Existe Contenedor");
+            if (actual.Estado.ToString() == "Baja") throw new Exception("El Contenedor ya esta dado de baja");
+            if (_alertaBL.ListarAlertasAbiertas(empresaid).Any(a => a.ContenedorId == contenedorid)) throw new Exception("El contenedor tiene alertas abiertas , no se puede dar de baja");
+            observacion = string.IsNullOrWhiteSpace(observacion) ? null : observacion.Trim();
+            if(motivo==TipoEstado.MotivoBaja.Otro && observacion==null)
             {
-                throw new Exception($"El contenedor ya esta en estado{estado}");
+                throw new Exception("Explique cual es la observacion");
             }
-            if (_contenedorDAL.CambiarEstado(id, estado.ToString(), empresaid) == 0)
+            if(observacion!=null && observacion.Length>100)
             {
-                throw new Exception("No se puede cambiar el estado al contenedor");
+                throw new Exception("");
+            }
+            if(!_contenedorDAL.BajaContenedor(contenedorid,empresaid,motivo,observacion,usuarioid))
+            {
+                throw new Exception("El contenedor no se puede dar de baja , no existe o ya fue dado de baja");
             }
         }
+      
     }
 }

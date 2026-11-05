@@ -16,5 +16,11 @@ namespace RecycleSmartBE
         public double? PosicionY {  get; set; }
         public TipoEstado.Estados Estado {  get; set; }
         public int InstitucionId {  get; set; }
+
+        public DateTime? FechaBaja {  get; set; }
+        public TipoEstado.MotivoBaja? MotivoBaja {  get; set; }
+        public string? ObservacionBaja {  get; set; }
+        public int? UsuarioBajaId {  get; set; }
+        public string? UsuarioBajaNombre {  get; set; }
     }
 }
