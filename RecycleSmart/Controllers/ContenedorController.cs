@@ -164,5 +164,15 @@ namespace RecycleSmart.Controllers
                 return View(contenedor);
             }
         }
+
+        public IActionResult Baja(int id)
+        {
+            var contenedor = _contenedorBL.BuscarContenedorXId(id, empresaid);
+            if(contenedor == null)
+            {
+                TempData["Error"] = "El contenedor no existe";
+                return RedirectToAction("Index");
+            }
+        }
     }
 }
