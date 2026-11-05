@@ -146,7 +146,7 @@ namespace RecycleSmartBLL
             }
             if(observacion!=null && observacion.Length>100)
             {
-                throw new Exception("");
+                throw new Exception("Deb");
             }
             if(!_contenedorDAL.BajaContenedor(contenedorid,empresaid,motivo,observacion,usuarioid))
             {

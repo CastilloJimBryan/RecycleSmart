@@ -1,0 +1,59 @@
+﻿@model Contenedor
+
+@{
+    ViewData["Title"]="Baja de Contenedor";
+    var motivoElegido = ViewBag.Motivo as TipoEstado.MotivoBaja?;
+    string observacion = ViewBag.Observacion as string ?? "";
+
+    string MotivoText(TipoEstado.MotivoBaja m) => m switch
+    {
+        TipoEstado.MotivoBaja.FallaEquipo=>"Falla Equipo",
+        TipoEstado.MotivoBaja.CierreArea=>"Cierre Area",
+        TipoEstado.MotivoBaja.Reemplazo=>"Reemplazo",
+        _=>"Otro"
+    };
+}
+    <partial name="_Error"/>
+    <div class="alert alert-warning mx-auto" style="max-width:650px">
+        <strong>Al Dar de Baja el Contenedor:</strong>
+        <ul class="mb-0 mt-1">
+            <li>Deja de aparecer en el listado, en el dashboard y en el monitoreo.</li>
+            <li>Su dispositivo IoT deja de recibir lecturas.</li>
+            <li>Se quita de las tarjetas RFID que lo tenían habilitado.</li>
+            <li>Se libera su lugar en el plan.</li>
+            <li>Sus lecturas, accesos y alertas anteriores se conservan para auditoría.</li>
+        </ul>
+        <div class="mt-2 fw-semibold">Esta acción no se puede deshacer.</div>
+    </div>
+<div class="card shadow-sm mx-auto"style="max-width:650px">
+     <div class="card-body">
+    <h2>Dar de Baja - @Model.Nombre</h2>
+        <form asp-action="Baja" method="post" style="max-width:600px">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="mb-3">
+                <label class="form-label" for="motivo">Motivo Baja</label>
+                <select class="form-select" id="motivo" name="motivo" required>
+                    @foreach (var item in Enum.GetValues<TipoEstado.MotivoBaja>())
+                        {
+                            <option value="@item" selected="@(item==motivoElegido)">@MotivoText(item)</option>
+                        }
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="observacion" >Observaciones <span class="text-muted small">(Si el motivo es OTRO)</span></label>
+                <textarea class="form-control" id="observacion" name="observacion" rows="3" maxlength="100">@observacion</textarea>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="confirmar" name="confirmar" value="true" required />
+                <label class="form-check-label" for="confirmar">Confirmo realizar la baja total del contenedor</label>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-danger">Confirmar Baja</button>
+                <a asp-action="Detalle" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+

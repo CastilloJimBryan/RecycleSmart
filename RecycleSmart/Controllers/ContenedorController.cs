@@ -168,10 +168,54 @@ namespace RecycleSmart.Controllers
         public IActionResult Baja(int id)
         {
             var contenedor = _contenedorBL.BuscarContenedorXId(id, empresaid);
-            if(contenedor == null)
+            if (contenedor == null)
             {
                 TempData["Error"] = "El contenedor no existe";
                 return RedirectToAction("Index");
+            }
+
+            if (contenedor.Estado.ToString() == "Baja")
+            {
+                TempData["Error"] = "El Contenedor ya esta dado de baja";
+                return RedirectToAction("Detalle", new { id });
+            }
+
+            if(_alertaBL.ListarAlertasAbiertas(empresaid).Any(a=>a.ContenedorId==id))
+            {
+
+                TempData["Error"] = "El Contenedor No se puede dar de baja , debido que tiene alertas activas";
+                return RedirectToAction("Detalle", new { id });
+            }
+            return View(contenedor);
+        }
+
+        [HttpPost]
+
+        public IActionResult Baja(int contenedorid,TipoEstado.MotivoBaja motivo,string? observacion,bool confirmar)
+        {
+            var contenedor = _contenedorBL.BuscarContenedorXId(contenedorid, empresaid);
+            if(contenedor== null)
+            {
+                TempData["Error"] = "El contenedor no Existe";
+                return RedirectToAction("Index");
+            }
+            try
+            {
+                if(!confirmar)
+                {
+                    throw new Exception("Debe Confirmar para realizar la baja del contenedor");
+                }
+                int usuarioid = Servicio.ManejosSesiones.ObtenerUsuarioEmpresaLogistica(User);
+                _contenedorBL.BajaContenedor(contenedorid, empresaid, motivo, observacion, usuarioid);
+                TempData["Mensaje"] = $"El Contenedor {contenedor.Nombre} fue dado de baja Correctamente";
+                return RedirectToAction("Index", new { institucionId = contenedor.InstitucionId });
+            }
+            catch (Exception ex) 
+            {
+                ModelState.AddModelError("", ex.Message);
+                ViewBag.Motivo = motivo;
+                ViewBag.Observacion = observacion;
+                return View(contenedor);
             }
         }
     }

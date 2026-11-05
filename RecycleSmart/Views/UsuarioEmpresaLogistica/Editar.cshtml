@@ -58,9 +58,9 @@
                     } 
             </div>
 
-            <div>
-                <button type="submit">Guardar Cambios</button>
-                <a asp-action="Detalle" asp-route-id="@Model.Id">Cancelar</a>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-success btn-sm">Guardar Cambios</button>
+                <a asp-action="Detalle" asp-route-id="@Model.Id" class="btn  btn-outline-danger btn-sm">Cancelar</a>
             </div>
         </form>
     </div>

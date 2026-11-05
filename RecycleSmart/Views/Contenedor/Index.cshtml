@@ -13,7 +13,7 @@
     var umbral = ViewBag.Umbrales as Dictionary<int, Umbral> ?? new();
     var lecturas = ViewBag.Lecturas as Dictionary<int, Telemetria> ?? new();
 }
-<partial name="_Mensajes" />
+<partial name="_Mensajes" /> 
 <div>
     <h2>Contenedores</h2>
 </div>
@@ -36,128 +36,136 @@
         </select>
 
     </form> 
-@if (instiId == 0)
+@if(insti.Count==0)
 {
-    <div class="alert alert-info">Seleccione una Institucion Para ver los contenedores</div>
+    <p class="text-muted">Todavia no hay instituciones registradas</p>
 }
-
 else
 {
-    <div class="mb-2">
-
-        @if (PuedeGestionaar)
-        {
-            if (limiteAlcanzado)
-            {
-                <button class="btn btn-success" disabled title="Alcanzo el Limite del Plan">Registrar Contenedor</button>
-            }
-            else
-            {
-                <a asp-controller="Contenedor" asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
-            }
-        }
-    </div>
-    @if (Model.Count == 0)
+    
+    @if (instiId == 0)
     {
-        <div class="alert alert-info">Todavia no tiene contenedores</div>
+        <div class="alert alert-info">Seleccione una Institucion Para ver los contenedores</div>
     }
+
     else
-    {     
-    <div class="card shadow">
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle">
-                <thead class="table table-success ">
-                    <tr>
-                        <th>Nombre</th>
-                        <th class="text-nowrap">Tipo Residuo</th>
-                        <th>Capacidad</th>
-                        <th>Piso</th>
-                        <th>Sector</th>
-                        <th>DispositivoIoT</th>
-                        <th>Estado</th>
-                        <th>Nivel</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        var estado = item.Estado.ToString();
-                        var piso = item.Piso switch { null => "", 0 => "PB", < 0 => $"Subsuelo {-item.Piso}", _ => $"Piso {item.Piso}" };
-                        <tr>
-                            <td>@item.Nombre</td>
-                            <td>@item.TipoResiduo</td>
-                            <td class="text-nowrap">@item.CapacidadLitros L</td>
-                            <td class="text-nowrap">@piso</td>
-                            <td>@item.Sector</td>
-                            <td class="text-nowrap">
-                                @if(dispositivo.TryGetValue(item.Id,out var dispositivos))
-                                {
-                                    var estadoDispositivo = dispositivos.EstadoDispositivo.ToString();
-                                        <code><small>@dispositivos.MacAdress</small></code>
-                                    <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)" data-dispositivo-contenedor="@item.Id" >@estadoDispositivo</span>
-                                }
-                                else if(PuedeGestionaar&&estado!="Baja")
-                                {
-                                    <a class="btn btn-outline-dark btn-sm" asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@item.Id">
-                                        Vincular
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Sin DispositivoIoT</span>
-                                }
-                            </td>
-                            <td>
-                                <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
-                            </td>
-                                <td style="min-width: 180px;" data-nivel-contenedor="@item.Id">
-                                @if(lecturas.TryGetValue(item.Id,out var lectura))
-                                {
-                                    umbral.TryGetValue(item.Id, out var umbralcont);
-                                    var clase=UmbralBL.ClasificarLectura(lectura,umbralcont);
-                                        bool viejo = UmbralBL.LecturaDesactualizada(lectura, umbralcont);
-                                        var color = clase switch
-                                        {
-                                            TipoEstado.ClasificacionLectura.Critico => "bg-danger",
-                                            TipoEstado.ClasificacionLectura.Advertencia => "bg-warning",
-                                            _=>"bg-success"
-                                        };
-                                        <div class="progress" style="height: 18px; @(viejo ? "opacity:0.5;":"")">
-                                            <div class ="progress-bar @color" style="width: @lectura.Nivel%" >@lectura.Nivel %</div>
-                                        </div>
-                                            <small class="text-muted d-block">
-                                                @lectura.Temperatura.ToString("0.0") °C - @lectura.FechaHora.ToString("dd/MM/yyyy - HH:mm:ss")
-                                            </small>
-                                            <div class="d-flex flex-wrap gap-1 mt-1 small">
-                                                @if (clase != TipoEstado.ClasificacionLectura.Normal)
-                                                {
-                                                    <span class="badge @color">@clase</span>
-                                                }
-                                                @if(viejo)
-                                                {
-                                                    <span class="badge bg-secondary">Sin Datos Recientes</span>
-                                                }
-                                            </div>
-                                }
-                                else
-                                { 
-                                    <span class="text-muted">Sin Lecturas</span>
+    {
+        <div class="mb-2">
 
-                                }
-                            </td>
-                           
-                            <td class="text-nowrap">
-                                    <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-theme-success btn-sm">Ver Detalle</a>
-                            </td>
-                        </tr>
-                    }
-
-                </tbody>
-            </table>
+            @if (PuedeGestionaar)
+            {
+                if (limiteAlcanzado)
+                {
+                    <button class="btn btn-success" disabled title="Alcanzo el Limite del Plan">Registrar Contenedor</button>
+                }
+                else
+                {
+                    <a asp-controller="Contenedor" asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
+                }
+            }
         </div>
-    </div>      
+        @if (Model.Count == 0)
+        {
+            <div class="alert alert-info">Todavia no tiene contenedores</div>
+        }
+        else
+        {     
+        <div class="card shadow">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table table-success ">
+                        <tr>
+                            <th>Nombre</th>
+                            <th class="text-nowrap">Tipo Residuo</th>
+                            <th>Capacidad</th>
+                            <th>Piso</th>
+                            <th>Sector</th>
+                            <th>DispositivoIoT</th>
+                            <th>Estado</th>
+                            <th>Nivel</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var estado = item.Estado.ToString();
+                            var piso = item.Piso switch { null => "", 0 => "PB", < 0 => $"Subsuelo {-item.Piso}", _ => $"Piso {item.Piso}" };
+                            <tr>
+                                <td>@item.Nombre</td>
+                                <td>@item.TipoResiduo</td>
+                                <td class="text-nowrap">@item.CapacidadLitros L</td>
+                                <td class="text-nowrap">@piso</td>
+                                <td>@item.Sector</td>
+                                <td class="text-nowrap">
+                                    @if(dispositivo.TryGetValue(item.Id,out var dispositivos))
+                                    {
+                                        var estadoDispositivo = dispositivos.EstadoDispositivo.ToString();
+                                            <code><small>@dispositivos.MacAdress</small></code>
+                                        <span class="badge @EstadosColor.EstadoBadge(estadoDispositivo)" data-dispositivo-contenedor="@item.Id" >@estadoDispositivo</span>
+                                    }
+                                    else if(PuedeGestionaar&&estado!="Baja")
+                                    {
+                                        <a class="btn btn-outline-dark btn-sm" asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@item.Id">
+                                            Vincular
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sin DispositivoIoT</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+                                </td>
+                                    <td style="min-width: 180px;" data-nivel-contenedor="@item.Id">
+                                    @if(lecturas.TryGetValue(item.Id,out var lectura))
+                                    {
+                                        umbral.TryGetValue(item.Id, out var umbralcont);
+                                        var clase=UmbralBL.ClasificarLectura(lectura,umbralcont);
+                                            bool viejo = UmbralBL.LecturaDesactualizada(lectura, umbralcont);
+                                            var color = clase switch
+                                            {
+                                                TipoEstado.ClasificacionLectura.Critico => "bg-danger",
+                                                TipoEstado.ClasificacionLectura.Advertencia => "bg-warning",
+                                                _=>"bg-success"
+                                            };
+                                            <div class="progress" style="height: 18px; @(viejo ? "opacity:0.5;":"")">
+                                                <div class ="progress-bar @color" style="width: @lectura.Nivel%" >@lectura.Nivel %</div>
+                                            </div>
+                                                <small class="text-muted d-block">
+                                                    @lectura.Temperatura.ToString("0.0") °C - @lectura.FechaHora.ToString("dd/MM/yyyy - HH:mm:ss")
+                                                </small>
+                                                <div class="d-flex flex-wrap gap-1 mt-1 small">
+                                                    @if (clase != TipoEstado.ClasificacionLectura.Normal)
+                                                    {
+                                                        <span class="badge @color">@clase</span>
+                                                    }
+                                                    @if(viejo)
+                                                    {
+                                                        <span class="badge bg-secondary">Sin Datos Recientes</span>
+                                                    }
+                                                </div>
+                                    }
+                                    else
+                                    { 
+                                        <span class="text-muted">Sin Lecturas</span>
+
+                                    }
+                                </td>
+                           
+                                <td class="text-nowrap">
+                                        <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-theme-success btn-sm">Ver Detalle</a>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>      
                 
+        }
     }
 }
 
