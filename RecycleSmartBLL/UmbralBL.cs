@@ -42,13 +42,13 @@ namespace RecycleSmartBLL
 
         }
 
-        private Contenedor ObtenerContenedor(int contendorid,int empresaid)
+        private Contenedor ObtenerContenedor(int contendorid,int empresaid,bool permitirBaja=false)
         {
             if(_contenedorDAl.BuscarContenedorXId(contendorid,empresaid) is not Contenedor contenedor)
             {
                 throw new Exception("No existe Contenedor!");
             }
-            if(contenedor.Estado==TipoEstado.Estados.Baja)
+            if(!permitirBaja && contenedor.Estado==TipoEstado.Estados.Baja)
             {
                 throw new Exception("Contendor dado de baja");
             }
@@ -57,13 +57,13 @@ namespace RecycleSmartBLL
 
         public Umbral Obtener(int contendorid,int empresaid)
         {
-            ObtenerContenedor(contendorid,empresaid);
+            ObtenerContenedor(contendorid, empresaid, permitirBaja: true);
             return _umbralDAl.BuscarxContenedor(contendorid, empresaid) ?? new Umbral { ContenedorId = contendorid };
         }
 
         public bool Guardar(Umbral u, int empresaid)
         {
-            ObtenerContenedor(u.ContenedorId,empresaid);
+            ObtenerContenedor(u.ContenedorId, empresaid);
             ValidarUmbral(u);
             u.EstadoSync = TipoEstado.EstadoSync.Pendiente;
             if(_umbralDAl.BuscarxContenedor(u.ContenedorId, empresaid)==null)

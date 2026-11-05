@@ -9,6 +9,7 @@
     var t = Model.Telemetria;
     var u = Model.Umbral;
 
+    bool DadodeBaja = c.Estado.ToString() == "Baja";
     bool esAdmin = User.IsInRole(Roles.Administrador);
     bool PuedeGestionar = User.IsInRole(Roles.Gestion);
     bool tieneAlertas = Model.AlertasAbiertas.Count > 0;
@@ -37,18 +38,37 @@
                 <h3 class="mb-0">@c.Nombre <span class="badge @EstadosColor.EstadoBadge(c.Estado.ToString()) fs-6 align-middle">@c.Estado</span></h3>
                 <span class="text-muted">@Model.InstitucionNombre · Piso @c.Piso · @c.Sector</span>
             </div>
-            @if (esAdmin)
+            
+            @if (esAdmin && !DadodeBaja)
             {
                 <div class="d-flex gap-2">
-                    <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-outline-dark">Editar</a>
+                    <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-outline-dark btn-sm">Editar</a>
                     @if (tieneAlertas)
                     {
                         <button class="btn btn-outline-danger" disabled title="Tiene alertas abiertas: resolvelas antes de dar de baja">Dar de baja</button>
                     }
                     else
                     {
-                        <a asp-action="Baja" asp-route-id="@c.Id" class="btn btn-outline-danger">Dar de baja</a>
+                        <a asp-action="Baja" asp-route-id="@c.Id" class="btn btn-outline-danger btn-sm">Dar de baja</a>
                     }
+                </div>
+            }
+            
+            @if (DadodeBaja)
+            {
+                <div class="alert alert-danger">
+                    <strong>Contenedor dado de baja</strong> el @c.FechaBaja?.ToString("dd/MM/yyyy HH:mm")
+                    @if (!string.IsNullOrEmpty(c.UsuarioBajaNombre))
+                    {
+                        <text> <strong>Por @c.UsuarioBajaNombre</strong></text>
+                    }
+                    <div class="small mt-1">
+                        <strong>Motivo:</strong> @c.MotivoBaja
+                        @if (!string.IsNullOrEmpty(c.ObservacionBaja))
+                        {
+                            <text> · @c.ObservacionBaja</text>
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -60,7 +80,7 @@
                     <div class="card-body">
                         <h6 class="text-uppercase text-muted small fw-semibold">Datos</h6>
                         <dl class="row small mb-0">
-                            <dt class="col-6 text-nowrap">Tipo de residuo</dt>
+                            <dt class="col-7 text-nowrap">Tipo de residuo</dt>
                             <dd class="col-5 text-nowrap">@c.TipoResiduo</dd>
                             <dt class="col-7">Capacidad</dt>
                             <dd class="col-5">@c.CapacidadLitros L</dd>
@@ -81,7 +101,7 @@
                         @if (d == null)
                         {
                             <p class="text-muted small">Sin dispositivo vinculado.</p>
-                            if (esAdmin) 
+                            if (esAdmin && !DadodeBaja)  
                             {
                                 <a asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@c.Id" class="btn btn-outline-dark btn-sm">Vincular</a>
                             }
@@ -159,7 +179,7 @@
                                 <dd class="col-5">@u?.MinutosSinConexion min</dd>
                             </dl>
                         }
-                        @if (User.TieneRol(Roles.Control))
+                        @if (User.TieneRol(Roles.Control) && !DadodeBaja)
                         {
                             <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorid="@c.Id" class="btn btn-outline-dark btn-sm">
                                 @(User.TieneRol(Roles.Gestion) ? (sinUmbral ? "Configurar" : "Editar") : "Ver")

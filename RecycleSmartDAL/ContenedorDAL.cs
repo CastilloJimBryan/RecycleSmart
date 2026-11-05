@@ -55,9 +55,11 @@ namespace RecycleSmartDAL
         public Contenedor?BuscarContenedorXId(int contenedorid,int empresaid)
         {
             using (var con = new SqlConnection(_contectar))
-            using (var cmd = new SqlCommand("SELECT Contenedor.Id,Contenedor.Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,PosicionX,PosicionY, Contenedor.Estado,InstitucionId " +
+            using (var cmd = new SqlCommand("SELECT Contenedor.Id,Contenedor.Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,PosicionX,PosicionY, Contenedor.Estado,InstitucionId, " +
+                " Contenedor.FechaBaja,Contenedor.MotivoBaja,Contenedor.ObservacionBaja,Contenedor.UsuarioBajaId , UsuarioEmpresaLogistica.Nombre + ' ' + UsuarioEmpresaLogistica.Apellido AS UsuarioBajaNombre " +
                 " FROM Contenedor " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                " LEFT JOIN UsuarioEmpresaLogistica ON UsuarioEmpresaLogistica.Id=Contenedor.UsuarioBajaId " +
                 " WHERE Contenedor.Id = @ContenedorId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId ", con))
             {
                 cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
@@ -71,16 +73,20 @@ namespace RecycleSmartDAL
                     {
                         return new Contenedor
                         {
-                            Id = leer.GetInt32(0),
-                            Nombre = leer.GetString(1),
-                            TipoResiduo = leer.GetString(2),
-                            CapacidadLitros = leer.GetInt32(3),
-                            Piso = leer.IsDBNull(4) ? null : leer.GetInt32(4),
-                            Sector = leer.IsDBNull(5) ? null : leer.GetString(5),
-                            PosicionX = leer.IsDBNull(6) ? null : leer.GetDouble(6),
-                            PosicionY = leer.IsDBNull(7) ? null : leer.GetDouble(7),
-                            Estado = Enum.Parse<TipoEstado.Estados>(leer.GetString(8)),
-                            InstitucionId = leer.GetInt32(9),
+                            Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                            Nombre = leer.GetString(leer.GetOrdinal("Nombre")),
+                            TipoResiduo = leer.GetString(leer.GetOrdinal("TipoResiduo")),
+                            CapacidadLitros = leer.GetInt32(leer.GetOrdinal("CapacidadLitros")),
+                            Piso = leer.IsDBNull(4) ? null : leer.GetInt32(leer.GetOrdinal("Piso")),
+                            Sector = leer.IsDBNull(5) ? null : leer.GetString((leer.GetOrdinal("Sector"))),
+                            PosicionX = leer.IsDBNull(6) ? null : leer.GetDouble(leer.GetOrdinal("PosicionX")),
+                            PosicionY = leer.IsDBNull(7) ? null : leer.GetDouble(leer.GetOrdinal("PosicionY")),
+                            Estado = Enum.Parse<TipoEstado.Estados>(leer.GetString(leer.GetOrdinal("Estado"))),
+                            InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
+                            FechaBaja = leer.IsDBNull(leer.GetOrdinal("FechaBaja")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaBaja")),
+                            MotivoBaja = leer.IsDBNull(leer.GetOrdinal("MotivoBaja")) ? null : Enum.Parse<TipoEstado.MotivoBaja>(leer.GetString(leer.GetOrdinal("MotivoBaja"))),
+                            ObservacionBaja = leer.IsDBNull(leer.GetOrdinal("ObservacionBaja")) ? null : leer.GetString(leer.GetOrdinal("ObservacionBaja")),
+                            UsuarioBajaNombre = leer.IsDBNull(leer.GetOrdinal("UsuarioBajaNombre")) ? null : leer.GetString(leer.GetOrdinal("UsuarioBajaNombre"))
                         };
                     }
                 }
@@ -150,12 +156,16 @@ namespace RecycleSmartDAL
                     try
                     {
                         int filas;
-                        using (var cmd = new SqlCommand("", con, tran))
+                        using (var cmd = new SqlCommand(@"UPDATE Contenedor SET Contenedor.Estado='Baja',Contenedor.FechaBaja=GETDATE(),Contenedor.MotivoBaja=@Motivo,Contenedor.ObservacionBaja=@Observacion,Contenedor.UsuarioBajaId=@UsuarioId " +
+                            " FROM Contenedor" +
+                            " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
+                            " WHERE Contenedor.Id=@ContenedorId " +
+                            " AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND Contenedor.Estado<>'Baja'", con, tran))
                         {
                             cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
                             cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
-                            cmd.Parameters.AddWithValue("@Motivo", baja);
-                            cmd.Parameters.AddWithValue("@Observacion", (object)observacion ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Motivo", baja.ToString());
+                            cmd.Parameters.AddWithValue("@Observacion", (object?)observacion ?? DBNull.Value);
                             cmd.Parameters.AddWithValue("@UsuarioId", usuarioid);
 
                             filas = cmd.ExecuteNonQuery();
@@ -165,12 +175,13 @@ namespace RecycleSmartDAL
                             tran.Rollback();
                             return false;
                         }
-                        using (var cmd = new SqlCommand("", con, tran))
+                        //Dispositivo deja de mandar señal
+                        using (var cmd = new SqlCommand("UPDATE DispositivoIoT SET EstadoDispositivo='Baja' WHERE DispositivoIoT.ContenedorId=@ContenedorId", con, tran))
                         {
                             cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);
                             cmd.ExecuteNonQuery();
                         }
-                        using (var cmd = new SqlCommand("", con, tran))
+                        using (var cmd = new SqlCommand("DELETE FROM Contenedor_Tarjeta WHERE Contenedor_Tarjeta.ContenedorId=@ContenedorId", con, tran))
                         {
 
                             cmd.Parameters.AddWithValue("@ContenedorId", contenedorid);

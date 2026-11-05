@@ -26,10 +26,10 @@
         <div class="mt-2 fw-semibold">Esta acción no se puede deshacer.</div>
     </div>
 <div class="card shadow-sm mx-auto"style="max-width:650px">
-     <div class="card-body">
+    <div class="card-body" style="background-color:#badbcc">
     <h2>Dar de Baja - @Model.Nombre</h2>
-        <form asp-action="Baja" method="post" style="max-width:600px">
-            <input type="hidden" name="id" value="@Model.Id" />
+        <form asp-action="Baja" method="post" style="max-width:600px ">
+            <input type="hidden" name="contenedorid" value="@Model.Id" />
             <div class="mb-3">
                 <label class="form-label" for="motivo">Motivo Baja</label>
                 <select class="form-select" id="motivo" name="motivo" required>
@@ -49,7 +49,7 @@
             </div>
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-danger">Confirmar Baja</button>
-                <a asp-action="Detalle" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancelar</a>
+                <a asp-action="Detalle" asp-route-id="@Model.Id" class="btn btn-outline-dark">Cancelar</a>
             </div>
 
         </form>
