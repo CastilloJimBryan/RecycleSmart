@@ -40,6 +40,7 @@ namespace RecycleSmart.Controllers
             var dispositivos = _dispositivoIoT.DispositivosXInstitucion(institucionId, empresaid);
 
             ViewBag.InstitucionId = institucionId;
+            ViewBag.Bajas = bajas;
             ViewBag.Instituciones = instituciones;
 
             var (usado, maximo) = _contenedorBL.UsoxPlan(empresaid);
@@ -58,10 +59,9 @@ namespace RecycleSmart.Controllers
             ViewBag.Dispositivos = dispositivos;
             ViewBag.Umbrales = _usmbralBL.UmbralxInstitucion(institucionId, empresaid);
             ViewBag.Lecturas=_telemetriaBL.UltimasLecturas(institucionId,empresaid);
-            ViewBag.Bajas = bajas;
             var contenedores = _contenedorBL.ListadoContenedorXInstitucion(institucionId, empresaid, bajas);
 
-            return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
+            return View(contenedores);
         }
         public IActionResult Detalle(int id)
         {

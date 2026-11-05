@@ -19,11 +19,11 @@ namespace RecycleSmartDAL
         {
             List<Contenedor> listar=new List<Contenedor>();
             using(var con=new SqlConnection(_contectar))
-            using(var cmd=new SqlCommand("SELECT Contenedor.Id,Contenedor.Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,PosicionX,PosicionY, Contenedor.Estado,InstitucionId " +
+            using(var cmd=new SqlCommand("SELECT Contenedor.Id,Contenedor.Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,PosicionX,PosicionY, Contenedor.Estado,InstitucionId,Contenedor.FechaBaja,Contenedor.MotivoBaja " +
                 " FROM Contenedor " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
                 " WHERE InstitucionId = @InstitucionId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId " +
-                " AND @Baja= 1 AND Contenedor.Estado = 'Baja' OR @Baja=0 AND Contenedor.Estado <>'Baja'", con))
+                " AND ((@Baja= 1 AND Contenedor.Estado = 'Baja') OR (@Baja=0 AND Contenedor.Estado <>'Baja'))", con))
             {
                 cmd.Parameters.AddWithValue("@InstitucionId", institucionId);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
@@ -47,6 +47,9 @@ namespace RecycleSmartDAL
                             PosicionY=leer.IsDBNull(7)?null : leer.GetDouble(7),
                             Estado=Enum.Parse<TipoEstado.Estados>(leer.GetString(8)),
                             InstitucionId=leer.GetInt32(9),
+                            FechaBaja=leer.IsDBNull(10)?null:leer.GetDateTime(10),
+                            MotivoBaja=leer.IsDBNull(11)?null:Enum.Parse<TipoEstado.MotivoBaja>(leer.GetString(11)),
+
                         });
                     }
                 }

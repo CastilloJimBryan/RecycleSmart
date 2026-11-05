@@ -13,7 +13,19 @@
     var umbral = ViewBag.Umbrales as Dictionary<int, Umbral> ?? new();
     var lecturas = ViewBag.Lecturas as Dictionary<int, Telemetria> ?? new();
     bool bajas = ViewBag.Bajas ?? false;
+
+    string textmotivo(TipoEstado.MotivoBaja? m) => m switch
+    {
+        TipoEstado.MotivoBaja.FallaEquipo => "Falla Equipo",
+        TipoEstado.MotivoBaja.Reemplazo => "Reemplazo",
+        TipoEstado.MotivoBaja.CierreArea => "Cierre Area",
+        TipoEstado.MotivoBaja.Otro => "Otro",
+        _ => ""
+    };
+
 }
+
+
 <partial name="_Mensajes" /> 
 <div>
     <h2>Contenedores</h2>
@@ -97,7 +109,7 @@ else
                             <th>Sector</th>
                             <th>DispositivoIoT</th>
                             <th>Estado</th>
-                            <th>Nivel</th>
+                            <th>@(bajas?"Fecha":"Nivel")</th>
                             <th>Detalle</th>
                         </tr>
                     </thead>
@@ -129,45 +141,56 @@ else
                                     {
                                         <span class="text-muted">Sin DispositivoIoT</span>
                                     }
-                                </td>
+                                </td>     
                                 <td>
-                                    <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+                                      <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
                                 </td>
-                                    <td style="min-width: 180px;" data-nivel-contenedor="@item.Id">
-                                    @if(lecturas.TryGetValue(item.Id,out var lectura))
-                                    {
-                                        umbral.TryGetValue(item.Id, out var umbralcont);
-                                        var clase=UmbralBL.ClasificarLectura(lectura,umbralcont);
-                                            bool viejo = UmbralBL.LecturaDesactualizada(lectura, umbralcont);
-                                            var color = clase switch
-                                            {
-                                                TipoEstado.ClasificacionLectura.Critico => "bg-danger",
-                                                TipoEstado.ClasificacionLectura.Advertencia => "bg-warning",
-                                                _=>"bg-success"
-                                            };
-                                            <div class="progress" style="height: 18px; @(viejo ? "opacity:0.5;":"")">
-                                                <div class ="progress-bar @color" style="width: @lectura.Nivel%" >@lectura.Nivel %</div>
-                                            </div>
-                                                <small class="text-muted d-block">
-                                                    @lectura.Temperatura.ToString("0.0") °C - @lectura.FechaHora.ToString("dd/MM/yyyy - HH:mm:ss")
-                                                </small>
-                                                <div class="d-flex flex-wrap gap-1 mt-1 small">
-                                                    @if (clase != TipoEstado.ClasificacionLectura.Normal)
-                                                    {
-                                                        <span class="badge @color">@clase</span>
-                                                    }
-                                                    @if(viejo)
-                                                    {
-                                                        <span class="badge bg-secondary">Sin Datos Recientes</span>
-                                                    }
+                                
+                                @if(bajas)
+                                {
+                                    <td>
+                                        @item.FechaBaja?.ToString("dd/MM/yyyy")
+                                        <div class="small text-muted">@textmotivo(item.MotivoBaja)</div>
+                                    </td>
+                                }
+                                else
+                                {
+                                     <td style="min-width: 180px;" data-nivel-contenedor="@item.Id">
+                                        @if(lecturas.TryGetValue(item.Id,out var lectura))
+                                        {
+                                            umbral.TryGetValue(item.Id, out var umbralcont);
+                                            var clase=UmbralBL.ClasificarLectura(lectura,umbralcont);
+                                                bool viejo = UmbralBL.LecturaDesactualizada(lectura, umbralcont);
+                                                var color = clase switch
+                                                {
+                                                    TipoEstado.ClasificacionLectura.Critico => "bg-danger",
+                                                    TipoEstado.ClasificacionLectura.Advertencia => "bg-warning",
+                                                    _=>"bg-success"
+                                                };
+                                                <div class="progress" style="height: 18px; @(viejo ? "opacity:0.5;":"")">
+                                                    <div class ="progress-bar @color" style="width: @lectura.Nivel%" >@lectura.Nivel %</div>
                                                 </div>
-                                    }
-                                    else
-                                    { 
-                                        <span class="text-muted">Sin Lecturas</span>
+                                                    <small class="text-muted d-block">
+                                                        @lectura.Temperatura.ToString("0.0") °C - @lectura.FechaHora.ToString("dd/MM/yyyy - HH:mm:ss")
+                                                    </small>
+                                                    <div class="d-flex flex-wrap gap-1 mt-1 small">
+                                                        @if (clase != TipoEstado.ClasificacionLectura.Normal)
+                                                        {
+                                                            <span class="badge @color">@clase</span>
+                                                        }
+                                                        @if(viejo)
+                                                        {
+                                                            <span class="badge bg-secondary">Sin Datos Recientes</span>
+                                                        }
+                                                    </div>
+                                        }
+                                        else
+                                        { 
+                                            <span class="text-muted">Sin Lecturas</span>
 
-                                    }
-                                </td>
+                                        }
+                                     </td>
+                                }
                            
                                 <td class="text-nowrap">
                                         <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-theme-success btn-sm">Ver</a>
