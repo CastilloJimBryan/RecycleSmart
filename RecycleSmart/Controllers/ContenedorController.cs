@@ -33,7 +33,7 @@ namespace RecycleSmart.Controllers
             _alertaBL=new AlertaBL(conectar);
         }
 
-        public IActionResult Index(int institucionId = 0)
+        public IActionResult Index(int institucionId = 0,bool bajas=false)
         {
             var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid)
                 .Where(i=>i.Estados!=TipoEstado.Estados.Baja).ToList();
@@ -58,7 +58,8 @@ namespace RecycleSmart.Controllers
             ViewBag.Dispositivos = dispositivos;
             ViewBag.Umbrales = _usmbralBL.UmbralxInstitucion(institucionId, empresaid);
             ViewBag.Lecturas=_telemetriaBL.UltimasLecturas(institucionId,empresaid);
-
+            ViewBag.Bajas = bajas;
+            var contenedores = _contenedorBL.ListadoContenedorXInstitucion(institucionId, empresaid, bajas);
 
             return View(_contenedorBL.ListadoContenedorXInstitucion(institucionId,empresaid));
         }

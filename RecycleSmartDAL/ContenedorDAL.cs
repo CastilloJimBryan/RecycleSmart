@@ -15,17 +15,19 @@ namespace RecycleSmartDAL
             _contectar = conectar;
         }
 
-        public List<Contenedor> ListasContenedorXInstitucion(int institucionId,int empresaId)
+        public List<Contenedor> ListasContenedorXInstitucion(int institucionId,int empresaId,bool baja=false)
         {
             List<Contenedor> listar=new List<Contenedor>();
             using(var con=new SqlConnection(_contectar))
             using(var cmd=new SqlCommand("SELECT Contenedor.Id,Contenedor.Nombre,TipoResiduo,CapacidadLitros,Piso,Sector,PosicionX,PosicionY, Contenedor.Estado,InstitucionId " +
                 " FROM Contenedor " +
                 " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId " +
-                " WHERE InstitucionId = @InstitucionId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId ",con))
+                " WHERE InstitucionId = @InstitucionId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId " +
+                " AND @Baja= 1 AND Contenedor.Estado = 'Baja' OR @Baja=0 AND Contenedor.Estado <>'Baja'", con))
             {
                 cmd.Parameters.AddWithValue("@InstitucionId", institucionId);
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
+                cmd.Parameters.AddWithValue("@Baja", baja);
 
                 con.Open();
 

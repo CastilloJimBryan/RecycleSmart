@@ -12,6 +12,7 @@
     bool PuedeGestionaar = User.IsInRole(Roles.Administrador);
     var umbral = ViewBag.Umbrales as Dictionary<int, Umbral> ?? new();
     var lecturas = ViewBag.Lecturas as Dictionary<int, Telemetria> ?? new();
+    bool bajas = ViewBag.Bajas ?? false;
 }
 <partial name="_Mensajes" /> 
 <div>
@@ -26,6 +27,7 @@
 </p>
 
 <form method="get" asp-action="Index">
+    <input type="hidden" name="bajas" value="@(bajas ? "true" : "false")" />
     <label class="form-label">Instituciones</label>
     <select name="institucionId" class="form-select mb-3" onchange="this.form.submit() ">
         <option value="0">Seleccione una Institucion</option>
@@ -35,7 +37,9 @@
             }
         </select>
 
-    </form> 
+</form> 
+
+
 @if(insti.Count==0)
 {
     <p class="text-muted">Todavia no hay instituciones registradas</p>
@@ -43,16 +47,27 @@
 else
 {
     
-    @if (instiId == 0)
+    if (instiId == 0)
     {
         <div class="alert alert-info">Seleccione una Institucion Para ver los contenedores</div>
     }
 
     else
     {
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a asp-action="Index" asp-route-institucionId="@instiId"
+                   class="nav-link @(!bajas ? "active" : "")">Activos</a>
+            </li>
+            <li class="nav-item">
+                <a asp-action="Index" asp-route-institucionId="@instiId" asp-route-bajas="true"
+                   class="nav-link @(bajas ? "active" : "")">Dados de baja</a>
+            </li>
+        </ul>
+
         <div class="mb-2">
 
-            @if (PuedeGestionaar)
+            @if (PuedeGestionaar && !bajas)
             {
                 if (limiteAlcanzado)
                 {
@@ -66,7 +81,7 @@ else
         </div>
         @if (Model.Count == 0)
         {
-            <div class="alert alert-info">Todavia no tiene contenedores</div>
+            <div class="alert alert-info">@(bajas ? "No hay contenedores dados de baja en esta institución." : "Todavía no tiene contenedores.")</div>
         }
         else
         {     

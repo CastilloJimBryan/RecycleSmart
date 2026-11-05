@@ -23,9 +23,9 @@ namespace RecycleSmartBLL
         }
         public static readonly string[] TiposResiduo ={ "Patogénico", "Cortopunzante", "Anatomopatológico", "Farmacéutico", "Químico" };
 
-        public List<Contenedor> ListadoContenedorXInstitucion(int institucionId, int empresaid)
+        public List<Contenedor> ListadoContenedorXInstitucion(int institucionId, int empresaid,bool baja=false)
         {
-            return _contenedorDAL.ListasContenedorXInstitucion(institucionId, empresaid);
+            return _contenedorDAL.ListasContenedorXInstitucion(institucionId, empresaid,baja);
         } 
         public Contenedor? BuscarContenedorXId(int mid,int empresaid)
         {
