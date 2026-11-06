@@ -7,7 +7,7 @@
             Activo, Suspendido, Baja
         }
         public enum EstadoDispositivo { Pendiente, Offline, Activo, Baja }
-        public enum EstadoSync { Pendiente, Sincronizado, Error }
+        public enum EstadoSync { Pendiente, Sincronizando, Error }
 
         public enum ClasificacionLectura { Normal, Advertencia, Critico }
 
@@ -19,5 +19,10 @@
         public enum MotivoAcceso { Autorizado,TarjetaDesconocida,TarjetaVencida,FueraHorario,TarjetaInactiva,ContenedorNoHabilitado}
 
         public enum MotivoBaja { FallaEquipo, Reemplazo, CierreArea, Otro }
+
+        public enum EstadoLote { EnCurso,RecoleccionSolicitadas,Recolectado,Tratado,Cerrado}
+
+        public enum TipoHito { Generacion,SolicitudRecoleccion,Recoleccion,Tratamiento,DisposicionFinal}
+        public enum MetodoTratamiento { Autoclave,Incineracion,Microondas,Otro}
     }
 }

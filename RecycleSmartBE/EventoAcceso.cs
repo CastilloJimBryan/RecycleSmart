@@ -26,5 +26,6 @@ namespace RecycleSmartBE
         public bool Permitido => EstadoAcceso == TipoEstado.EstadoAcceso.Permitido;
 
         public List<Alerta> AlertasNuevas { get; set; } = new();
+        public int? LoteId {  get; set; }
     }
 }

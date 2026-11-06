@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Servicio;
 
 var builder = WebApplication.CreateBuilder(args);
+Integridad.Configurar(builder.Configuration["Trazabilidad:ClaveIntegridad"] ?? "");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
@@ -24,6 +25,7 @@ builder.Services.AddAuthentication(ManejosSesiones.esquema).AddCookie(ManejosSes
     });
 builder.Services.AddHostedService<RecycleSmart.Servicios.MotorIoT>();
 builder.Services.AddSignalR();
+
 var app=builder.Build();
 
 // Configure the HTTP request pipeline.
