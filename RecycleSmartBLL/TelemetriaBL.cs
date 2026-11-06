@@ -10,6 +10,7 @@ namespace RecycleSmartBLL
     {
         private readonly TelemetriaDAL _telemetriaDAl;
         private readonly UmbralDAL _umbralDAL;
+        private readonly LoteBL _loteBL;
         private readonly DispositivoIoTDAL _dispositivoIoTDAL;
         private readonly AlertaBL _alertaBL;
         private readonly EventoAccesoDAL _eventoaccesoDAL;
@@ -20,6 +21,7 @@ namespace RecycleSmartBLL
             _umbralDAL=new UmbralDAL(conectar);
             _alertaBL=new AlertaBL(conectar);
             _eventoaccesoDAL=new EventoAccesoDAL(conectar);
+            _loteBL=new LoteBL(conectar);
         }
 
         public static void ValidarDatos(LecturaSensor l)
@@ -76,7 +78,13 @@ namespace RecycleSmartBLL
                 var (idAcceso, nivelprevio, capacidad) = pendiente.Value;
                 decimal volumen=Math.Round((telemetria.Nivel-nivelprevio)/100m*capacidad,1);
                 _eventoaccesoDAL.CompletarCierre(idAcceso,telemetria.Nivel,volumen);
-                telemetria.CompletoAcceso = true;
+                if(volumen>0)
+                {
+                    var (loteid, codigo, creado) = _loteBL.RegistrarDeposito(idAcceso);
+                    telemetria.LoteCodigo = codigo;
+                    telemetria.LoteCreado = creado;
+                }
+                telemetria.CompletoAcceso = true; 
             }
             telemetria.EmpresaLogisticaId = dispositivoIoT.EmpresaLogisticaId;
             var umbral = _umbralDAL.BuscarxContenedor(telemetria.ContenedorId, dispositivoIoT.EmpresaLogisticaId);

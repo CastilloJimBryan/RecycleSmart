@@ -21,5 +21,8 @@ namespace RecycleSmartBE
         public bool CompletoAcceso {  get; set; }
         public List<Alerta> ALertasNuevas { get; set; } = new();
        
+        public string? LoteCodigo {  get; set; }
+        public bool LoteCreado {  get; set; }
+
     }
 }

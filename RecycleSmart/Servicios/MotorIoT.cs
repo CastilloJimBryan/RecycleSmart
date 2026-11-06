@@ -177,6 +177,12 @@ namespace RecycleSmart.Servicios
             if(t.CompletoAcceso)
             {
                 await _hub.Clients.Group(grupo).SendAsync("NuevoAcceso", new { ContenedorId = t.ContenedorId });
+                if(t.LoteCreado)
+                {
+                    _log.LogInformation("Lote {Codigo} iniciado en el contenedor {Id}", t.LoteCodigo, t.ContenedorId);
+                    await _hub.Clients.Group(grupo)
+                        .SendAsync("NuevoLote", new { codigo = t.LoteCodigo, contenedorId = t.ContenedorId });
+                }
             }
             await AvisarAlertas(t.ALertasNuevas, t.EmpresaLogisticaId);
         }
