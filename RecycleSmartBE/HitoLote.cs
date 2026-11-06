@@ -8,7 +8,7 @@ namespace RecycleSmartBE
     {
         public int Id {  get; set; }
         public TipoEstado.TipoHito TipoHito { get; set; }
-        public DateTime Fecha {  get; set; }
+        public DateTime Fecha {  get; set; } 
         public string? Responsable {  get; set; }
         public string? Metodo {  get; set; }
         public string? NumeroDocumento {  get; set; }

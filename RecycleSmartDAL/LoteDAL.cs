@@ -36,7 +36,11 @@ namespace RecycleSmartDAL
                         decimal Volumen;
                         string TipoResiduo;
 
-                        using (var cmd = new SqlCommand("", con, tram))
+                        using (var cmd = new SqlCommand(@" SELECT EventoAcceso.ContenedorId,EventoAcceso.UsuarioInstitucionId,EventoAcceso.Fecha,EventoAcceso.NivelPrevio,EventoAcceso.NivelPosterior,EventoAcceso.VolumenDepositado," +
+                            " Contenedor.TipoResiduo,Contenedor.InstitucionId" +
+                            " FROM EventoAcceso" +
+                            " INNER JOIN Contenedor ON Contenedor.Id=EventoAcceso.ContenedorId" +
+                            " WHERE EventoAcceso.Id=@Id AND EventoAcceso.LoteId IS NULL ", con, tram))
                         {
                             cmd.Parameters.AddWithValue("@EventoAccesoId", EventoAccesoId);
 
@@ -58,8 +62,8 @@ namespace RecycleSmartDAL
                         }
                         int loteid = 0;
                         string codigo = "";
-
-                        using (var cmd=new SqlCommand("",con,tram))
+                        // busca si hay lotes activos
+                        using (var cmd=new SqlCommand(@"SELECT Id ,Codigo FROM Lote WITH (UPDLOCK,HOLDLOCK) WHERE ContenedorId=@ContenedorId AND EstadoLote IN ('EnCurso','RecoleccionSolicitada')", con,tram))
                         {
                             cmd.Parameters.AddWithValue("@ContenedorId", contenedorId);
                             using (var leer=cmd.ExecuteReader())
@@ -78,7 +82,7 @@ namespace RecycleSmartDAL
                             var fechacreacion = Integridad.Truncar(Fecha);
                             int anio = fechacreacion.Year;
                             int numero;
-                            using (var cmd=new SqlCommand("",con,tram))
+                            using (var cmd=new SqlCommand("SELECT ISNULL (MAX(Numero),0)+1 FROM Lote WITH (UPDLOCK , HOLDLOCK) WHERE InstitucionId=@InstitucionId AND Anio=@Anio", con,tram))
                             {
                                 cmd.Parameters.AddWithValue("@InstitucionId",institucionId);
                                 cmd.Parameters.AddWithValue("@Anio",anio);
@@ -86,7 +90,9 @@ namespace RecycleSmartDAL
                             }
                             codigo = $"RS-{institucionId}-{anio}-{numero:D4}";
                             //lote
-                            using(var cmd=new SqlCommand("",con,tram))
+                            using(var cmd=new SqlCommand(@"INSERT INTO Lote(Codigo,Anio,Numero,TipoResiduo,EstadoLote,FechaGeneracion,FechaLimiteRecoleccion,ContenedorId,InstitucionId) " +
+                                " OUTPUT INSERTED.Id " +
+                                " VALUES(@codigo,@Anio,@Numero,@TipoResiduo,@EstadoLote,@FechaGeneracion,@FechaLimiteRecolecion,@ContenedorId,@InstituicionId) ", con,tram))
                             {
                                 cmd.Parameters.AddWithValue("@Codigo",codigo);
                                 cmd.Parameters.AddWithValue("@EstadoLote",TipoEstado.EstadoLote.EnCurso.ToString());
@@ -116,9 +122,12 @@ namespace RecycleSmartDAL
                             creado = true;
                         }
 
-                        using (var cmd=new SqlCommand("",con,tram))
+                        using (var cmd=new SqlCommand(@"UPDATE Lote SET VolumenTotal=@VolumenTotal,CantidadDeposito=CantidadDeposito + 1 " +
+                            " WHERE Id=@Id; " +
+                            " UPDATE EventoAcceso SET LoteId=@LoteId" +
+                            " WHERE Id=@EventoAccesoId ", con,tram))
                         {
-                            cmd.Parameters.AddWithValue("@Volumen", Volumen);
+                            cmd.Parameters.AddWithValue("@VolumenTotal", Volumen);
                             cmd.Parameters.AddWithValue("@LoteId", loteid);
                             cmd.Parameters.AddWithValue("@EventoId", EventoAccesoId);
                             cmd.ExecuteNonQuery();
@@ -137,7 +146,25 @@ namespace RecycleSmartDAL
 
         public void InsertarHito(HitoLote hito, SqlConnection con, SqlTransaction st)
         {
+            using (var cmd = new SqlCommand(@"INSERT INTO HitoLote (TipoHito,Fecha,Responsable,Metodo,NumeroDocumento,Observaciones,DentroPlazo,HashAnterior,Hash,LoteId,UsuarioId,UsuarioInstitucionId) " +
+                " VALUES(@TipoHito,@Fecha,@Responsable,@Metodo,@NumeroDocumento,@Observaciones,@DentroPlazo,@HashAnterior,@Hash,@LoteId,@UsuarioId,@UsuarioInstitucionId) ", con,st))
+            {
+                cmd.Parameters.AddWithValue("@TipoHito",hito.TipoHito);
+                cmd.Parameters.AddWithValue("@Fecha",hito.Fecha);
+                cmd.Parameters.AddWithValue("@Responsable",hito.Responsable);
+                cmd.Parameters.AddWithValue("@Metodo",hito.Metodo);
+                cmd.Parameters.AddWithValue("@NumeroDocumento",hito.NumeroDocumento);
+                cmd.Parameters.AddWithValue("@Observaciones",hito.Observaciones);
+                cmd.Parameters.AddWithValue("@DentroPlazo",hito.DentroDelPlazo);
+                cmd.Parameters.AddWithValue("@HashAnterior",hito.HashAnterior);
+                cmd.Parameters.AddWithValue("@Hash",hito.Hash);
+                cmd.Parameters.AddWithValue("@LoteId",hito.LoteId);
+                cmd.Parameters.AddWithValue("@UsuarioId",hito.UsuarioId);
+                cmd.Parameters.AddWithValue("@UsuarioInstitucionId",hito.UsuarioInstitucionId);
+                
 
+                cmd.ExecuteNonQuery();
+            }
         }
 
     }
