@@ -40,7 +40,7 @@ namespace RecycleSmartDAL
                             " Contenedor.TipoResiduo,Contenedor.InstitucionId" +
                             " FROM EventoAcceso" +
                             " INNER JOIN Contenedor ON Contenedor.Id=EventoAcceso.ContenedorId" +
-                            " WHERE EventoAcceso.Id=@Id AND EventoAcceso.LoteId IS NULL ", con, tram))
+                            " WHERE EventoAcceso.Id=@EventoAccesoId AND EventoAcceso.LoteId IS NULL ", con, tram))
                         {
                             cmd.Parameters.AddWithValue("@EventoAccesoId", EventoAccesoId);
 
@@ -54,9 +54,9 @@ namespace RecycleSmartDAL
                                 institucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId"));
                                 UsuarioInstitucionId =leer.IsDBNull(leer.GetOrdinal("UsuarioInstitucionId"))?null: leer.GetInt32(leer.GetOrdinal("UsuarioInstitucionId"));
                                 Fecha = leer.GetDateTime(leer.GetOrdinal("Fecha"));
-                                NivelPre = leer.GetInt32(leer.GetOrdinal("NivelPrecio"));
-                                NivelPost = leer.GetInt32(leer.GetOrdinal("NivelPosterios"));
-                                Volumen = leer.GetDecimal(leer.GetOrdinal("VolumenTotal"));
+                                NivelPre = leer.GetInt32(leer.GetOrdinal("NivelPrevio"));
+                                NivelPost = leer.GetInt32(leer.GetOrdinal("NivelPosterior"));
+                                Volumen = leer.GetDecimal(leer.GetOrdinal("VolumenDepositado"));
                                 TipoResiduo = leer.GetString(leer.GetOrdinal("TipoResiduo"));
                             }
                         }
@@ -90,9 +90,9 @@ namespace RecycleSmartDAL
                             }
                             codigo = $"RS-{institucionId}-{anio}-{numero:D4}";
                             //lote
-                            using(var cmd=new SqlCommand(@"INSERT INTO Lote(Codigo,Anio,Numero,TipoResiduo,EstadoLote,FechaGeneracion,FechaLimiteRecoleccion,ContenedorId,InstitucionId) " +
+                            using(var cmd=new SqlCommand(@"INSERT INTO Lote(Codigo,Anio,Numero,TipoResiduo,EstadoLote,FechaGeneracion,FechaLimiteRecoleccion,VolumenTotal,CantidadDeposito,ContenedorId,InstitucionId) " +
                                 " OUTPUT INSERTED.Id " +
-                                " VALUES(@codigo,@Anio,@Numero,@TipoResiduo,@EstadoLote,@FechaGeneracion,@FechaLimiteRecolecion,@ContenedorId,@InstituicionId) ", con,tram))
+                                " VALUES(@codigo,@Anio,@Numero,@TipoResiduo,@EstadoLote,@FechaGeneracion,@FechaLimiteRecoleccion,0,0,@ContenedorId,@InstitucionId) ", con,tram))
                             {
                                 cmd.Parameters.AddWithValue("@Codigo",codigo);
                                 cmd.Parameters.AddWithValue("@EstadoLote",TipoEstado.EstadoLote.EnCurso.ToString());
@@ -100,7 +100,7 @@ namespace RecycleSmartDAL
                                 cmd.Parameters.AddWithValue("@TipoResiduo",TipoResiduo);
                                 cmd.Parameters.AddWithValue("@Anio",anio);
                                 cmd.Parameters.AddWithValue("@FechaGeneracion",fechacreacion);
-                                cmd.Parameters.AddWithValue("@FechaLimite",fechacreacion.AddDays(diasRecoleccion));
+                                cmd.Parameters.AddWithValue("@FechaLimiteRecoleccion",fechacreacion.AddDays(diasRecoleccion));
                                 cmd.Parameters.AddWithValue("@ContenedorId",contenedorId);
                                 cmd.Parameters.AddWithValue("@InstitucionId",institucionId);
 
@@ -122,14 +122,14 @@ namespace RecycleSmartDAL
                             creado = true;
                         }
 
-                        using (var cmd=new SqlCommand(@"UPDATE Lote SET VolumenTotal=@VolumenTotal,CantidadDeposito=CantidadDeposito + 1 " +
-                            " WHERE Id=@Id; " +
+                        using (var cmd=new SqlCommand(@"UPDATE Lote SET VolumenTotal=VolumenTotal+@Volumen,CantidadDeposito=CantidadDeposito + 1 " +
+                            " WHERE Id=@LoteId; " +
                             " UPDATE EventoAcceso SET LoteId=@LoteId" +
-                            " WHERE Id=@EventoAccesoId ", con,tram))
+                            " WHERE EventoAcceso.Id=@EventoAccesoId ", con,tram))
                         {
-                            cmd.Parameters.AddWithValue("@VolumenTotal", Volumen);
+                            cmd.Parameters.AddWithValue("@Volumen", Volumen);
                             cmd.Parameters.AddWithValue("@LoteId", loteid);
-                            cmd.Parameters.AddWithValue("@EventoId", EventoAccesoId);
+                            cmd.Parameters.AddWithValue("@EventoAccesoId", EventoAccesoId);
                             cmd.ExecuteNonQuery();
                         }
                         tram.Commit();
@@ -149,18 +149,18 @@ namespace RecycleSmartDAL
             using (var cmd = new SqlCommand(@"INSERT INTO HitoLote (TipoHito,Fecha,Responsable,Metodo,NumeroDocumento,Observaciones,DentroPlazo,HashAnterior,Hash,LoteId,UsuarioId,UsuarioInstitucionId) " +
                 " VALUES(@TipoHito,@Fecha,@Responsable,@Metodo,@NumeroDocumento,@Observaciones,@DentroPlazo,@HashAnterior,@Hash,@LoteId,@UsuarioId,@UsuarioInstitucionId) ", con,st))
             {
-                cmd.Parameters.AddWithValue("@TipoHito",hito.TipoHito);
+                cmd.Parameters.AddWithValue("@TipoHito",hito.TipoHito.ToString());
                 cmd.Parameters.AddWithValue("@Fecha",hito.Fecha);
-                cmd.Parameters.AddWithValue("@Responsable",hito.Responsable);
-                cmd.Parameters.AddWithValue("@Metodo",hito.Metodo);
-                cmd.Parameters.AddWithValue("@NumeroDocumento",hito.NumeroDocumento);
-                cmd.Parameters.AddWithValue("@Observaciones",hito.Observaciones);
-                cmd.Parameters.AddWithValue("@DentroPlazo",hito.DentroDelPlazo);
+                cmd.Parameters.AddWithValue("@Responsable",(object?)hito.Responsable??DBNull.Value);
+                cmd.Parameters.AddWithValue("@Metodo",(object?)hito.Metodo??DBNull.Value);
+                cmd.Parameters.AddWithValue("@NumeroDocumento",(object?)hito.NumeroDocumento??DBNull.Value);
+                cmd.Parameters.AddWithValue("@Observaciones",(object?)hito.Observaciones ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@DentroPlazo",(object?)hito.DentroDelPlazo ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@HashAnterior",hito.HashAnterior);
                 cmd.Parameters.AddWithValue("@Hash",hito.Hash);
                 cmd.Parameters.AddWithValue("@LoteId",hito.LoteId);
-                cmd.Parameters.AddWithValue("@UsuarioId",hito.UsuarioId);
-                cmd.Parameters.AddWithValue("@UsuarioInstitucionId",hito.UsuarioInstitucionId);
+                cmd.Parameters.AddWithValue("@UsuarioId",(object?)hito.UsuarioId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@UsuarioInstitucionId",(object?)hito.UsuarioInstitucionId ?? DBNull.Value);
                 
 
                 cmd.ExecuteNonQuery();
