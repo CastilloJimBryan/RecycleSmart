@@ -11,7 +11,7 @@ namespace RecycleSmartBE
         public DateTime Fecha {  get; set; } 
         public string? Responsable {  get; set; }
         public string? Metodo {  get; set; }
-        public string? NumeroDocumento {  get; set; }
+        public string? NumeroDocumento {  get; set; } 
         public string? Observaciones {  get; set; }
         public bool? DentroDelPlazo {  get; set; }
         public string HashAnterior { get; set; } = string.Empty;

@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Data.SqlClient;
 using RecycleSmartBE;
 using Servicio;
 using System;
@@ -17,12 +18,12 @@ namespace RecycleSmartDAL
             _conectar = conectar;
         }
 
-        public (int loteId,string Codigo,bool Creado) RegistrarDeposito(long EventoAccesoId,int diasRecoleccion)
+        public (int loteId, string Codigo, bool Creado) RegistrarDeposito(long EventoAccesoId, int diasRecoleccion)
         {
-            using(var con=new SqlConnection(_conectar))
+            using (var con = new SqlConnection(_conectar))
             {
                 con.Open();
-                using(var tram=con.BeginTransaction())
+                using (var tram = con.BeginTransaction())
                 {
                     try
                     {
@@ -44,15 +45,15 @@ namespace RecycleSmartDAL
                         {
                             cmd.Parameters.AddWithValue("@EventoAccesoId", EventoAccesoId);
 
-                            using(var leer = cmd.ExecuteReader())
+                            using (var leer = cmd.ExecuteReader())
                             {
-                                if(!leer.Read())
+                                if (!leer.Read())
                                 {
                                     throw new Exception($"El Evento {EventoAccesoId} no existe o ya tiene lote");
                                 }
                                 contenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId"));
                                 institucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId"));
-                                UsuarioInstitucionId =leer.IsDBNull(leer.GetOrdinal("UsuarioInstitucionId"))?null: leer.GetInt32(leer.GetOrdinal("UsuarioInstitucionId"));
+                                UsuarioInstitucionId = leer.IsDBNull(leer.GetOrdinal("UsuarioInstitucionId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioInstitucionId"));
                                 Fecha = leer.GetDateTime(leer.GetOrdinal("Fecha"));
                                 NivelPre = leer.GetInt32(leer.GetOrdinal("NivelPrevio"));
                                 NivelPost = leer.GetInt32(leer.GetOrdinal("NivelPosterior"));
@@ -63,12 +64,12 @@ namespace RecycleSmartDAL
                         int loteid = 0;
                         string codigo = "";
                         // busca si hay lotes activos
-                        using (var cmd=new SqlCommand(@"SELECT Id ,Codigo FROM Lote WITH (UPDLOCK,HOLDLOCK) WHERE ContenedorId=@ContenedorId AND EstadoLote IN ('EnCurso','RecoleccionSolicitada')", con,tram))
+                        using (var cmd = new SqlCommand(@"SELECT Id ,Codigo FROM Lote WITH (UPDLOCK,HOLDLOCK) WHERE ContenedorId=@ContenedorId AND EstadoLote IN ('EnCurso','RecoleccionSolicitada')", con, tram))
                         {
                             cmd.Parameters.AddWithValue("@ContenedorId", contenedorId);
-                            using (var leer=cmd.ExecuteReader())
+                            using (var leer = cmd.ExecuteReader())
                             {
-                                if(leer.Read())
+                                if (leer.Read())
                                 {
                                     loteid = leer.GetInt32(0);
                                     codigo = leer.GetString(1);
@@ -76,33 +77,33 @@ namespace RecycleSmartDAL
                             }
                         }
 
-                        bool creado=false;
+                        bool creado = false;
                         if (loteid == 0)
                         {
                             var fechacreacion = Integridad.Truncar(Fecha);
                             int anio = fechacreacion.Year;
                             int numero;
-                            using (var cmd=new SqlCommand("SELECT ISNULL (MAX(Numero),0)+1 FROM Lote WITH (UPDLOCK , HOLDLOCK) WHERE InstitucionId=@InstitucionId AND Anio=@Anio", con,tram))
+                            using (var cmd = new SqlCommand("SELECT ISNULL (MAX(Numero),0)+1 FROM Lote WITH (UPDLOCK , HOLDLOCK) WHERE InstitucionId=@InstitucionId AND Anio=@Anio", con, tram))
                             {
-                                cmd.Parameters.AddWithValue("@InstitucionId",institucionId);
-                                cmd.Parameters.AddWithValue("@Anio",anio);
-                                numero=(int)cmd.ExecuteScalar();
+                                cmd.Parameters.AddWithValue("@InstitucionId", institucionId);
+                                cmd.Parameters.AddWithValue("@Anio", anio);
+                                numero = (int)cmd.ExecuteScalar();
                             }
                             codigo = $"RS-{institucionId}-{anio}-{numero:D4}";
                             //lote
-                            using(var cmd=new SqlCommand(@"INSERT INTO Lote(Codigo,Anio,Numero,TipoResiduo,EstadoLote,FechaGeneracion,FechaLimiteRecoleccion,VolumenTotal,CantidadDeposito,ContenedorId,InstitucionId) " +
+                            using (var cmd = new SqlCommand(@"INSERT INTO Lote(Codigo,Anio,Numero,TipoResiduo,EstadoLote,FechaGeneracion,FechaLimiteRecoleccion,VolumenTotal,CantidadDeposito,ContenedorId,InstitucionId) " +
                                 " OUTPUT INSERTED.Id " +
-                                " VALUES(@codigo,@Anio,@Numero,@TipoResiduo,@EstadoLote,@FechaGeneracion,@FechaLimiteRecoleccion,0,0,@ContenedorId,@InstitucionId) ", con,tram))
+                                " VALUES(@codigo,@Anio,@Numero,@TipoResiduo,@EstadoLote,@FechaGeneracion,@FechaLimiteRecoleccion,0,0,@ContenedorId,@InstitucionId) ", con, tram))
                             {
-                                cmd.Parameters.AddWithValue("@Codigo",codigo);
-                                cmd.Parameters.AddWithValue("@EstadoLote",TipoEstado.EstadoLote.EnCurso.ToString());
-                                cmd.Parameters.AddWithValue("@Numero",numero);
-                                cmd.Parameters.AddWithValue("@TipoResiduo",TipoResiduo);
-                                cmd.Parameters.AddWithValue("@Anio",anio);
-                                cmd.Parameters.AddWithValue("@FechaGeneracion",fechacreacion);
-                                cmd.Parameters.AddWithValue("@FechaLimiteRecoleccion",fechacreacion.AddDays(diasRecoleccion));
-                                cmd.Parameters.AddWithValue("@ContenedorId",contenedorId);
-                                cmd.Parameters.AddWithValue("@InstitucionId",institucionId);
+                                cmd.Parameters.AddWithValue("@Codigo", codigo);
+                                cmd.Parameters.AddWithValue("@EstadoLote", TipoEstado.EstadoLote.EnCurso.ToString());
+                                cmd.Parameters.AddWithValue("@Numero", numero);
+                                cmd.Parameters.AddWithValue("@TipoResiduo", TipoResiduo);
+                                cmd.Parameters.AddWithValue("@Anio", anio);
+                                cmd.Parameters.AddWithValue("@FechaGeneracion", fechacreacion);
+                                cmd.Parameters.AddWithValue("@FechaLimiteRecoleccion", fechacreacion.AddDays(diasRecoleccion));
+                                cmd.Parameters.AddWithValue("@ContenedorId", contenedorId);
+                                cmd.Parameters.AddWithValue("@InstitucionId", institucionId);
 
                                 loteid = (int)cmd.ExecuteScalar();
                             }
@@ -117,15 +118,15 @@ namespace RecycleSmartDAL
                                 Observaciones = $"Primer Deposito nivel {NivelPre} % -> {NivelPost} %, {Volumen.ToString("0.0", CultureInfo.InvariantCulture)} L"
                             };
                             hito.Hash = Integridad.hashito(codigo, hito);
-                            InsertarHito(hito,con,tram);
+                            InsertarHito(hito, con, tram);
 
                             creado = true;
                         }
 
-                        using (var cmd=new SqlCommand(@"UPDATE Lote SET VolumenTotal=VolumenTotal+@Volumen,CantidadDeposito=CantidadDeposito + 1 " +
+                        using (var cmd = new SqlCommand(@"UPDATE Lote SET VolumenTotal=VolumenTotal+@Volumen,CantidadDeposito=CantidadDeposito + 1 " +
                             " WHERE Id=@LoteId; " +
                             " UPDATE EventoAcceso SET LoteId=@LoteId" +
-                            " WHERE EventoAcceso.Id=@EventoAccesoId ", con,tram))
+                            " WHERE EventoAcceso.Id=@EventoAccesoId ", con, tram))
                         {
                             cmd.Parameters.AddWithValue("@Volumen", Volumen);
                             cmd.Parameters.AddWithValue("@LoteId", loteid);
@@ -147,25 +148,153 @@ namespace RecycleSmartDAL
         public void InsertarHito(HitoLote hito, SqlConnection con, SqlTransaction st)
         {
             using (var cmd = new SqlCommand(@"INSERT INTO HitoLote (TipoHito,Fecha,Responsable,Metodo,NumeroDocumento,Observaciones,DentroPlazo,HashAnterior,Hash,LoteId,UsuarioId,UsuarioInstitucionId) " +
-                " VALUES(@TipoHito,@Fecha,@Responsable,@Metodo,@NumeroDocumento,@Observaciones,@DentroPlazo,@HashAnterior,@Hash,@LoteId,@UsuarioId,@UsuarioInstitucionId) ", con,st))
+                " VALUES(@TipoHito,@Fecha,@Responsable,@Metodo,@NumeroDocumento,@Observaciones,@DentroPlazo,@HashAnterior,@Hash,@LoteId,@UsuarioId,@UsuarioInstitucionId) ", con, st))
             {
-                cmd.Parameters.AddWithValue("@TipoHito",hito.TipoHito.ToString());
-                cmd.Parameters.AddWithValue("@Fecha",hito.Fecha);
-                cmd.Parameters.AddWithValue("@Responsable",(object?)hito.Responsable??DBNull.Value);
-                cmd.Parameters.AddWithValue("@Metodo",(object?)hito.Metodo??DBNull.Value);
-                cmd.Parameters.AddWithValue("@NumeroDocumento",(object?)hito.NumeroDocumento??DBNull.Value);
-                cmd.Parameters.AddWithValue("@Observaciones",(object?)hito.Observaciones ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@DentroPlazo",(object?)hito.DentroDelPlazo ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@HashAnterior",hito.HashAnterior);
-                cmd.Parameters.AddWithValue("@Hash",hito.Hash);
-                cmd.Parameters.AddWithValue("@LoteId",hito.LoteId);
-                cmd.Parameters.AddWithValue("@UsuarioId",(object?)hito.UsuarioId ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@UsuarioInstitucionId",(object?)hito.UsuarioInstitucionId ?? DBNull.Value);
-                
+                cmd.Parameters.AddWithValue("@TipoHito", hito.TipoHito.ToString());
+                cmd.Parameters.AddWithValue("@Fecha", hito.Fecha);
+                cmd.Parameters.AddWithValue("@Responsable", (object?)hito.Responsable ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Metodo", (object?)hito.Metodo ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@NumeroDocumento", (object?)hito.NumeroDocumento ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Observaciones", (object?)hito.Observaciones ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@DentroPlazo", (object?)hito.DentroDelPlazo ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@HashAnterior", hito.HashAnterior);
+                cmd.Parameters.AddWithValue("@Hash", hito.Hash);
+                cmd.Parameters.AddWithValue("@LoteId", hito.LoteId);
+                cmd.Parameters.AddWithValue("@UsuarioId", (object?)hito.UsuarioId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@UsuarioInstitucionId", (object?)hito.UsuarioInstitucionId ?? DBNull.Value);
+
 
                 cmd.ExecuteNonQuery();
             }
         }
 
+        public List<Lote> ListarLote(int empresaid, int institucionid, bool cerrados)
+        {
+            var lista = new List<Lote>();
+
+            using (var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand("", con))
+            {
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                cmd.Parameters.AddWithValue("@InstitucionId", institucionid);
+                cmd.Parameters.AddWithValue("@Cerrados", cerrados);
+                con.Open();
+
+                using (var leer = cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                    {
+                        lista.Add(new Lote
+                        {
+                            Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                            Codigo = leer.GetString(leer.GetOrdinal("Codigo")),
+                            TipoResiduo = leer.GetString(leer.GetOrdinal("TipoResiduo")),
+                            EstadoLote = Enum.Parse<TipoEstado.EstadoLote>(leer.GetString(leer.GetOrdinal("EstadoLote")), true),
+                            FechaGeneracion = leer.GetDateTime(leer.GetOrdinal("FechaGeneracion")),
+                            FechaTratamiento = leer.GetDateTime(leer.GetOrdinal("FechaTratamiento")),
+                            FechaRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaRecoleccion")),
+                            FechaCierre = leer.GetDateTime(leer.GetOrdinal("FechaCierre")),
+                            VolumenTotal = leer.GetDecimal(leer.GetOrdinal("VolumenTotal")),
+                            CatidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDepositada")),
+                            Conforme = leer.GetBoolean(leer.GetOrdinal("Conforme")),
+                            ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
+                            ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
+                            InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
+                            InsitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre"))
+
+                        });
+                    }
+                }
+            }
+            return lista;
+        }
+
+        public Lote? BuscarxId(int loteid, int empresaid)
+        {
+            Lote? lote = null;
+            using (var con = new SqlConnection(_conectar))
+            {
+                con.Open();
+
+                using (var cmd = new SqlCommand("", con))
+                {
+                    cmd.Parameters.AddWithValue("@Id", loteid);
+                    cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+
+                    using (var leer = cmd.ExecuteReader())
+                    {
+                        if (!leer.Read()) return null;
+                        lote = new Lote
+                        {
+                            Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                            Codigo = leer.GetString(leer.GetOrdinal("Codigo")),
+                            TipoResiduo = leer.GetString(leer.GetOrdinal("TipoResiduo")),
+                            EstadoLote = Enum.Parse<TipoEstado.EstadoLote>(leer.GetString(leer.GetOrdinal("EstadoLote")), true),
+                            FechaGeneracion = leer.GetDateTime(leer.GetOrdinal("FechaGeneracion")),
+                            FechaTratamiento = leer.GetDateTime(leer.GetOrdinal("FechaTratamiento")),
+                            FechaRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaRecoleccion")),
+                            FechaCierre = leer.GetDateTime(leer.GetOrdinal("FechaCierre")),
+                            VolumenTotal = leer.GetDecimal(leer.GetOrdinal("VolumenTotal")),
+                            CatidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDepositada")),
+                            Conforme = leer.GetBoolean(leer.GetOrdinal("Conforme")),
+                            ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
+                            ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
+                            InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
+                            InsitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre")),
+                            HashFinal = leer.IsDBNull(leer.GetOrdinal("HashFinal")) ? null : leer.GetString(leer.GetOrdinal("HashFinal"))
+                        };
+                    }
+                }
+
+                //sus hitos
+                using (var cmd = new SqlCommand("", con))
+                {
+                    cmd.Parameters.AddWithValue("@LoteId", loteid);
+                    using (var leer = cmd.ExecuteReader())
+                    {
+                        while (leer.Read())
+                        {
+                            lote.Hitos.Add(new HitoLote
+                            {
+                                Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                                TipoHito = Enum.Parse<TipoEstado.TipoHito>(leer.GetString(leer.GetOrdinal("TipoHito")), true),
+                                Fecha = leer.GetDateTime(leer.GetOrdinal("Fecha")),
+                                Responsable = leer.IsDBNull(leer.GetOrdinal("Responsable")) ? null : leer.GetString(leer.GetOrdinal("Responsable")),
+                                Metodo = leer.IsDBNull(leer.GetOrdinal("Metodo")) ? null : leer.GetString(leer.GetOrdinal("Metodo")),
+                                NumeroDocumento = leer.IsDBNull(leer.GetOrdinal("NumeroDocumento")) ? null : leer.GetString(leer.GetOrdinal("NumeroDocumento")),
+                                Observaciones = leer.IsDBNull(leer.GetOrdinal("Respnsable")) ? null : leer.GetString(leer.GetOrdinal("Responsable")),
+                                DentroDelPlazo = leer.IsDBNull(leer.GetOrdinal("DentroPlazo")) ? null : leer.GetBoolean(leer.GetOrdinal("DentroPlazo")),
+                                HashAnterior = leer.GetString(leer.GetOrdinal("HashAnterior")),
+                                Hash = leer.GetString(leer.GetOrdinal("Hash")),
+                                LoteId = leer.GetInt32(leer.GetOrdinal("LoteId")),
+                                UsuarioId = leer.IsDBNull(leer.GetOrdinal("UsuarioId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioId")),
+                                UsuarioNombre = leer.IsDBNull(leer.GetOrdinal("UsuarioNombre")) ? null : leer.GetString(leer.GetOrdinal("UsuarioNombre")),
+                                UsuarioInstitucionId = leer.IsDBNull(leer.GetOrdinal("UsuarioInstitucionId")) ? null : leer.GetInt32(leer.GetOrdinal("UsuarioInstitucionId")),
+                            });
+                        }
+                    }
+                }
+            }
+            return lote;
+        }
+
+        public List<(DateTime fecha, string usuario, decimal volumen)> Depositos(int loteid)
+        {
+            var lista = new List<(DateTime, string, decimal)>();
+            using (var con = new SqlConnection(_conectar))
+            using (var  cmd = new SqlCommand("",con))
+            {
+                cmd.Parameters.AddWithValue("@LoteId", loteid);
+                con.Open();
+                using(var leer=cmd.ExecuteReader())
+                {
+                    while(leer.Read())
+                    {
+                        lista.Add((leer.GetDateTime(0), leer.GetString(1), leer.GetDecimal(2)));
+                    }
+                }
+            }
+            return lista;
+        }
     }
 }
