@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = Model.Codigo;
 
-    var deposito = ViewBag.Deposito as List<(DateTime fecha, string usuario, decimal volumen)> ?? new();
+    var deposito = ViewBag.Depositos as List<(DateTime fecha, string usuario, decimal volumen)> ?? new();
     var verificacion = ViewBag.Verificacion as (bool integro, string mensaje)?;
     var plazos = LoteBL.PlazoActual(Model);
 
@@ -15,8 +15,10 @@
         (Tipo:TipoEstado.TipoHito.Recoleccion,Titulo:"Recoleccion"),
         (Tipo:TipoEstado.TipoHito.Tratamiento,Titulo:"Tratamiento"),
         (Tipo:TipoEstado.TipoHito.DisposicionFinal,Titulo:"Disposicion Final"),
-        
+
     };
+
+    int actual = Array.FindIndex(pasos, p => !Model.Hitos.Any(h => h.TipoHito == p.Tipo));
 
 }
 
@@ -78,59 +80,52 @@
 <div class="card shadow-sm mb-3">
     <div class="card-body">
         <h6 class="text-uppercase text-muted small fw-semibold mb-3">Ciclo de vida</h6>
-        <ol class="list-unstyled mb-0">
-            @foreach (var paso in pasos)
+
+        <div class="ciclo">
+            @for (int i = 0; i < pasos.Length; i++)
             {
+                var paso = pasos[i];
                 var h = Model.Hitos.FirstOrDefault(x => x.TipoHito == paso.Tipo);
-                <li class="d-flex gap-3 pb-3">
-                    <div class="rounded-circle flex-shrink-0 @(h != null ? "bg-success" : "bg-light border")" style="width:14px;height:14px;margin-top:5px"></div>
-                    <div class="flex-grow-1">
-                        <div class="fw-semibold @(h == null ? "text-muted" : "")">
-                            @paso.Titulo
-                            @if (h?.DentroDelPlazo == true)
-                            {
-                                <span class="badge bg-success ms-1">En plazo</span>
-                            }
-                            @if (h?.DentroDelPlazo == false)
-                            {
-                                <span class="badge bg-danger ms-1">Fuera de plazo</span>
-                            }
-                        </div>
+                string clase = h != null ? "hecho" : i == actual ? "actual" : "pendiente";
+                <div class="ciclo-paso @clase">
+                    <div class="ciclo-circulo">@(h != null ? "✓" : (i + 1).ToString())</div>
+                    <div>
+                        <div class="ciclo-titulo">@paso.Titulo</div>
                         @if (h == null)
                         {
-                            <div class="small text-muted">Pendiente</div>
+                            <div class="small text-muted">@(i == actual ? "Siguiente paso" : "Pendiente")</div>
                         }
                         else
                         {
-                            <div class="small">
-                                @h.Fecha.ToString("dd/MM/yyyy HH:mm")
-                                @if (!string.IsNullOrEmpty(h.UsuarioNombre))
-                                {
-                                    <text> · @h.UsuarioNombre</text>
-                                }
-                                @if (!string.IsNullOrEmpty(h.Responsable))
-                                {
-                                    <text> · @h.Responsable</text>
-                                }
-                                @if (!string.IsNullOrEmpty(h.Metodo))
-                                {
-                                    <text> · @h.Metodo</text>
-                                }
-                                @if (!string.IsNullOrEmpty(h.NumeroDocumento))
-                                {
-                                    <text> · Doc. @h.NumeroDocumento</text>
-                                }
-                            </div>
+                            <div class="small">@h.Fecha.ToString("dd/MM/yyyy HH:mm")</div>
+                            @if (!string.IsNullOrEmpty(h.UsuarioNombre))
+                            {
+                                <div class="small text-muted">@h.UsuarioNombre</div>
+                            }
+                            @if (h.DentroDelPlazo == true)
+                            {
+                                <span class="badge bg-success">En plazo</span>
+                            }
+                            @if (h.DentroDelPlazo == false)
+                            {
+                                <span class="badge bg-danger">Fuera de plazo</span>
+                            }
+                            @if (!string.IsNullOrEmpty(h.NumeroDocumento))
+                            {
+                                <div class="small text-muted">Doc. @h.NumeroDocumento</div>
+                            }
                             @if (!string.IsNullOrEmpty(h.Observaciones))
                             {
                                 <div class="small text-muted">@h.Observaciones</div>
                             }
-                            <div class="small text-muted"><code title="@h.Hash">#@h.Hash[..12]…</code></div>
+                            <div class="small text-muted" title="@h.Observaciones">
+                                <code title="@h.Hash">#@h.Hash[..8]…</code>
+                            </div>
                         }
                     </div>
-                </li>
+                </div>
             }
-        </ol>
+        </div>
     </div>
 </div>
 

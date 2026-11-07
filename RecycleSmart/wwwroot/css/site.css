@@ -393,3 +393,91 @@ body {
         z-index: 1040;
     }
 }
+/***/
+.ciclo {
+    display: flex;
+    gap: 0;
+}
+
+.ciclo-paso {
+    flex: 1;
+    position: relative;
+    text-align: center;
+    padding: 0 8px;
+}
+
+    /* La línea que une los círculos: va desde el centro de cada paso hacia el siguiente */
+    .ciclo-paso:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        width: 100%;
+        height: 3px;
+        background: #dee2e6;
+        z-index: 0;
+    }
+
+    .ciclo-paso.hecho:not(:last-child)::after {
+        background: var(--bs-success);
+    }
+
+.ciclo-circulo {
+    position: relative;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    background: #fff;
+    border: 3px solid #dee2e6;
+    color: #adb5bd;
+}
+
+.ciclo-paso.hecho .ciclo-circulo {
+    background: var(--bs-success);
+    border-color: var(--bs-success);
+    color: #fff;
+}
+
+.ciclo-paso.actual .ciclo-circulo {
+    border-color: var(--bs-success);
+    color: var(--bs-success);
+}
+
+.ciclo-titulo {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ciclo-paso.pendiente .ciclo-titulo {
+    color: #adb5bd;
+}
+
+/* Celular: vuelve a vertical */
+@media (max-width: 768px) {
+    .ciclo {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .ciclo-paso {
+        text-align: left;
+        display: flex;
+        gap: 12px;
+    }
+
+        .ciclo-paso:not(:last-child)::after {
+            display: none;
+        }
+
+    .ciclo-circulo {
+        margin: 0;
+        flex-shrink: 0;
+    }
+}
