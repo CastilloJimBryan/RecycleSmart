@@ -173,11 +173,19 @@ namespace RecycleSmartDAL
             var lista = new List<Lote>();
 
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("", con))
+            using (var cmd = new SqlCommand(@"SELECT Lote.Id,Lote.Codigo,Lote.TipoResiduo,Lote.EstadoLote,Lote.FechaGeneracion,Lote.VolumenTotal,Lote.CantidadDeposito, " +
+                " Lote.FechaLimiteRecoleccion,Lote.FechaLimiteTratamiento,Lote.FechaCierre,Lote.Conforme,Lote.InstitucionId,Contenedor.Id AS ContenedorId,Contenedor.Nombre AS ContenedorNombre," +
+                " InstitucionCliente.Nombre AS InstitucionNombre" +
+                " FROM Lote" +
+                " INNER JOIN Contenedor ON Contenedor.Id=Lote.ContenedorId" +
+                " INNER JOIN InstitucionCliente on InstitucionCliente.Id=Contenedor.InstitucionId" +
+                " WHERE InstitucionCliente.EmpresaLogisticaId=@EmpresaId " +
+                " AND (@InstitucionId=0 OR lote.InstitucionId=@InstitucionId) AND ((@Cerrado=1 AND Lote.EstadoLote='Cerrado') OR (@Cerrado=0 AND Lote.EstadoLote<>'Cerrado'))" +
+                " ORDER BY Lote.FechaGeneracion DESC ", con))
             {
                 cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
                 cmd.Parameters.AddWithValue("@InstitucionId", institucionid);
-                cmd.Parameters.AddWithValue("@Cerrados", cerrados);
+                cmd.Parameters.AddWithValue("@Cerrado", cerrados);
                 con.Open();
 
                 using (var leer = cmd.ExecuteReader())
@@ -191,12 +199,12 @@ namespace RecycleSmartDAL
                             TipoResiduo = leer.GetString(leer.GetOrdinal("TipoResiduo")),
                             EstadoLote = Enum.Parse<TipoEstado.EstadoLote>(leer.GetString(leer.GetOrdinal("EstadoLote")), true),
                             FechaGeneracion = leer.GetDateTime(leer.GetOrdinal("FechaGeneracion")),
-                            FechaTratamiento = leer.GetDateTime(leer.GetOrdinal("FechaTratamiento")),
-                            FechaRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaRecoleccion")),
-                            FechaCierre = leer.GetDateTime(leer.GetOrdinal("FechaCierre")),
+                            FechaTratamiento = leer.IsDBNull(leer.GetOrdinal("FechaLimiteTratamiento")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaLimiteTratamiento")),
+                            FechaRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaLimiteRecoleccion")),
+                            FechaCierre = leer.IsDBNull(leer.GetOrdinal("FechaCierre")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaCierre")),
                             VolumenTotal = leer.GetDecimal(leer.GetOrdinal("VolumenTotal")),
-                            CatidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDepositada")),
-                            Conforme = leer.GetBoolean(leer.GetOrdinal("Conforme")),
+                            CatidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDeposito")),
+                            Conforme = leer.IsDBNull(leer.GetOrdinal("Conforme")) ? null : leer.GetBoolean(leer.GetOrdinal("Conforme")),
                             ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
                             ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
                             InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),

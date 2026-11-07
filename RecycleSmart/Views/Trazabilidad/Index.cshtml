@@ -1,0 +1,105 @@
+﻿@using RecycleSmartBLL
+@model List<Lote>
+
+@{
+    ViewData["Title"] = "Trazabilidad";
+    var instituciones = ViewBag.Instituciones as List<InstitucionCliente> ?? new();
+    int instId = ViewBag.InstitucionId ?? 0;
+    bool cerrado = ViewBag.Cerrado ?? false;
+}
+<partial name="_Mensajes"/>
+<h2>Trazabilidad de Lotes</h2>
+<p class="text-muted">Ciclo de Vida de cada lote</p>
+
+<form method="get" asp-action="Index">
+    <input type="hidden" name="cerrado" value="(Cerrado?"true":"false")"/>
+    <label>Institucion</label>
+    <select>
+        <option value="0">Todas Las Instituciones</option>
+        @foreach (var item in instituciones)
+            {
+                <option value="@item.Id" selected="@(item.Id==instId)">@item.Nombre</option>
+            }
+        </select>
+    </form>
+    <ul>
+        <li>
+        <a asp-action="Index" asp-route-institucionId="@instId">En Curso</a>
+    </li>
+        <li>Cerrados</li>
+    </ul>
+    @if(Model.Count==0)
+{
+    <div>@(cerrado?"Todavia no hay lotes Cerrados":"No hay lotes en Curso,Se crean con el primer deposito en el contenedor")</div>
+}
+else
+{
+    <div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lote</th>
+                        <th>Contenedor</th>
+                        @if(instId==0)
+                        {
+                            <th>Institucion</th>   
+                        }
+                        <th>Estado</th>
+                        <th>Generado</th>
+                        <th class="text-end">Volumen</th>
+                        <th>@(cerrado?"Resultado":"Plazo")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><code>@item.Codigo</code></td>
+                            <td>@item.ContenedorNombre</td>
+                            @if(instId==0)
+                            {
+
+                                <td>@item.InsitucionNombre</td>
+                            }
+                            <td>@item.EstadoLote</td>
+                            <td>@item.FechaGeneracion.ToString("dd/MM HH:mm")</td>
+                            <td>@item.VolumenTotal.ToString("0.0") L</td>
+                            <td>
+                                @if(cerrado)
+                                {
+
+                                }
+                                else
+                                {
+                                    var p = LoteBL.PlazoActual(item);
+                                    if(p.Limite!=null)
+                                    {
+                                        <div>
+                                            <div></div>
+                                        </div>
+                                        <div>
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span>Sin Plazos Pendientes</span>
+                                    }
+
+                                }
+                            </td>
+                            <td>Ver</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+@section Scripts{
+    <script>
+        
+    </script>
+}
