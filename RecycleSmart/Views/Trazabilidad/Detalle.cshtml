@@ -1,5 +1,170 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using RecycleSmartBLL
+@model Lote
+
 @{
+    ViewData["Title"] = Model.Codigo;
+
+    var deposito = ViewBag.Deposito as List<(DateTime fecha, string usuario, decimal volumen)> ?? new();
+    var verificacion = ViewBag.Verificacion as (bool integro, string mensaje)?;
+    var plazos = LoteBL.PlazoActual(Model);
+
+    var pasos = new[]
+    {
+        (Tipo:TipoEstado.TipoHito.Generacion,Titulo:"Generacion"),
+        (Tipo:TipoEstado.TipoHito.SolicitudRecoleccion,Titulo:"Solicitud de Recoleccion"),
+        (Tipo:TipoEstado.TipoHito.Recoleccion,Titulo:"Recoleccion"),
+        (Tipo:TipoEstado.TipoHito.Tratamiento,Titulo:"Tratamiento"),
+        (Tipo:TipoEstado.TipoHito.DisposicionFinal,Titulo:"Disposicion Final"),
+        
+    };
+
 }
+
+<partial name="_Mensajes"/>
+
+<div>
+    <a asp-action="Index" class ="btn btn-theme-success btn-sm mb-2">Volver</a>
+</div>
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    <h2 class="fs-4 mb-0"><code class="fs-4">@Model.Codigo</code></h2>
+    <span class="badge bg-primary fs-6">@Model.EstadoLote</span>
+    @if (Model.Conforme != null)
+    {
+        <span>@(Model.Conforme==true?"Conforme":"No Conforme")</span>
+    }
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted small fw-semibold">Datos del lote</h6>
+                <dl class="row small mb-0">
+                    <dt class="col-5">Contenedor</dt>
+                    <dd class="col-7">@Model.ContenedorNombre</dd>
+                    <dt class="col-5">Institución</dt>
+                    <dd class="col-7">@Model.InstitucionNombre</dd>
+                    <dt class="col-5">Tipo de residuo</dt>
+                    <dd class="col-7">@Model.TipoResiduo</dd>
+                    <dt class="col-5">Volumen</dt>
+                    <dd class="col-7">@Model.VolumenTotal.ToString("0.0") L en @Model.CantidadDepositada depósito(s)</dd>
+                    <dt class="col-5">Generado</dt>
+                    <dd class="col-7">@Model.FechaGeneracion.ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted small fw-semibold">Plazos (Ley 24.051)</h6>
+                <dl class="row small">
+                    <dt class="col-6">Recolección (5 días)</dt>
+                    <dd class="col-6">hasta @Model.FechaLimiteRecoleccion.ToString("dd/MM HH:mm")</dd>
+                    <dt class="col-6">Tratamiento (72 h)</dt>
+                    <dd class="col-6">@(Model.FechaLimiteTratamiento?.ToString("dd/MM HH:mm") is string ft ? $"hasta {ft}" : "desde la recolección")</dd>
+                </dl>
+                @if (plazos.Limite != null)
+                {
+                    string color = plazos.Vencido ? "bg-danger" : plazos.Porcentaje >= 80 ? "bg-warning" : "bg-success";
+                    <div class="small mb-1">@plazos.Etapa: @plazos.Porcentaje % del plazo consumido</div>
+                    <div class="progress" style="height:8px"><div class="progress-bar @color" style="@($"width:{plazos.Porcentaje}%")"></div></div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ---------- Línea de tiempo de los hitos ---------- *@
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <h6 class="text-uppercase text-muted small fw-semibold mb-3">Ciclo de vida</h6>
+        <ol class="list-unstyled mb-0">
+            @foreach (var paso in pasos)
+            {
+                var h = Model.Hitos.FirstOrDefault(x => x.TipoHito == paso.Tipo);
+                <li class="d-flex gap-3 pb-3">
+                    <div class="rounded-circle flex-shrink-0 @(h != null ? "bg-success" : "bg-light border")" style="width:14px;height:14px;margin-top:5px"></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold @(h == null ? "text-muted" : "")">
+                            @paso.Titulo
+                            @if (h?.DentroDelPlazo == true)
+                            {
+                                <span class="badge bg-success ms-1">En plazo</span>
+                            }
+                            @if (h?.DentroDelPlazo == false)
+                            {
+                                <span class="badge bg-danger ms-1">Fuera de plazo</span>
+                            }
+                        </div>
+                        @if (h == null)
+                        {
+                            <div class="small text-muted">Pendiente</div>
+                        }
+                        else
+                        {
+                            <div class="small">
+                                @h.Fecha.ToString("dd/MM/yyyy HH:mm")
+                                @if (!string.IsNullOrEmpty(h.UsuarioNombre))
+                                {
+                                    <text> · @h.UsuarioNombre</text>
+                                }
+                                @if (!string.IsNullOrEmpty(h.Responsable))
+                                {
+                                    <text> · @h.Responsable</text>
+                                }
+                                @if (!string.IsNullOrEmpty(h.Metodo))
+                                {
+                                    <text> · @h.Metodo</text>
+                                }
+                                @if (!string.IsNullOrEmpty(h.NumeroDocumento))
+                                {
+                                    <text> · Doc. @h.NumeroDocumento</text>
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(h.Observaciones))
+                            {
+                                <div class="small text-muted">@h.Observaciones</div>
+                            }
+                            <div class="small text-muted"><code title="@h.Hash">#@h.Hash[..12]…</code></div>
+                        }
+                    </div>
+                </li>
+            }
+        </ol>
+    </div>
+</div>
+
+@* ---------- Integridad ---------- *@
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h6 class="text-uppercase text-muted small fw-semibold mb-1">Integridad del registro</h6>
+                <div class="small text-muted">Cada hito está firmado (HMAC-SHA256) y encadenado con el anterior. Cualquier cambio en la base se detecta.</div>
+            </div>
+            <a asp-action="Detalle" asp-route-id="@Model.Id" asp-route-verificar="true" class="btn btn-outline-dark">Verificar integridad</a>
+        </div>
+        @if (verificacion != null)
+        {
+            <div class="alert @(verificacion.Value.integro ? "alert-success" : "alert-danger") mt-3 mb-0">
+                @(verificacion.Value.integro ? "✅" : "❌") @verificacion.Value.mensaje
+            </div>
+        }
+    </div>
+</div>
+
+@* ---------- Depósitos ---------- *@
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h6 class="text-uppercase text-muted small fw-semibold">Depósitos del lote</h6>
+        <table class="table table-sm mb-0">
+            <thead><tr><th>Fecha</th><th>Usuario</th><th class="text-end">Volumen</th></tr></thead>
+            <tbody>
+                @foreach (var d in deposito)
+                {
+                    <tr><td>@d.fecha.ToString("dd/MM HH:mm")</td><td>@d.usuario</td><td class="text-end">@d.volumen.ToString("0.0") L</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

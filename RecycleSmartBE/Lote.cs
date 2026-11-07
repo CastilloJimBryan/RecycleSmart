@@ -14,9 +14,9 @@ namespace RecycleSmartBE
         public TipoEstado.EstadoLote EstadoLote { get; set; }
         public DateTime FechaGeneracion { get; set; }
         public decimal VolumenTotal {  get; set; }
-        public int CatidadDepositada {  get; set; }
-        public DateTime FechaRecoleccion {  get; set; }
-        public DateTime? FechaTratamiento {  get; set; }
+        public int CantidadDepositada {  get; set; }
+        public DateTime FechaLimiteRecoleccion {  get; set; }
+        public DateTime? FechaLimiteTratamiento {  get; set; }
         public DateTime? FechaCierre {  get; set; }
         public bool? Conforme {  get; set; }
         public string? HashFinal {  get; set; }
@@ -24,7 +24,7 @@ namespace RecycleSmartBE
         public int ContenedorId {  get; set; }
         public int InstitucionId {  get; set; }
         public string ContenedorNombre { get; set; } = string.Empty;
-        public string InsitucionNombre { get; set; } = string.Empty;
+        public string InstitucionNombre { get; set; } = string.Empty;
 
         public List<HitoLote> Hitos { get; set; } = new List<HitoLote>();
     }

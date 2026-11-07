@@ -68,12 +68,12 @@ namespace RecycleSmartBLL
             {
                 etapa = "Recolección";
                 desde = l.FechaGeneracion;
-                limite = l.FechaRecoleccion;
+                limite = l.FechaLimiteRecoleccion;
             }
-            else if (l.EstadoLote == TipoEstado.EstadoLote.Recolectado && l.FechaTratamiento != null)
+            else if (l.EstadoLote == TipoEstado.EstadoLote.Recolectado && l.FechaLimiteTratamiento != null)
             {
                 etapa = "Tratamiento";
-                limite = l.FechaTratamiento.Value;
+                limite = l.FechaLimiteTratamiento.Value;
                 desde = limite.AddHours(-HorasTratamiento);
             }
             else

@@ -8,13 +8,13 @@
     bool cerrado = ViewBag.Cerrado ?? false;
 }
 <partial name="_Mensajes"/>
-<h2>Trazabilidad de Lotes</h2>
+<h2 class="fs-4">Trazabilidad de Lotes</h2>
 <p class="text-muted">Ciclo de Vida de cada lote</p>
 
-<form method="get" asp-action="Index">
-    <input type="hidden" name="cerrado" value="(Cerrado?"true":"false")"/>
-    <label>Institucion</label>
-    <select>
+<form method="get" asp-action="Index" class="mb-3" >
+    <input type="hidden" name="cerrado" value="@(cerrado?"true":"false")"/>
+    <label class="form-label" for="institucionId">Institucion</label>
+    <select class="form-select" name="institucionId" id="institucionId" onchange="this.form.submit()"> 
         <option value="0">Todas Las Instituciones</option>
         @foreach (var item in instituciones)
             {
@@ -22,84 +22,96 @@
             }
         </select>
     </form>
-    <ul>
-        <li>
-        <a asp-action="Index" asp-route-institucionId="@instId">En Curso</a>
-    </li>
-        <li>Cerrados</li>
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+        <a asp-action="Index" asp-route-institucionId="@instId" class="nav-link @(!cerrado ? "active" : "")">En Curso</a>
+        </li>
+        <li class="nav-item">
+        <a asp-action ="Index" asp-route-institucionId="@instId" asp-route-cerrado="true" class="nav-link @(cerrado ? "active" : "")">Cerrados</a>
+        </li>
     </ul>
     @if(Model.Count==0)
-{
-    <div>@(cerrado?"Todavia no hay lotes Cerrados":"No hay lotes en Curso,Se crean con el primer deposito en el contenedor")</div>
-}
-else
-{
-    <div>
+    {
+        <div class="alert alert-info">@(cerrado?"Todavia no hay lotes Cerrados":"No hay lotes en Curso,Se crean con el primer deposito en el contenedor")</div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
         <div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Lote</th>
-                        <th>Contenedor</th>
-                        @if(instId==0)
-                        {
-                            <th>Institucion</th>   
-                        }
-                        <th>Estado</th>
-                        <th>Generado</th>
-                        <th class="text-end">Volumen</th>
-                        <th>@(cerrado?"Resultado":"Plazo")</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle mb-0 ">
+                    <thead class="table-success">
                         <tr>
-                            <td><code>@item.Codigo</code></td>
-                            <td>@item.ContenedorNombre</td>
+                            <th>Lote</th>
+                            <th>Contenedor</th>
                             @if(instId==0)
                             {
-
-                                <td>@item.InsitucionNombre</td>
+                             <th>Institucion</th>   
                             }
-                            <td>@item.EstadoLote</td>
-                            <td>@item.FechaGeneracion.ToString("dd/MM HH:mm")</td>
-                            <td>@item.VolumenTotal.ToString("0.0") L</td>
-                            <td>
-                                @if(cerrado)
+                            <th>Estado</th>
+                            <th>Generado</th>
+                            <th class="text-end">Volumen</th>
+                            <th>@(cerrado?"Resultado":"Plazo")</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-nowrap"><code>@item.Codigo</code></td>
+                                <td>@item.ContenedorNombre</td>
+                                @if(instId==0)
                                 {
-
+                                    <td>@item.InstitucionNombre</td>
                                 }
-                                else
-                                {
-                                    var p = LoteBL.PlazoActual(item);
-                                    if(p.Limite!=null)
+                                <td>
+                                    <span class="badge @EstadosColor.EstadoBadge(item.EstadoLote.ToString())">@item.EstadoLote</span>
+                                </td>
+                                <td class="text-nowrap">@item.FechaGeneracion.ToString("dd/MM HH:mm")</td>
+                                <td class="text-nowrap text-end">@item.VolumenTotal.ToString("0.0") L
+                                    <div class="text-muted small">@item.CantidadDepositada Deposito</div>
+                                </td>
+                                <td>
+                                    @if(cerrado)
                                     {
-                                        <div>
-                                            <div></div>
-                                        </div>
-                                        <div>
-
-                                        </div>
+                                        <span class="badge @(item.Conforme==true?"bg-success":"bg-danger")">@(item.Conforme==true?"Conforme":"No Conforme")</span>
+                                        <div class="text-muted" >Cerrado @item.FechaCierre?.ToString("dd/MM/yyyy") </div>
                                     }
                                     else
                                     {
-                                        <span>Sin Plazos Pendientes</span>
-                                    }
+                                        var p = LoteBL.PlazoActual(item);
+                                        if(p.Limite!=null)
+                                        {
+                                            string color = p.Vencido ? "bg-danger" : p.Porcentaje >= 80 ? "bg-warning" : "bg-success";
+                                            <div class="progress" style="height:8px">
+                                                <div class="progress-bar @color" style="@($"width:{p.Porcentaje}%")"></div>
+                                            </div>
+                                            <div class="small @(p.Vencido?"text-danger fw-semibold":"text-muted")">
+                                                @p.Etapa: @(p.Vencido ? "Vencido el" : "Vence el")@p.Limite?.ToString("dd/MM HH:mm")
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Sin Plazos Pendientes</span>
+                                        }
 
-                                }
-                            </td>
-                            <td>Ver</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-theme-success btn-sm">Ver</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-}
+        </div>
+    }
 @section Scripts{
     <script>
-        
+        conexionMonitoreo.on("NuevoLote",()=>location.reload());
+        conexionMonitoreo.on("NuevoAcceso",()=>location.reload());
     </script>
 }

@@ -199,16 +199,16 @@ namespace RecycleSmartDAL
                             TipoResiduo = leer.GetString(leer.GetOrdinal("TipoResiduo")),
                             EstadoLote = Enum.Parse<TipoEstado.EstadoLote>(leer.GetString(leer.GetOrdinal("EstadoLote")), true),
                             FechaGeneracion = leer.GetDateTime(leer.GetOrdinal("FechaGeneracion")),
-                            FechaTratamiento = leer.IsDBNull(leer.GetOrdinal("FechaLimiteTratamiento")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaLimiteTratamiento")),
-                            FechaRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaLimiteRecoleccion")),
+                            FechaLimiteTratamiento = leer.IsDBNull(leer.GetOrdinal("FechaLimiteTratamiento")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaLimiteTratamiento")),
+                            FechaLimiteRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaLimiteRecoleccion")),
                             FechaCierre = leer.IsDBNull(leer.GetOrdinal("FechaCierre")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaCierre")),
                             VolumenTotal = leer.GetDecimal(leer.GetOrdinal("VolumenTotal")),
-                            CatidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDeposito")),
+                            CantidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDeposito")),
                             Conforme = leer.IsDBNull(leer.GetOrdinal("Conforme")) ? null : leer.GetBoolean(leer.GetOrdinal("Conforme")),
                             ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
                             ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
                             InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
-                            InsitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre"))
+                            InstitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre"))
 
                         });
                     }
@@ -224,9 +224,14 @@ namespace RecycleSmartDAL
             {
                 con.Open();
 
-                using (var cmd = new SqlCommand("", con))
+                using (var cmd = new SqlCommand(@"SELECT Lote.Id, Lote.Codigo,Lote.TipoResiduo,Lote.EstadoLote,Lote.FechaGeneracion,Lote.VolumenTotal,lote.CantidadDeposito,Lote.FechaLimiteRecoleccion,Lote.FechaLimiteTratamiento, " +
+                    " lote.FechaCierre,Lote.Conforme,Lote.HashFinal,Lote.ContenedorId,lote.InstitucionId,Contenedor.Nombre AS ContenedorNombre,InstitucionCliente.Nombre AS InstitucionNombre " +
+                    " FROM Lote" +
+                    " INNER JOIN Contenedor ON Contenedor.Id=Lote.ContenedorId" +
+                    " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId" +
+                    " WHERE Lote.Id=@LoteId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId ", con))
                 {
-                    cmd.Parameters.AddWithValue("@Id", loteid);
+                    cmd.Parameters.AddWithValue("@LoteId", loteid);
                     cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
 
                     using (var leer = cmd.ExecuteReader())
@@ -239,23 +244,29 @@ namespace RecycleSmartDAL
                             TipoResiduo = leer.GetString(leer.GetOrdinal("TipoResiduo")),
                             EstadoLote = Enum.Parse<TipoEstado.EstadoLote>(leer.GetString(leer.GetOrdinal("EstadoLote")), true),
                             FechaGeneracion = leer.GetDateTime(leer.GetOrdinal("FechaGeneracion")),
-                            FechaTratamiento = leer.GetDateTime(leer.GetOrdinal("FechaTratamiento")),
-                            FechaRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaRecoleccion")),
-                            FechaCierre = leer.GetDateTime(leer.GetOrdinal("FechaCierre")),
+                            FechaLimiteTratamiento = leer.IsDBNull(leer.GetOrdinal("FechaLimiteTratamiento")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaLimiteTratamiento")),
+                            FechaLimiteRecoleccion = leer.GetDateTime(leer.GetOrdinal("FechaLimiteRecoleccion")),
+                            FechaCierre = leer.IsDBNull(leer.GetOrdinal("FechaCierre")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaCierre")),
                             VolumenTotal = leer.GetDecimal(leer.GetOrdinal("VolumenTotal")),
-                            CatidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDepositada")),
-                            Conforme = leer.GetBoolean(leer.GetOrdinal("Conforme")),
+                            CantidadDepositada = leer.GetInt32(leer.GetOrdinal("CantidadDeposito")),
+                            Conforme = leer.IsDBNull(leer.GetOrdinal("Conforme")) ? null : leer.GetBoolean(leer.GetOrdinal("Conforme")),
                             ContenedorId = leer.GetInt32(leer.GetOrdinal("ContenedorId")),
                             ContenedorNombre = leer.GetString(leer.GetOrdinal("ContenedorNombre")),
                             InstitucionId = leer.GetInt32(leer.GetOrdinal("InstitucionId")),
-                            InsitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre")),
+                            InstitucionNombre = leer.GetString(leer.GetOrdinal("InstitucionNombre")),
                             HashFinal = leer.IsDBNull(leer.GetOrdinal("HashFinal")) ? null : leer.GetString(leer.GetOrdinal("HashFinal"))
                         };
                     }
                 }
 
                 //sus hitos
-                using (var cmd = new SqlCommand("", con))
+                using (var cmd = new SqlCommand(@"SELECT HitoLote.Id,HitoLote.LoteId,HitoLote.TipoHito,HitoLote.Fecha,HitoLote.Responsable,HitoLote.Metodo,HitoLote.NumeroDocumento,HitoLote.Observaciones, " +
+                    " HitoLote.DentroPlazo,HitoLote.HashAnterior,HitoLote.Hash,HitoLote.UsuarioId,HitoLote.UsuarioInstitucionId," +
+                    " COALESCE(UsuarioEmpresaLogistica.Nombre+' '+UsuarioEmpresaLogistica.Apellido, UsuarioInstitucion.Nombre+' '+UsuarioInstitucion.Apellido) AS UsuarioNombre " +
+                    " FROM HitoLote" +
+                    " LEFT JOIN UsuarioEmpresaLogistica ON UsuarioEmpresaLogistica.Id=HitoLote.UsuarioId" +
+                    " LEFT JOIN UsuarioInstitucion ON UsuarioInstitucion.Id=HitoLote.UsuarioInstitucionId" +
+                    " WHERE HitoLote.LoteId=@LoteId ORDER BY HitoLote.Id ", con))
                 {
                     cmd.Parameters.AddWithValue("@LoteId", loteid);
                     using (var leer = cmd.ExecuteReader())
@@ -270,7 +281,7 @@ namespace RecycleSmartDAL
                                 Responsable = leer.IsDBNull(leer.GetOrdinal("Responsable")) ? null : leer.GetString(leer.GetOrdinal("Responsable")),
                                 Metodo = leer.IsDBNull(leer.GetOrdinal("Metodo")) ? null : leer.GetString(leer.GetOrdinal("Metodo")),
                                 NumeroDocumento = leer.IsDBNull(leer.GetOrdinal("NumeroDocumento")) ? null : leer.GetString(leer.GetOrdinal("NumeroDocumento")),
-                                Observaciones = leer.IsDBNull(leer.GetOrdinal("Respnsable")) ? null : leer.GetString(leer.GetOrdinal("Responsable")),
+                                Observaciones = leer.IsDBNull(leer.GetOrdinal("Observaciones")) ? null : leer.GetString(leer.GetOrdinal("Observaciones")),
                                 DentroDelPlazo = leer.IsDBNull(leer.GetOrdinal("DentroPlazo")) ? null : leer.GetBoolean(leer.GetOrdinal("DentroPlazo")),
                                 HashAnterior = leer.GetString(leer.GetOrdinal("HashAnterior")),
                                 Hash = leer.GetString(leer.GetOrdinal("Hash")),
@@ -290,7 +301,10 @@ namespace RecycleSmartDAL
         {
             var lista = new List<(DateTime, string, decimal)>();
             using (var con = new SqlConnection(_conectar))
-            using (var  cmd = new SqlCommand("",con))
+            using (var  cmd = new SqlCommand(@"SELECT EventoAcceso.Fecha, ISNULL(UsuarioInstitucion.Nombre+' '+UsuarioInstitucion.Apellido,'-') AS Usuario,EventoAcceso.VolumenDepositado " +
+                " FROM EventoAcceso" +
+                " LEFT JOIN UsuarioInstitucion ON UsuarioInstitucion.Id=EventoAcceso.UsuarioInstitucionId" +
+                " WHERE EventoAcceso.LoteId=@LoteId ORDER BY EventoAcceso.Fecha ", con))
             {
                 cmd.Parameters.AddWithValue("@LoteId", loteid);
                 con.Open();
