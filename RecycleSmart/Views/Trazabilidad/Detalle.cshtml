@@ -10,11 +10,11 @@
 
     var pasos = new[]
     {
-        (Tipo:TipoEstado.TipoHito.Generacion,Titulo:"Generacion"),
-        (Tipo:TipoEstado.TipoHito.SolicitudRecoleccion,Titulo:"Solicitud de Recoleccion"),
-        (Tipo:TipoEstado.TipoHito.Recoleccion,Titulo:"Recoleccion"),
-        (Tipo:TipoEstado.TipoHito.Tratamiento,Titulo:"Tratamiento"),
-        (Tipo:TipoEstado.TipoHito.DisposicionFinal,Titulo:"Disposicion Final"),
+        (Tipo:TipoEstado.TipoHito.Generacion,Titulo:"Generacion" , Corto:"Generación"),
+        (Tipo:TipoEstado.TipoHito.SolicitudRecoleccion,Titulo:"Solicitud de Recoleccion", Corto:"Solicitud"),
+        (Tipo:TipoEstado.TipoHito.Recoleccion,Titulo:"Recoleccion", Corto:"Recolección"),
+        (Tipo:TipoEstado.TipoHito.Tratamiento,Titulo:"Tratamiento", Corto:"Tratamiento"),
+        (Tipo:TipoEstado.TipoHito.DisposicionFinal,Titulo:"Disposicion Final", Corto:"Disposición"),
 
     };
 
@@ -29,7 +29,7 @@
 </div>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
     <h2 class="fs-4 mb-0"><code class="fs-4">@Model.Codigo</code></h2>
-    <span class="badge bg-primary">@Model.EstadoLote</span>
+    <span class="badge text-bg-warning">@Model.EstadoLote</span>
     @if (Model.Conforme != null)
     {
         <span>@(Model.Conforme==true?"Conforme":"No Conforme")</span>
@@ -61,7 +61,7 @@
                 <h6 class="text-uppercase text-muted small fw-semibold">Plazos (Ley 24.051)</h6>
                 <dl class="row small">
                     <dt class="col-6">Recolección (5 días)</dt>
-                    <dd class="col-6">hasta @Model.FechaLimiteRecoleccion.ToString("dd/MM HH:mm")</dd>
+                    <dd class="col-6">hasta @Model.FechaLimiteRecoleccion.ToString("dd/MM/yyyy HH:mm")</dd>
                     <dt class="col-6">Tratamiento (72 h)</dt>
                     <dd class="col-6">@(Model.FechaLimiteTratamiento?.ToString("dd/MM HH:mm") is string ft ? $"hasta {ft}" : "desde la recolección")</dd>
                 </dl>
@@ -75,7 +75,21 @@
         </div>
     </div>
 </div>
-
+@if(Model.EstadoLote==TipoEstado.EstadoLote.EnCurso && User.TieneRol(Roles.Gestion))
+{
+    <div class="card shadow-sm mb-3 border-success">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted small fw-semibold">Siguiente Paso : Solicitar Recolección</h6>
+            <p class="text-muted small">Pedir que se retire el lote. El Plazo de Recoleccion vence el @Model.FechaLimiteRecoleccion.ToString("dd/MM HH:mm")</p>
+            <form asp-action="SolicitarRecoleccion" method="post" class="d-flex flex-wrap gap-2 align-items-center">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <h6 class="text-muted">Observaciones</h6>
+                <input type="text" name="observacion" maxlength="100" class="form-control" style="max-width:420px" placeholder="ejemplo, retirar antes del mediodia"/> 
+                <button type="submit" class="btn btn-success">Solicitar Recoleccion</button>
+            </form>
+        </div>
+    </div>
+}
 @* ---------- Línea de tiempo de los hitos ---------- *@
 <div class="card shadow-sm mb-3">
     <div class="card-body">
@@ -88,12 +102,11 @@
                 var h = Model.Hitos.FirstOrDefault(x => x.TipoHito == paso.Tipo);
                 string clase = h != null ? "hecho" : i == actual ? "actual" : "pendiente";
                 <div class="ciclo-paso @clase">
-                    <div class="ciclo-circulo">@(h != null ? "✓" : (i + 1).ToString())</div>
+                    <div class="ciclo-circulo" title="@paso.Titulo">@(h != null ? "✓" : "")@paso.Corto</div>
                     <div>
-                        <div class="ciclo-titulo">@paso.Titulo</div>
                         @if (h == null)
                         {
-                            <div class="small text-muted">@(i == actual ? "Siguiente paso" : "Pendiente")</div>
+                            <div class="small text-muted">@(i == actual ? "Siguiente paso" : "")</div>
                         }
                         else
                         {

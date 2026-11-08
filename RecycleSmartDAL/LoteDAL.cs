@@ -301,22 +301,88 @@ namespace RecycleSmartDAL
         {
             var lista = new List<(DateTime, string, decimal)>();
             using (var con = new SqlConnection(_conectar))
-            using (var  cmd = new SqlCommand(@"SELECT EventoAcceso.Fecha, ISNULL(UsuarioInstitucion.Nombre+' '+UsuarioInstitucion.Apellido,'-') AS Usuario,EventoAcceso.VolumenDepositado " +
+            using (var cmd = new SqlCommand(@"SELECT EventoAcceso.Fecha, ISNULL(UsuarioInstitucion.Nombre+' '+UsuarioInstitucion.Apellido,'-') AS Usuario,EventoAcceso.VolumenDepositado " +
                 " FROM EventoAcceso" +
                 " LEFT JOIN UsuarioInstitucion ON UsuarioInstitucion.Id=EventoAcceso.UsuarioInstitucionId" +
                 " WHERE EventoAcceso.LoteId=@LoteId ORDER BY EventoAcceso.Fecha ", con))
             {
                 cmd.Parameters.AddWithValue("@LoteId", loteid);
                 con.Open();
-                using(var leer=cmd.ExecuteReader())
+                using (var leer = cmd.ExecuteReader())
                 {
-                    while(leer.Read())
+                    while (leer.Read())
                     {
                         lista.Add((leer.GetDateTime(0), leer.GetString(1), leer.GetDecimal(2)));
                     }
                 }
             }
             return lista;
+        }
+
+
+        public void RegistrarHito(int loteid, int empresaid, TipoEstado.EstadoLote estadoRequerido, TipoEstado.EstadoLote estadoNuevo, HitoLote hito, DateTime? limitetratamiento = null, bool? conforme=null)
+        {
+            using(var con=new SqlConnection(_conectar))
+            {
+                con.Open();
+                using (var tran= con.BeginTransaction())
+                {
+                    try
+                    {
+                        string codigo;
+                        string estadoActual;
+                        using(var cmd=new SqlCommand(@"SELECT Lote.Codigo,Lote.EstadoLote FROM Lote WITH (UPDLOCK,HOLDLOCK)" +
+                            " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Lote.InstitucionId " +
+                            " WHERE Lote.Id=@LoteId AND InstitucionCliente.EmpresaLogisticaId=@EmpresaId ", con,tran))
+                        {
+                            cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                            cmd.Parameters.AddWithValue("@LoteId", loteid);
+
+                            using(var leer=cmd.ExecuteReader())
+                            {
+                                if (!leer.Read()) throw new Exception("Lote no existe");
+                                codigo = leer.GetString(0);
+                                estadoActual = leer.GetString(1);
+                            }
+                        }
+                        if (estadoActual != estadoRequerido.ToString())
+                        {
+                            throw new Exception($"El lote esta en estado {estadoActual} : Este paso no corresponde ahora");
+                        }
+                        using(var cmd=new SqlCommand(@"SELECT TOP 1 HitoLote.Hash FROM HitoLote WHERE HitoLote.LoteId=@LoteId ORDER BY Id DESC", con,tran))
+                        {
+                            cmd.Parameters.AddWithValue("@LoteId", loteid);
+                            hito.HashAnterior = (string?)cmd.ExecuteScalar() ?? Integridad.HashInicial;
+                        }
+
+                        //hito firmado
+
+                        hito.LoteId = loteid;
+                        hito.Hash = Integridad.hashito(codigo, hito);
+                        InsertarHito(hito, con, tran);
+
+                        using (var cmd=new SqlCommand(@"UPDATE Lote SET EstadoLote=@EstadoLote,FechaLimiteTratamiento=ISNULL(@LimiteTratamiento,FechaLimiteTratamiento), " +
+                            " Conforme=ISNULL(@Conforme,Conforme),FechaCierre=CASE WHEN @Conforme IS NULL THEN FechaCierre ELSE @Fecha END," +
+                            " HashFinal=CASE WHEN @Conforme IS NULL THEN HashFinal ELSE @Hash END" +
+                            " WHERE Id=@LoteId   ", con,tran))
+                        {
+                            cmd.Parameters.AddWithValue("@EstadoLote",estadoNuevo.ToString());
+                            cmd.Parameters.AddWithValue("@LimiteTratamiento",(object?)limitetratamiento??DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Conforme",(object?)conforme??DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Fecha",hito.Fecha);
+                            cmd.Parameters.AddWithValue("@Hash",hito.Hash);
+                            cmd.Parameters.AddWithValue("@LoteId",loteid);
+                            cmd.ExecuteNonQuery();
+                        }
+                        tran.Commit();
+                    }
+                    catch
+                    {
+                        tran.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
     }
 }

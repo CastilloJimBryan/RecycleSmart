@@ -86,5 +86,27 @@ namespace RecycleSmartBLL
             int porcentaje = (int)Math.Clamp(usado / total * 100, 0, 100);
             return (etapa, limite, porcentaje, DateTime.Now > limite);
         }
+
+        public void SolicitarRecoleccion(int loteid, int empresaid, int usuarioid, string? observacion)
+        {
+            var lote = ObtenerLote(loteid, empresaid);
+            if (lote.EstadoLote != TipoEstado.EstadoLote.EnCurso)
+                throw new Exception("Solo se puede solicitar la recolección de un lote en curso.");
+
+            observacion = string.IsNullOrWhiteSpace(observacion) ? null : observacion.Trim();
+            if (observacion != null && observacion.Length > 500)
+                throw new Exception("Las observaciones pueden tener hasta 500 caracteres.");
+
+            var hito = new HitoLote
+            {
+                TipoHito = TipoEstado.TipoHito.SolicitudRecoleccion,
+                Fecha = Integridad.Truncar(DateTime.Now),
+                UsuarioId = usuarioid,
+                Observaciones = observacion
+                // DentroDelPlazo queda null: la solicitud no tiene plazo propio
+            };
+
+            _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.EnCurso, TipoEstado.EstadoLote.RecoleccionSolicitadas, hito);
+        }
     }
 }
