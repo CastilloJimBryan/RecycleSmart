@@ -20,6 +20,14 @@
 
     int actual = Array.FindIndex(pasos, p => !Model.Hitos.Any(h => h.TipoHito == p.Tipo));
 
+
+    string TextoMetodo(TipoEstado.MetodoTratamiento m) => m switch
+    {
+        TipoEstado.MetodoTratamiento.Autoclave => "Autoclave (esterilización por vapor)",
+        TipoEstado.MetodoTratamiento.Incineracion => "Incineración",
+        TipoEstado.MetodoTratamiento.Microondas => "Microondas",
+        _ => "Otro"
+    };
 }
 
 <partial name="_Mensajes"/>
@@ -136,14 +144,6 @@
     bool vencido = DateTime.Now > Model.FechaLimiteTratamiento;
     string ahora = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
 
-    string TextoMetodo(TipoEstado.MetodoTratamiento m) => m switch
-    {
-        TipoEstado.MetodoTratamiento.Autoclave => "Autoclave (esterilización por vapor)",
-        TipoEstado.MetodoTratamiento.Incineracion => "Incineración",
-        TipoEstado.MetodoTratamiento.Microondas => "Microondas",
-        _ => "Otro"
-    };
-
     <div class="card shadow-sm mb-3 border-warning">
         <div class="card-body">
             <h6 class="text-uppercase text-muted small fw-semibold">Siguiente paso: registrar el tratamiento</h6>
@@ -230,7 +230,8 @@
                             }
                             @if (!string.IsNullOrEmpty(h.Metodo))
                             {
-                                <div class="small text-muted">@h.Metodo</div>
+                                var texto = Enum.TryParse<TipoEstado.MetodoTratamiento>(h.Metodo, out var m) ?TextoMetodo(m) h.Metodo;
+                                <div class="small text-muted">@texto</div>
                             }
                             @if (!string.IsNullOrEmpty(h.Observaciones))
                             {
