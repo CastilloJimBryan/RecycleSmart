@@ -130,6 +130,64 @@
         </div>
     </div>
 }
+@if (Model.EstadoLote == TipoEstado.EstadoLote.Recolectado && User.TieneRol(Roles.Gestion))
+{
+    var recoleccion = Model.Hitos.First(x => x.TipoHito == TipoEstado.TipoHito.Recoleccion);
+    bool vencido = DateTime.Now > Model.FechaLimiteTratamiento;
+    string ahora = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+
+    string TextoMetodo(TipoEstado.MetodoTratamiento m) => m switch
+    {
+        TipoEstado.MetodoTratamiento.Autoclave => "Autoclave (esterilización por vapor)",
+        TipoEstado.MetodoTratamiento.Incineracion => "Incineración",
+        TipoEstado.MetodoTratamiento.Microondas => "Microondas",
+        _ => "Otro"
+    };
+
+    <div class="card shadow-sm mb-3 border-warning">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted small fw-semibold">Siguiente paso: registrar el tratamiento</h6>
+            <p class="small @(vencido ? "text-danger fw-semibold" : "text-muted")">
+                @(vencido ? "El plazo de tratamiento venció el" : "El plazo de tratamiento vence el")
+                @Model.FechaLimiteTratamiento?.ToString("dd/MM HH:mm") (72 h desde la recolección).
+            </p>
+            <form asp-action="RegistrarTratamiento" method="post" onsubmit="this.querySelector('button').disabled = true;">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label small" for="fechaTrat">Fecha y hora del tratamiento</label>
+                        <input type="datetime-local" class="form-control" id="fechaTrat" name="fecha" value="@ahora"
+                               min="@recoleccion.Fecha.ToString("yyyy-MM-ddTHH:mm")" max="@ahora" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small" for="metodo">Método</label>
+                        <select class="form-select" id="metodo" name="metodo" required>
+                            @foreach (var m in Enum.GetValues<TipoEstado.MetodoTratamiento>())
+                            {
+                                <option value="@m">@TextoMetodo(m)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small" for="operador">Planta / operador</label>
+                        <input type="text" class="form-control" id="operador" name="operador" maxlength="100" required
+                               placeholder="Planta de tratamiento Sur" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small" for="certificado">N.º de certificado</label>
+                        <input type="text" class="form-control" id="certificado" name="certificado" maxlength="50" required
+                               placeholder="CT-2026-0088" />
+                    </div>
+                    <div class="col-12">
+                        <input type="text" class="form-control" name="observaciones" maxlength="500"
+                               placeholder="Observaciones (obligatorias si el método es «Otro»)" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning mt-2">Registrar tratamiento</button>
+            </form>
+        </div>
+    </div>
+}
 @* ---------- Línea de tiempo de los hitos ---------- *@
 <div class="card shadow-sm mb-3">
     <div class="card-body">
@@ -169,6 +227,10 @@
                             @if (!string.IsNullOrEmpty(h.NumeroDocumento))
                             {
                                 <div class="small text-muted">Doc. @h.NumeroDocumento</div>
+                            }
+                            @if (!string.IsNullOrEmpty(h.Metodo))
+                            {
+                                <div class="small text-muted">@h.Metodo</div>
                             }
                             @if (!string.IsNullOrEmpty(h.Observaciones))
                             {

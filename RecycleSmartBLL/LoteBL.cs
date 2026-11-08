@@ -146,9 +146,48 @@ namespace RecycleSmartBLL
                 DentroDelPlazo = fecha <= lote.FechaLimiteRecoleccion
             };
 
-            _loteDal.RegistrarHito(loteid, empresaid,
-                TipoEstado.EstadoLote.RecoleccionSolicitada, TipoEstado.EstadoLote.Recolectado,
-                hito, limitetratamiento: fecha.AddHours(HorasTratamiento));
+            _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.RecoleccionSolicitada, TipoEstado.EstadoLote.Recolectado,hito, limitetratamiento: fecha.AddHours(HorasTratamiento));
+        }
+
+
+        public void RegistrarTratamiento(int loteid,int empresaid,int usuarioid,DateTime fechatratamiento,TipoEstado.MetodoTratamiento metodo,string? operario,string?certificado,string?observacion)
+        {
+            var lote = ObtenerLote(loteid, empresaid);
+            if (lote.EstadoLote != TipoEstado.EstadoLote.Recolectado)
+                throw new Exception("El tratamiento solo se puede registrar después de la recolección.");
+
+            var recoleccion = lote.Hitos.First(h => h.TipoHito == TipoEstado.TipoHito.Recoleccion);
+            var fecha = Integridad.Truncar(fechatratamiento);
+            if (fecha > DateTime.Now.AddMinutes(5))
+                throw new Exception("La fecha de tratamiento no puede ser futura.");
+            if (fecha < recoleccion.Fecha)
+                throw new Exception($"El tratamiento no puede ser anterior a la recolección ({recoleccion.Fecha:dd/MM/yyyy HH:mm}).");
+            if (!Enum.IsDefined(metodo))
+                throw new Exception("Elegí un método de tratamiento válido.");
+
+            operario = operario?.Trim();
+            certificado = certificado?.Trim();
+            observacion = string.IsNullOrWhiteSpace(observacion) ? null : observacion.Trim();
+            if (string.IsNullOrEmpty(operario) || operario.Length > 100)
+                throw new Exception("Indicá la planta u operador que realizó el tratamiento (hasta 100 caracteres).");
+            if (string.IsNullOrEmpty(certificado) || certificado.Length > 50)
+                throw new Exception("El número de certificado de tratamiento es obligatorio (hasta 50 caracteres).");
+            if (metodo == TipoEstado.MetodoTratamiento.Otro && observacion == null)
+                throw new Exception("Si el método es «Otro», indicá cuál en las observaciones.");
+
+            var hito = new HitoLote
+            {
+                TipoHito = TipoEstado.TipoHito.Tratamiento,
+                Fecha = fecha,
+                UsuarioId = usuarioid,
+                Responsable = operario,
+                Metodo = metodo.ToString(),
+                NumeroDocumento = certificado,
+                Observaciones = observacion,
+                DentroDelPlazo = fecha <= lote.FechaLimiteTratamiento   // usá tu nombre de propiedad
+            };
+
+            _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.Recolectado, TipoEstado.EstadoLote.Tratado, hito);
         }
     }
 }

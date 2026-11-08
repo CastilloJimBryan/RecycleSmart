@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RecycleSmartBE;
 using RecycleSmartBLL;
 using Servicio;
 
@@ -75,6 +76,24 @@ namespace RecycleSmart.Controllers
                 TempData["Mensaje"] = "Recoleccion Registrada, El Lote Pasa a Tratamiento";
             }
             catch(Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            return RedirectToAction("Detalle", new { id });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = Roles.Gestion)]
+        public IActionResult RegistrarTratamiento(int id, DateTime fecha, TipoEstado.MetodoTratamiento metodo,
+                                          string? operador, string? certificado, string? observaciones)
+        {
+            try
+            {
+                int usuarioId = ManejosSesiones.ObtenerUsuarioEmpresaLogistica(User);
+                _lotebl.RegistrarTratamiento(id, empresaid, usuarioId, fecha, metodo, operador, certificado, observaciones);
+                TempData["Mensaje"] = "Tratamiento registrado.";
+            }
+            catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
             }
