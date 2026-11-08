@@ -99,5 +99,23 @@ namespace RecycleSmart.Controllers
             }
             return RedirectToAction("Detalle", new { id });
         }
+        [HttpPost]
+        [Authorize(Roles = Roles.Gestion)]
+        public IActionResult RegistrarDisposicion(int id, DateTime fecha,string? destino,string?manifiesto,string? observaciones)
+        {
+            try
+            {
+                int usuarioId = ManejosSesiones.ObtenerUsuarioEmpresaLogistica(User);
+                _lotebl.RegistrarDisposicion(id, empresaid, usuarioId, fecha, destino, manifiesto, observaciones);
+                TempData["Mensaje"] = "Tratamiento registrado.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            return RedirectToAction("Detalle", new { id });
+        }
+
+
     }
 }

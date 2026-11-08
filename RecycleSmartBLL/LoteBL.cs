@@ -189,5 +189,45 @@ namespace RecycleSmartBLL
 
             _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.Recolectado, TipoEstado.EstadoLote.Tratado, hito);
         }
+
+        public bool RegistrarDisposicion(int loteid,int empresaid,int usuarioid,DateTime fechadisposicion,string? destino,string?manifiesto,string?observacion)
+        {
+            var lote = ObtenerLote(loteid, empresaid);
+            if (lote.EstadoLote != TipoEstado.EstadoLote.Tratado)
+                throw new Exception("La disposición final solo se puede registrar después del tratamiento.");
+
+            var tratamiento = lote.Hitos.First(h => h.TipoHito == TipoEstado.TipoHito.Tratamiento);
+            var fecha = Integridad.Truncar(fechadisposicion);
+            if (fecha > DateTime.Now.AddMinutes(5))
+                throw new Exception("La fecha de disposición no puede ser futura.");
+            if (fecha < tratamiento.Fecha)
+                throw new Exception($"La disposición no puede ser anterior al tratamiento ({tratamiento.Fecha:dd/MM/yyyy HH:mm}).");
+
+            destino = destino?.Trim();
+            manifiesto = manifiesto?.Trim();
+            observacion = string.IsNullOrWhiteSpace(observacion) ? null : observacion.Trim();
+            if (string.IsNullOrEmpty(destino) || destino.Length > 100)
+                throw new Exception("Indicá el destino final (empresa o sitio de disposición, hasta 100 caracteres).");
+            if (string.IsNullOrEmpty(manifiesto) || manifiesto.Length > 50)
+                throw new Exception("El número de manifiesto final es obligatorio (hasta 50 caracteres).");
+
+            // Conforme: ningún hito con plazo quedó fuera de plazo
+            bool conforme = lote.Hitos.All(h => h.DentroDelPlazo != false);
+
+            var hito = new HitoLote
+            {
+                TipoHito = TipoEstado.TipoHito.DisposicionFinal,
+                Fecha = fecha,
+                UsuarioId = usuarioid,
+                Responsable = destino,
+                NumeroDocumento = manifiesto,
+                Observaciones = observacion
+                // DentroDelPlazo queda null: la disposición no tiene plazo propio
+            };
+
+            _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.Tratado, TipoEstado.EstadoLote.Cerrado, hito, conforme: conforme);
+
+            return conforme;
+        }
     }
 }

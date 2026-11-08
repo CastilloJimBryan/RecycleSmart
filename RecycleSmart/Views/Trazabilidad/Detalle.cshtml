@@ -20,6 +20,7 @@
 
     int actual = Array.FindIndex(pasos, p => !Model.Hitos.Any(h => h.TipoHito == p.Tipo));
 
+    string colorestado = Model.EstadoLote == TipoEstado.EstadoLote.Cerrado ? (Model.Conforme == true ? "bg-success" : "bg-danger") : "bg-warning text-dark";
 
     string TextoMetodo(TipoEstado.MetodoTratamiento m) => m switch
     {
@@ -37,12 +38,27 @@
 </div>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
     <h2 class="fs-4 mb-0"><code class="fs-4">@Model.Codigo</code></h2>
-    <span class="badge text-bg-warning">@Model.EstadoLote</span>
-    @if (Model.Conforme != null)
-    {
-        <span>@(Model.Conforme==true?"Conforme":"No Conforme")</span>
-    }
+    <span class="badge @colorestado">@Model.EstadoLote</span>
 </div>
+    @if (Model.EstadoLote == TipoEstado.EstadoLote.Cerrado)
+    {
+        bool ok = Model.Conforme == true;
+        <div class="alert @(ok ? "alert-success" : "alert-danger") d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <strong>Lote cerrado: @(ok ? "CONFORME" : "NO CONFORME")</strong>
+                <div class="small">
+                    @(ok ? "Todos los hitos se cumplieron dentro de los plazos de la Ley 24.051."
+                         : "Al menos un hito se registró fuera del plazo de la Ley 24.051.")
+                    Cerrado el @Model.FechaCierre?.ToString("dd/MM/yyyy HH:mm").
+                </div>
+            </div>
+            <div class="small text-end">
+                Sello del lote<br />
+                <code title="@Model.HashFinal">@Model.HashFinal?[..16]…</code>
+            </div>
+        </div>
+    }
+    
 <div class="row g-3 mb-3">
     <div class="col-md-6">
         <div class="card h-100 shadow-sm">
@@ -188,6 +204,48 @@
         </div>
     </div>
 }
+@if (Model.EstadoLote == TipoEstado.EstadoLote.Tratado && User.TieneRol(Roles.Operacion))
+{
+    var tratamiento = Model.Hitos.First(x => x.TipoHito == TipoEstado.TipoHito.Tratamiento);
+    string ahora = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+    bool seraConforme = Model.Hitos.All(x => x.DentroDelPlazo != false);
+
+    <div class="card shadow-sm mb-3 border-warning">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted small fw-semibold">Último paso: disposición final y cierre del lote</h6>
+            <p class="small text-muted">
+                Al registrarla, el lote se cierra como
+                <strong class="@(seraConforme ? "text-success" : "text-danger")">@(seraConforme ? "Conforme" : "No conforme")</strong>
+                y se sella su cadena de integridad. Esta acción no se puede deshacer.
+            </p>
+            <form asp-action="RegistrarDisposicion" method="post" onsubmit="this.querySelector('button').disabled = true;">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label small" for="fechaDisp">Fecha y hora de disposición</label>
+                        <input type="datetime-local" class="form-control" id="fechaDisp" name="fecha" value="@ahora"
+                               min="@tratamiento.Fecha.ToString("yyyy-MM-ddTHH:mm")" max="@ahora" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small" for="destino">Destino final</label>
+                        <input type="text" class="form-control" id="destino" name="destino" maxlength="100" required
+                               placeholder="Relleno de seguridad Norte S.A." />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small" for="manifiestoFinal">N.º de manifiesto final</label>
+                        <input type="text" class="form-control" id="manifiestoFinal" name="manifiesto" maxlength="50" required
+                               placeholder="MF-2026-00031" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small" for="obsDisp">Observaciones</label>
+                        <input type="text" class="form-control" id="obsDisp" name="observaciones" maxlength="500" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning mt-2">Registrar disposición y cerrar lote</button>
+            </form>
+        </div>
+    </div>
+}
 @* ---------- Línea de tiempo de los hitos ---------- *@
 <div class="card shadow-sm mb-3">
     <div class="card-body">
@@ -230,7 +288,7 @@
                             }
                             @if (!string.IsNullOrEmpty(h.Metodo))
                             {
-                                var texto = Enum.TryParse<TipoEstado.MetodoTratamiento>(h.Metodo, out var m) ?TextoMetodo(m) h.Metodo;
+                                var texto = Enum.TryParse<TipoEstado.MetodoTratamiento>(h.Metodo, out var m) ? TextoMetodo(m) : h.Metodo;
                                 <div class="small text-muted">@texto</div>
                             }
                             @if (!string.IsNullOrEmpty(h.Observaciones))
