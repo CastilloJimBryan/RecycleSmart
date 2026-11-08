@@ -20,7 +20,7 @@
 
         public enum MotivoBaja { FallaEquipo, Reemplazo, CierreArea, Otro }
 
-        public enum EstadoLote { EnCurso,RecoleccionSolicitadas,Recolectado,Tratado,Cerrado}
+        public enum EstadoLote { EnCurso,RecoleccionSolicitada,Recolectado,Tratado,Cerrado}
 
         public enum TipoHito { Generacion,SolicitudRecoleccion,Recoleccion,Tratamiento,DisposicionFinal}
         public enum MetodoTratamiento { Autoclave,Incineracion,Microondas,Otro}

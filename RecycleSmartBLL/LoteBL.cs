@@ -64,7 +64,7 @@ namespace RecycleSmartBLL
             DateTime desde, limite;
             string etapa;
 
-            if (l.EstadoLote is TipoEstado.EstadoLote.EnCurso or TipoEstado.EstadoLote.RecoleccionSolicitadas)
+            if (l.EstadoLote is TipoEstado.EstadoLote.EnCurso or TipoEstado.EstadoLote.RecoleccionSolicitada)
             {
                 etapa = "Recolección";
                 desde = l.FechaGeneracion;
@@ -106,7 +106,7 @@ namespace RecycleSmartBLL
                 // DentroDelPlazo queda null: la solicitud no tiene plazo propio
             };
 
-            _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.EnCurso, TipoEstado.EstadoLote.RecoleccionSolicitadas, hito);
+            _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.EnCurso, TipoEstado.EstadoLote.RecoleccionSolicitada, hito);
         }
     }
 }
