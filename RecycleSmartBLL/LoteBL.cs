@@ -108,5 +108,47 @@ namespace RecycleSmartBLL
 
             _loteDal.RegistrarHito(loteid, empresaid,TipoEstado.EstadoLote.EnCurso, TipoEstado.EstadoLote.RecoleccionSolicitada, hito);
         }
+
+        public void RegistrarRecoleccion(int loteid,int empresaid,int usuarioid,DateTime fecharecoleccion,string? responsable,string? manifiesto,string?observacion)
+        {
+            var lote = ObtenerLote(loteid, empresaid);
+            if(lote.EstadoLote!=TipoEstado.EstadoLote.RecoleccionSolicitada)
+            {
+                throw new Exception("La Recoleccion solo se puede registrar despues de solicitarla");
+            }
+
+            var fecha = Integridad.Truncar(fecharecoleccion);
+            if (fecha > DateTime.Now.AddMinutes(5))
+            {
+                throw new Exception("La fecha de recolecion no puede ser futura");
+            }
+            if(fecha<lote.FechaGeneracion)
+            {
+                throw new Exception("la fecha de coleccion no puede ser anterior a la fecha que se genero");
+            }
+
+            responsable = responsable?.Trim();
+            manifiesto = manifiesto?.Trim();
+            observacion = string.IsNullOrWhiteSpace(observacion) ? null : observacion.Trim();
+            if (string.IsNullOrEmpty(responsable) || responsable.Length > 100)
+                throw new Exception("Indicá el operario y/o vehículo que retiró el lote (hasta 100 caracteres).");
+            if (string.IsNullOrEmpty(manifiesto) || manifiesto.Length > 50)
+                throw new Exception("El número de manifiesto de transporte es obligatorio (hasta 50 caracteres).");
+
+            var hito = new HitoLote
+            {
+                TipoHito = TipoEstado.TipoHito.Recoleccion,
+                Fecha = fecha,
+                UsuarioId = usuarioid,
+                Responsable = responsable,
+                NumeroDocumento = manifiesto,
+                Observaciones = observacion,
+                DentroDelPlazo = fecha <= lote.FechaLimiteRecoleccion
+            };
+
+            _loteDal.RegistrarHito(loteid, empresaid,
+                TipoEstado.EstadoLote.RecoleccionSolicitada, TipoEstado.EstadoLote.Recolectado,
+                hito, limitetratamiento: fecha.AddHours(HorasTratamiento));
+        }
     }
 }

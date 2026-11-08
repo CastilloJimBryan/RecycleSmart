@@ -90,11 +90,50 @@
         </div>
     </div>
 }
+
+@if (Model.EstadoLote == TipoEstado.EstadoLote.RecoleccionSolicitada && User.TieneRol(Roles.Operacion))
+{
+    bool vencido = DateTime.Now > Model.FechaLimiteRecoleccion;
+    string ahora = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+
+    <div class="card shadow-sm mb-3 border-warning">
+        <div class="card-body">
+            <h6 class="text-uppercase text-muted small fw-semibold">Siguiente paso: registrar la recolección</h6>
+            <p class="small @(vencido ? "text-danger fw-semibold" : "text-muted")">
+                @(vencido ? "El plazo de recolección venció el" : "El plazo de recolección vence el")
+                @Model.FechaLimiteRecoleccion.ToString("dd/MM HH:mm").
+            </p>
+            <form asp-action="RegistrarRecoleccion" method="post" onsubmit="this.querySelector('button').disabled = true;">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label small" for="fecha">Fecha y hora del retiro</label>
+                        <input type="datetime-local" class="form-control" id="fecha" name="fecha" value="@ahora" max="@ahora" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small" for="responsable">Operario / vehículo</label>
+                        <input type="text" class="form-control" id="responsable" name="responsable" maxlength="100" required
+                               placeholder="Diego Fernández · AB 123 CD" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small" for="manifiesto">N.º de manifiesto</label>
+                        <input type="text" class="form-control" id="manifiesto" name="manifiesto" maxlength="50" required
+                               placeholder="MT-2026-00145" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small" for="observaciones">Observaciones</label>
+                        <input type="text" class="form-control" id="observaciones" name="observaciones" maxlength="500" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning mt-2">Registrar recolección</button>
+            </form>
+        </div>
+    </div>
+}
 @* ---------- Línea de tiempo de los hitos ---------- *@
 <div class="card shadow-sm mb-3">
     <div class="card-body">
         <h6 class="text-uppercase text-muted small fw-semibold mb-3">Ciclo de vida</h6>
-
         <div class="ciclo">
             @for (int i = 0; i < pasos.Length; i++)
             {
@@ -114,6 +153,10 @@
                             @if (!string.IsNullOrEmpty(h.UsuarioNombre))
                             {
                                 <div class="small text-muted">@h.UsuarioNombre</div>
+                            }
+                            @if (!string.IsNullOrEmpty(h.Responsable))
+                            {
+                                <div class="small text-muted">@h.Responsable</div>
                             }
                             @if (h.DentroDelPlazo == true)
                             {

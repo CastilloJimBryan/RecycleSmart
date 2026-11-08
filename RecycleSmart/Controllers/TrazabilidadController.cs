@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RecycleSmartBLL;
 using Servicio;
 
@@ -62,6 +63,22 @@ namespace RecycleSmart.Controllers
                 TempData["Error"] = ex.Message;
             }
             return RedirectToAction("Detalle", new { id });
-        } 
+        }
+      //  [HttpPost]
+       // [Authorize(Roles =Roles.Operario)]
+        public IActionResult RegistrarRecoleccion(int id,string?responsable,DateTime fecha,string? manifiesto,string?observacion)
+        {
+            try
+            {
+                int usuarioid = Servicio.ManejosSesiones.ObtenerUsuarioEmpresaLogistica(User);
+                _lotebl.RegistrarRecoleccion(id, empresaid, usuarioid, fecha, responsable, manifiesto, observacion);
+                TempData["Mensaje"] = "Recoleccion Registrada, El Lote Pasa a Tratamiento";
+            }
+            catch(Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+            return RedirectToAction("Detalle", new { id });
+        }
     }
 }
