@@ -384,5 +384,54 @@ namespace RecycleSmartDAL
                 }
             }
         }
+        // no cierra el contenedor si tiene lote activo
+        public List<Lote> SinCerrarContenedor(int contenedorId)
+        {
+            var lista=new List<Lote>();
+            using(var con=new SqlConnection(_conectar))
+            using(var cmd=new SqlCommand(@"SELECT Id,Codigo,EstadoLote,FechaGeneracion,VolumenTotal FROM Lote " +
+                " WHERE ContenedorId=@ContenedorId AND EstadoLote <>'Cerrado'" +
+                " ORDER BY FechaGeneracion ", con))
+            {
+                cmd.Parameters.AddWithValue("@ContenedorId",contenedorId);
+                con.Open();
+                using(var leer=cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                    {
+                        lista.Add(new Lote
+                        {
+                            Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                            Codigo = leer.GetString(leer.GetOrdinal("Codigo")),
+                            EstadoLote=Enum.Parse<TipoEstado.EstadoLote>(leer.GetString(leer.GetOrdinal("EstadoLote")),true),
+                            FechaGeneracion=leer.GetDateTime(leer.GetOrdinal("FechaGeneracion")),
+                            VolumenTotal=leer.GetDecimal(leer.GetOrdinal("VolumenTotal"))
+                        });
+                    }
+                }
+                return lista;
+            }
+        }
+        //x Empresa
+
+        public Dictionary<int, (int loteid,TipoEstado.EstadoLote)>AbiertosXEmpresa(int empresaid)
+        {
+            var dic = new Dictionary<int, (int, TipoEstado.EstadoLote)>();
+            using (var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand(@"SELECT Lote.ContenedorId, Lote.Id, Lote.EstadoLote FROM Lote " +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id = Lote.InstitucionId " +
+                " WHERE InstitucionCliente.EmpresaLogisticaId = @EmpresaId" +
+                " AND Lote.EstadoLote IN ('EnCurso', 'RecoleccionSolicitada')", con))
+            {
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaid);
+                con.Open();
+                using (var leer = cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                        dic[leer.GetInt32(0)] = (leer.GetInt32(1), Enum.Parse<TipoEstado.EstadoLote>(leer.GetString(2), true));
+                }
+            }
+            return dic;
+        }
     }
 }

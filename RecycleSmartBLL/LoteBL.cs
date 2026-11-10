@@ -229,5 +229,15 @@ namespace RecycleSmartBLL
 
             return conforme;
         }
+        ///Contenedor
+        ///
+        public List<Lote> SinCerrarContenedor(int contenedorid)
+        {
+            return _loteDal.SinCerrarContenedor(contenedorid);
+        }
+        public Dictionary<int,(int loteid,TipoEstado.EstadoLote estado)>AbiertosXEmpresa(int empresaid)
+        {
+            return _loteDal.AbiertosXEmpresa(empresaid);
+        }
     }
 }

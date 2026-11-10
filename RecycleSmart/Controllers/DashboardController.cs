@@ -16,6 +16,7 @@ namespace RecycleSmart.Controllers
         private readonly AlertaBL _alertaBL;
         private readonly InstitucionClienteBLL _institucionClienteBLL;
         private readonly ContenedorBL _contenedorBL;
+        private readonly LoteBL _lotesbl;
 
         public DashboardController(IConfiguration configuration)
         {
@@ -24,6 +25,7 @@ namespace RecycleSmart.Controllers
             _alertaBL=new AlertaBL(conexion);
             _contenedorBL=new ContenedorBL(conexion);
             _institucionClienteBLL = new InstitucionClienteBLL(conexion);
+            _lotesbl = new LoteBL(conexion);
         }
 
         public IActionResult Index(int institucionId = 0)
@@ -48,7 +50,7 @@ namespace RecycleSmart.Controllers
                 AlertasAbiertaXEmpresa = _alertaBL.ContarAlertasAbiertas(empresaid),
                 Linea = _dashboardBL.LineaTiempo(empresaid, institucionId),
                 LitrosHora = _dashboardBL.LitrosPorHora(empresaid, institucionId),
-
+                LotesAbiertos = _lotesbl.AbiertosXEmpresa(empresaid),
                 usoPlan = new UsoPlan()
                 {
                     Instituciones = institucionUsadas,

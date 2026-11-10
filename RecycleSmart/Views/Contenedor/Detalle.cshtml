@@ -13,6 +13,7 @@
     bool esAdmin = User.IsInRole(Roles.Administrador);
     bool PuedeGestionar = User.IsInRole(Roles.Gestion);
     bool tieneAlertas = Model.AlertasAbiertas.Count > 0;
+    bool tieneLotes = Model.Lotes.Count > 0;
     bool sinUmbral = u == null || u.Id == 0;
     string colorNivel = "bg-success";
     if(t!=null)
@@ -43,9 +44,9 @@
             {
                 <div class="d-flex gap-2">
                     <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-outline-dark btn-sm">Editar</a>
-                    @if (tieneAlertas)
+                    @if (tieneAlertas || tieneLotes)
                     {
-                        <button class="btn btn-outline-danger" disabled title="Tiene alertas abiertas: resolvelas antes de dar de baja">Dar de baja</button>
+                        <button class="btn btn-outline-danger" disabled title="@(tieneAlertas?"Tiene Alertas abiertas":"Tiene Lotes sin Cerrar"):No se Puede Dar de Baja">Dar de baja</button>
                     }
                     else
                     {
@@ -226,6 +227,25 @@
 <div class="card shadow-sm">
     <div class="card-body">
         <h6 class="text-uppercase text-muted small fw-semibold">Lotes activos</h6>
-        <p class="text-muted small mb-0">Disponible cuando esté implementada la trazabilidad.</p>
+        @if (!tieneLotes)
+        {
+        <p class="text-muted small mb-0">No tiene lotes en curso. Se Inicia con el proximo primer Deposito.</p>  
+        }
+        @foreach (var item in Model.Lotes)
+        {
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border rounded  p-2 mb-2">
+                <div>
+                    <code>@item.Codigo</code>
+                    <span class="badge @EstadosColor.EstadoBadge(item.EstadoLote.ToString())">@item.EstadoLote</span>
+                    <span class="text-muted ms-1 small">Desde @item.FechaGeneracion.ToString("dd/MM/yyyy HH:mm") - @item.VolumenTotal.ToString("0.0") L</span>
+                </div>
+                <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-sm btn-theme-success">Ver Lote</a>
+            </div>
+        }
+        @if(tieneLotes && User.IsInRole(Roles.Administrador))
+        {
+        <p class="text-muted small mb-0">Para dar de baja un contenedor , hay q cerrar lotes activos.</p>
+            
+        }
     </div>
 </div>

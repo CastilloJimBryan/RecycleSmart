@@ -19,6 +19,7 @@ namespace RecycleSmart.Controllers
         readonly UmbralBL _usmbralBL;
         readonly TelemetriaBL _telemetriaBL;
         readonly AlertaBL _alertaBL;
+        readonly LoteBL _loteBL;
         private int empresaid => Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
 
         public ContenedorController(IConfiguration configuracion)
@@ -31,6 +32,7 @@ namespace RecycleSmart.Controllers
             _usmbralBL=new UmbralBL(conectar);
             _telemetriaBL=new TelemetriaBL(conectar);
             _alertaBL=new AlertaBL(conectar);
+            _loteBL=new LoteBL(conectar);
         }
 
         public IActionResult Index(int institucionId = 0,bool bajas=false)
@@ -67,7 +69,7 @@ namespace RecycleSmart.Controllers
         {
             int empresaid = Servicio.ManejosSesiones.ObtenerEmpresaLogisticaId(User);
             var contenedor = _contenedorBL.BuscarContenedorXId(id, empresaid);
-             
+            
             var instituciones = _institucionClienteBLL.ListadoInstitucioneXEmpresa(empresaid);
             var institucion = contenedor == null ? null : instituciones.FirstOrDefault(i => i.Id == contenedor.InstitucionId);
             if(contenedor==null || institucion==null)
@@ -77,12 +79,13 @@ namespace RecycleSmart.Controllers
             }
             var cd = new ContenedorDetalleViewModel()
             {
-                Contenedor= contenedor,
-                InstitucionNombre=institucion.Nombre,
-                Dispositivos=_dispositivoIoT.BuscarXContenedor(contenedor.Id,empresaid),
-                Telemetria=_telemetriaBL.UltimasLecturas(institucion.Id,empresaid).GetValueOrDefault(contenedor.Id),
-                Umbral=_usmbralBL.Obtener(contenedor.Id, empresaid),
-                AlertasAbiertas=_alertaBL.ListarAlertasAbiertas(empresaid).Where(c=>c.ContenedorId==id).ToList(),
+                Contenedor = contenedor,
+                InstitucionNombre = institucion.Nombre,
+                Dispositivos = _dispositivoIoT.BuscarXContenedor(contenedor.Id, empresaid),
+                Telemetria = _telemetriaBL.UltimasLecturas(institucion.Id, empresaid).GetValueOrDefault(contenedor.Id),
+                Umbral = _usmbralBL.Obtener(contenedor.Id, empresaid),
+                AlertasAbiertas = _alertaBL.ListarAlertasAbiertas(empresaid).Where(c => c.ContenedorId == id).ToList(),
+                Lotes = _loteBL.SinCerrarContenedor(id)
             };
             return View(cd);
         }
@@ -186,6 +189,12 @@ namespace RecycleSmart.Controllers
 
                 TempData["Error"] = "El Contenedor No se puede dar de baja , debido que tiene alertas activas";
                 return RedirectToAction("Detalle", new { id });
+            }
+            if (_loteBL.SinCerrarContenedor(id).Count > 0)
+            {
+                TempData["Error"] = "El Contenedor No se puede dar de baja , debido que tiene lotes sin cerrar";
+                return RedirectToAction("Detalle", new { id });
+                
             }
             return View(contenedor);
         }

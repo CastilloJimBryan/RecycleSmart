@@ -15,5 +15,7 @@ namespace RecycleSmart.Models
         public UsoPlan usoPlan{  get; set; }=new UsoPlan();
         public LitrosxHora LitrosHora { get; set; } = new LitrosxHora();
 
+
+        public Dictionary<int, (int LoteId, TipoEstado.EstadoLote Estado)> LotesAbiertos { get; set; } = new();
     }
 }

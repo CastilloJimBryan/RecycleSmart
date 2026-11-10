@@ -13,6 +13,7 @@ namespace RecycleSmartBLL
         private readonly InstitucionClienteDAL _institucionClienteDAL;
         private readonly PlanDAL _planDAL;
         private readonly AlertaBL _alertaBL;
+        private readonly LoteBL _loteBL;
         public ContenedorBL(string conectar)
         {
             _contenedorDAL = new ContenedorDAL(conectar);
@@ -20,6 +21,7 @@ namespace RecycleSmartBLL
             _institucionClienteDAL=new InstitucionClienteDAL(conectar);
             _planDAL=new PlanDAL(conectar);
             _alertaBL= new AlertaBL(conectar);
+            _loteBL=new LoteBL(conectar);
         }
         public static readonly string[] TiposResiduo ={ "Patogénico", "Cortopunzante", "Anatomopatológico", "Farmacéutico", "Químico" };
 
@@ -136,6 +138,11 @@ namespace RecycleSmartBLL
         public void BajaContenedor(int contenedorid, int empresaid, TipoEstado.MotivoBaja motivo, string? observacion, int usuarioid)
         {
             var actual=ObtenerContenedores(contenedorid, empresaid);
+            var lote = _loteBL.SinCerrarContenedor(contenedorid);
+            if(lote.Count>0)
+            {
+                throw new Exception($"El Contenedor tiene {lote.Count} Lotes sin cerrar , Complete su ciclo antes de dar de baja el contenedor");
+            }
             if (actual == null) throw new Exception("No Existe Contenedor");
             if (actual.Estado.ToString() == "Baja") throw new Exception("El Contenedor ya esta dado de baja");
             if (_alertaBL.ListarAlertasAbiertas(empresaid).Any(a => a.ContenedorId == contenedorid)) throw new Exception("El contenedor tiene alertas abiertas , no se puede dar de baja");

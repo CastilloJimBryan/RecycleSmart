@@ -151,11 +151,26 @@
                                     </div>
                                 </div>
                                 <div class=" d-flex gap-1">
+                                    @if(items.TipoAlerta==TipoEstado.TipoAlerta.Nivel && Model.LotesAbiertos.TryGetValue(items.ContenedorId,out var lote))
+                                    {
+                                        if(lote.Estado==TipoEstado.EstadoLote.EnCurso && User.TieneRol(Roles.Gestion))
+                                        {
+                                           <form asp-controller="Trazabilidad" asp-action="SolicitarRecoleccion" method="post" class="d-inline" onsubmit="this.querySelector('button').disabled=true;">
+                                                <input type="hidden" name="id" value="@lote.LoteId" />
+                                                <input type="hidden" name="observaciones" value="Solicitada desde el Dashboard por alerta de nivel"/>
+                                                <button type="submit" class="btn btn-outline-primary btn-sm">Solicitar Recoleccion</button>
+                                           </form>
+                                        }
+                                        else if(lote.Estado==TipoEstado.EstadoLote.RecoleccionSolicitada)
+                                        {
+                                            <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@lote.LoteId" class="btn btn-outline-dark btn-sm">Recoleccion Solicitada</a>
+                                        }
+                                    }
                                     @if(puedeGestionar&&items.EstadoAlerta==TipoEstado.EstadoAlerta.Activa)
                                     {
                                         <form asp-controller="Alertas" asp-action="Tomar" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="@items.Id"/>
-                                            <button type="submit" class="btn btn-sm btn-theme-success" >Tomar</button>
+                                            <button type="submit" class="btn btn-sm btn-theme-success">Tomar</button>
                                         </form>
                                     }
                                     @if(puedeGestionar)

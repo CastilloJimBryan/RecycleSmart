@@ -10,5 +10,6 @@ namespace RecycleSmart.Models
         public Telemetria? Telemetria { get; set; }
         public List<Alerta> AlertasAbiertas { get; set; } = new List<Alerta>();
         public string InstitucionNombre { get; set; } = string.Empty;
+        public List<Lote> Lotes { get; set; } = new();
     }
 }
