@@ -112,13 +112,14 @@ else
                                     <form asp-action="Tomar" method="post" class="d-inline">
 
                                         <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path+ Context.Request.QueryString)" />
                                         <button type="submit" class="btn btn-outline-dark btn-sm">Tomar</button>
 
                                     </form>
                                 }
                                 if (item.EstadoAlerta != TipoEstado.EstadoAlerta.Resuelta)
                                 {
-                                    <a asp-action="Resolver" asp-route-id="@item.Id" class="btn btn-outline-success btn-sm">Resolver</a>
+                                    <a asp-action="Resolver" asp-route-id="@item.Id" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" class="btn btn-outline-success btn-sm">Resolver</a>
                                 }
                             }
                         </td>

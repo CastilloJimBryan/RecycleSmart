@@ -26,6 +26,7 @@
 
         <form asp-action="Resolver" method="post">
             <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
             <div class="mb-3">
                 <label class="form-label">¿Qué se hizo?</label>
                 <textarea name="nota" class="form-control" rows="4" maxlength="500" minlength="10" required
@@ -35,7 +36,7 @@
             <div class="d-flex justify-content-between">
 
             <button type="submit" class="btn btn-success">Marcar como resuelta</button>
-            <a asp-action="Index" class="btn btn-outline-danger">Cancelar</a>
+                <a href="@(ViewBag.ReturnUrl ?? Url.Action("Index"))" class="btn btn-outline-danger">Cancelar</a>
             </div>
         </form>
     </div>
