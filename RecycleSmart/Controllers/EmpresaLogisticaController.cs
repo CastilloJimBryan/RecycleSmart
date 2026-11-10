@@ -105,8 +105,8 @@ namespace RecycleSmart.Controllers
 
         public IActionResult CambiarEstado(int id,string? estado)
         {
-            return Content($"DEBUG: id={id} estado='{estado}'");
-           /* try
+            
+            try
             {
                 if(!Enum.TryParse<TipoEstado.Estados>(estado, true, out var nuevo))
                 {
@@ -119,7 +119,7 @@ namespace RecycleSmart.Controllers
             {
                 TempData["Error"] = ex.Message;
             }
-            return RedirectToAction("Index");*/
+            return RedirectToAction("Index");
         }
 
     }

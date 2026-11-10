@@ -14,9 +14,11 @@ var sensores = new List<Sensor>
 
     // new Sensor { Mac = "AA:BB:CC:DD:AA:13", Nivel = 50 },
 };
-string uidTarjeta = "12345678";
-int segundosEntreLecturas = 3;
-// ================================tiempo====son 10 segundos pero para el ejemplo es de 3 seg ==========================
+string[] tarjetas = { "12345678", "AC12F1B1", "56489211" };   // permitida, horario, vencida, desconocida
+int tarjetaActual = 0;
+//string uidTarjeta = "12345678";
+int segundosEntreLecturas = 5;
+// ================================tiempo====son 10 segundos pero para el ejemplo es de 5 seg ==========================
 
 var rnd = new Random();
 var factory = new MqttFactory();
@@ -26,11 +28,31 @@ var opciones = new MqttClientOptionsBuilder()
     .WithClientId("recyclesmart-sim-" + Guid.NewGuid().ToString("N")[..8])
     .Build();
 
-// Muestra lo que responde el servidor cuando se pasa una tarjeta
+Console.OutputEncoding = Encoding.UTF8;   // para que se vean bien los íconos y tildes
+
+// El servidor contesta si la tarjeta está permitida: recién ahí se abre la tapa
 cliente.ApplicationMessageReceivedAsync += e =>
 {
-    Console.ForegroundColor = ConsoleColor.Cyan;
-    Console.WriteLine($"  ← Respuesta lector: {e.ApplicationMessage.ConvertPayloadToString()}");
+    // topic: recyclesmart/{mac}/rfid/respuesta
+    var mac = e.ApplicationMessage.Topic.Split('/')[1];
+    var s = sensores.FirstOrDefault(x => x.Mac == mac);
+    if (s == null) return Task.CompletedTask;   // es un broker público: puede llegar la respuesta de otro
+
+    using var doc = JsonDocument.Parse(e.ApplicationMessage.ConvertPayloadToString());
+    var r = doc.RootElement;
+
+    if (r.GetProperty("acceso").GetBoolean())
+    {
+        int deposito = rnd.Next(8, 16);
+        s.Nivel = Math.Min(100, s.Nivel + deposito);
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"  🔓 [{mac}] Acceso permitido – {r.GetProperty("usuario").GetString()} deposita +{deposito}%");
+    }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"  🔒 [{mac}] Acceso denegado – {r.GetProperty("motivo").GetString()}. La tapa no se abre.");
+    }
     Console.ResetColor();
     return Task.CompletedTask;
 };
@@ -40,8 +62,7 @@ await cliente.SubscribeAsync(factory.CreateSubscribeOptionsBuilder()
     .WithTopicFilter("recyclesmart/+/rfid/respuesta").Build());
 
 Console.WriteLine("Simulador conectado.... Teclas:");
-Console.WriteLine("  1-9 elegir sensor | V vaciar | T calor on/off | C cortar/reconectar | R pasar tarjeta | Q salir");
-
+Console.WriteLine("  1-9 elegir sensor | V vaciar | T calor on/off | C cortar/reconectar | K cambiar tarjeta | R pasar tarjeta | Q salir");
 int elegido = 0;
 var proxima = DateTime.MinValue;
 
@@ -51,7 +72,6 @@ while (true)
     if (Console.KeyAvailable)
     {
         var tecla = Console.ReadKey(true).KeyChar;
-        Console.WriteLine($"DEBUG tecla: '{tecla}' ({(int)tecla})");
         var s = sensores[elegido];
 
         if (char.IsDigit(tecla) && tecla != '0' && tecla - '1' < sensores.Count)
@@ -74,9 +94,12 @@ while (true)
                     Console.WriteLine($"[{s.Mac}] {(s.Conectado ? "Reconectado" : "SIN CONEXIÓN (deja de publicar)")}");
                     break;
                 case 'R':
-                    await Publicar($"recyclesmart/{s.Mac}/rfid", new { Uid = uidTarjeta });
-                    s.Nivel = Math.Min(100, s.Nivel + rnd.Next(3, 9)); // el usuario deposita residuos
-                    Console.WriteLine($"[{s.Mac}] Tarjeta {uidTarjeta} pasada");
+                    Console.WriteLine($"[{s.Mac}] Tarjeta {tarjetas[tarjetaActual]} pasada, esperando respuesta...");
+                    await Publicar($"recyclesmart/{s.Mac}/rfid", new { Uid = tarjetas[tarjetaActual] });
+                    break;
+                case 'K':
+                    tarjetaActual = (tarjetaActual + 1) % tarjetas.Length;
+                    Console.WriteLine($"Tarjeta elegida: {tarjetas[tarjetaActual]}");
                     break;
                 case 'Q':
                     await cliente.DisconnectAsync();
@@ -150,10 +173,11 @@ class Sensor
                 LecturaLLeno = 0;
             }
         }
-        else
-        {
-            Nivel = Math.Min(100, Nivel + rnd.NextDouble() * 3);
-        }
+        //esto permite simular solo el contenedor y no solo cuando esta permitido la tarjeta
+       //else
+        //{
+          //  Nivel = Math.Min(100, Nivel + rnd.NextDouble() * 3);
+        //}
         // Temperatura: se acerca al objetivo y oscila alrededor (±0,5 °C)
         double objetivo = Calor ? 45 : 22;
         Temperatura += (objetivo - Temperatura) * 0.15 + (rnd.NextDouble() - 0.5);

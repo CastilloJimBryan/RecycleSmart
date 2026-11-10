@@ -63,7 +63,7 @@ namespace RecycleSmart.Controllers
             {
                 int id = _institucionClienteBL.AgregarInstitucion(institucion);
                 TempData["Mensaje"] = $"Institucion{institucion.Nombre} Se Registro Correctamente";
-                return RedirectToAction("Detalle", new { id });
+                return RedirectToAction("Index", new { id });
             }
             catch (Exception ex)
             {

@@ -164,6 +164,7 @@ namespace RecycleSmart.Servicios
                               ?? throw new Exception("El mensaje está vacío.");
 
             var t = _telemetriabl.ProcesarLectura(mac, lectura);
+             
             _log.LogInformation("Lectura {Id}: contenedor {Contenedor}, nivel {Nivel}%", t.Id, t.ContenedorId, t.Nivel);
             string grupo = $"empresa-{t.EmpresaLogisticaId}";
             await _hub.Clients.Group(grupo).SendAsync("NuevaLectura", new
@@ -174,6 +175,7 @@ namespace RecycleSmart.Servicios
                 fecha = t.FechaHora.ToString("dd/MM HH:mm"),
                 clase = t.Clasificacion.ToString()
             });
+            
             if(t.CompletoAcceso)
             {
                 await _hub.Clients.Group(grupo).SendAsync("NuevoAcceso", new { ContenedorId = t.ContenedorId });
