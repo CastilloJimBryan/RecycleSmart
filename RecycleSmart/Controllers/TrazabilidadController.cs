@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RecycleSmart.Servicios;
 using RecycleSmartBE;
 using RecycleSmartBLL;
 using Servicio;
@@ -116,6 +117,35 @@ namespace RecycleSmart.Controllers
             return RedirectToAction("Detalle", new { id });
         }
 
+        //comprobante
 
+        public IActionResult Comprobante(int id)
+        {
+            try
+            {
+                var lote = _lotebl.ObtenerLote(id, empresaid);
+
+                if (lote.EstadoLote != TipoEstado.EstadoLote.Cerrado)
+                {
+                    TempData["Error"] = "El comprobante solo se emite para lotes cerrados.";
+                    return RedirectToAction("Detalle", new { id });
+                }
+
+                var (integro, mensaje) = _lotebl.VerificarIntegridad(lote);
+                if (!integro)
+                {
+                    TempData["Error"] = $"No se puede emitir el comprobante: {mensaje}";
+                    return RedirectToAction("Detalle", new { id });
+                }
+
+                var pdf = ComprobanteLote.Generar(lote, ManejosSesiones.ObtenerEmpresaNombre(User), mensaje);
+                return File(pdf, "application/pdf", $"Comprobante-{lote.Codigo}.pdf");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index");
+            }
+        }
     }
 }

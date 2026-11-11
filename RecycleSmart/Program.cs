@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Servicio;
 
+
 var builder = WebApplication.CreateBuilder(args);
 Integridad.Configurar(builder.Configuration["Trazabilidad:ClaveIntegridad"] ?? "");
 
@@ -25,6 +26,8 @@ builder.Services.AddAuthentication(ManejosSesiones.esquema).AddCookie(ManejosSes
     });
 builder.Services.AddHostedService<RecycleSmart.Servicios.MotorIoT>();
 builder.Services.AddSignalR();
+
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var app=builder.Build();
 

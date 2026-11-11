@@ -41,7 +41,7 @@
     <span class="badge @colorestado">@Model.EstadoLote</span>
 </div>
     @if (Model.EstadoLote == TipoEstado.EstadoLote.Cerrado)
-    {
+    { 
         bool ok = Model.Conforme == true;
         <div class="alert @(ok ? "alert-success" : "alert-danger") d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div>
@@ -55,6 +55,11 @@
             <div class="small text-end">
                 Sello del lote<br />
                 <code title="@Model.HashFinal">@Model.HashFinal?[..16]…</code>
+                <div class="mt-2">
+                    <a asp-action="Comprobante" asp-route-id="@Model.Id" class="btn btn-sm btn-dark">
+                        <i class="bx bx-download"></i> Descargar comprobante (PDF)
+                    </a>
+                </div>
             </div>
         </div>
     }
