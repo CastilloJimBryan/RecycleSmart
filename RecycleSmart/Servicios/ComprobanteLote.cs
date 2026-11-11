@@ -111,7 +111,7 @@ namespace RecycleSmart.Servicios
                                 t.Cell().Element(Celda).AlignCenter().Text(plazo).FontColor(colorPlazo);
                             }
                         });
-
+                        col.Item().Text("— : etapa sin plazo legal establecido. Plazos controlados: recolección (5 días) y tratamiento (72 h).").FontSize(8).FontColor(Colors.Grey.Darken1);
                         // Sello de integridad
                         col.Item().Background(Colors.Grey.Lighten4).Padding(10).Column(c =>
                         {
