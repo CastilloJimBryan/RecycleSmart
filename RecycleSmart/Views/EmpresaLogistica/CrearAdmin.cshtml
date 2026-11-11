@@ -1,0 +1,50 @@
+﻿@model RecycleSmartBE.UsuarioEmpresaLogistica
+@{
+    var empresa = ViewBag.Empresa as RecycleSmartBE.EmpresaLogistica;
+    ViewData["Title"] = "Crear Administrador";
+}
+
+<h2>Crear administrador</h2>
+<p class="text-muted">
+    Empresa: <strong>@empresa?.Nombre</strong> · El usuario tendrá el rol <strong>Administrador</strong>
+    y podrá crear al resto de los usuarios de su empresa.
+</p>
+
+<partial name="_Mensajes" />
+
+<div class="card" style="max-width:800px">
+    <div class="card-body">
+        <form asp-action="CrearAdmin" method="post">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            }
+
+            <input type="hidden" name="empresaLogisticaId" value="@Model.EmpresaLogisticaId" />
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nombre</label>
+                    <input name="nombre" value="@Model.Nombre" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Apellido</label>
+                    <input name="apellido" value="@Model.Apellido" class="form-control" required />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Correo</label>
+                    <input name="correo" type="email" value="@Model.Correo" class="form-control" required />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Clave</label>
+                    <input name="clave" type="password" class="form-control" required />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-success">Crear Administrador</button>
+                <a asp-action="Detalle" asp-route-id="@Model.EmpresaLogisticaId" class="btn btn-outline-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

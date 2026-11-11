@@ -11,11 +11,132 @@
         (Titulo:"Contenedores",Usado:Model.Uso?.Contenedores??0,Max:Model.Uso?.MaxContenedores??0),
     };
 }
-<div>
-    <a>Volver al Listado</a>
-    <div>
-        <h2>@e.Nombre</h2>
-        <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+<partial name="_Mensajes"/>
+<div class="mb-4">
+    <a class="btn btn-theme-success btn-sm" asp-action="Index">
+        <i class="bx bx-arrow-back btn-sm"></i> Volver al Listado
+    </a>
+</div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+         <h2 class="mb-1">@e.Nombre</h2>    
+         <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+
+    </div>
+@if(!Model.TieneAdministrador && e.Estados!=TipoEstado.Estados.Baja)
+{
+    <div class="alert-info d-flex justify-content-between align-items-center mb-3">
+        <span>Aun No tiene Administrador</span>
+        <a asp-action="CrearAdmin" asp-route-id="@e.Id" class="btn btn-outline-dark btn-sm">Crear Administrador</a>
+    </div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-bold">Datos de la Empresa</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="fw-semibold">CUIT</div>
+                        <div class="text-muted small">@($"{e.Cuit[..2]}-{e.Cuit[2..10]}-{e.Cuit[10]}")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-semibold">Plan</div>
+                        <div class="text-muted small">@e.PlanNombre</div>
+                        
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-semibold">Fecha Registro</div>
+                        <div class="text-muted small">@e.FechaRegistro.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-semibold">Direccion</div>
+                        <div class="text-muted small">@e.Direccion</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-bold">Uso del Plan @e.PlanNombre</div>
+            <div class="card-body">
+                @foreach (var item in usos)
+                {
+                    var ilimitado = item.Max == 0;
+                    var porcentaje = ilimitado ? 100 : Math.Min(100, item.Usado * 100 / item.Max);
+                    var color = ilimitado ? "bg-info" : porcentaje >= 90 ? "bg-danger" : porcentaje >= 70 ? "bg-warning" : "bg-success";
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>@item.Titulo</span>
+                            <span>@item.Usado/@(ilimitado?"Ilimitado":item.Max.ToString())</span>
+                        </div>
+                        <div class="progress" style="height:10px">
+                            <div class="progress-bar @color" style="@($"width:{porcentaje}%")" ></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
-<partial name="_Mensajes"/>
+
+<div class="card mb-3">
+    <div class="card-header fw-bold">Usuarios de la Empresa</div>
+    <div class="card-body">
+        @if (Model.Usuarios.Count == 0)
+        {
+            <p class="text-muted p-3 mb-0">La empresa no tiene usuarios</p>
+        }
+        else
+        {
+            <table class="table table-bordered table-striped mb-0">
+                <thead class="table table-success">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Usuarios)
+                    {
+                        var colorestado = item.Estados.ToString();
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.Apellido</td>
+                            <td>@item.Correo</td>
+                            <td>@item.Rol</td>
+                            <td><span class="badge @EstadosColor.EstadoBadge(colorestado)">@item.Estados</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+@if(e.Estados!=TipoEstado.Estados.Baja)
+{  
+    <div class="d-flex justify-content-center">
+        <div class="card shadow-sm">
+            <div class="card-header fw-bold text-center">Acciones</div>
+            <div class="card-body d-flex gap-2">
+                <a asp-action="Editar" asp-route-id="@e.Id" class="btn btn-outline-secondary">Editar</a>
+                 <form asp-action="CambiarEstado" method="post" class="d-flex gap-2" >
+                    <input type="hidden" name="id" value="@e.Id" />
+                    @if(e.Estados==TipoEstado.Estados.Activo)
+                        {
+                            <button name="estado" value="Suspendido" class="btn btn-outline-warning">Suspender</button>
+                        }
+                        else
+                        {
+                            <button name="estado" value="Activo" class="btn btn-outline-success">Reactivar</button>
+                        }
+                    <button name="estado" value="Baja" class="btn btn-outline-danger" onclick="return confirm('¿Dar de baja a @e.Nombre? Esta acción no se puede deshacer.');">Dar de Baja</button>
+                </form>  
+            </div>
+        </div>
+    </div>
+}

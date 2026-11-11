@@ -14,5 +14,7 @@ namespace RecycleSmartBE
         public TipoEstado.Estados Estados{  get;set; }
         public int PlanId { get; set; } 
         public string PlanNombre { get; set; } = string.Empty;
+
+        public string? AdminNombre { get; set; } = string.Empty;
     }
 }

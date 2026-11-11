@@ -20,7 +20,8 @@ namespace RecycleSmartDAL
         {
             List<EmpresaLogistica> listado = new List<EmpresaLogistica>();
             using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("SELECT EmpresaLogistica.Id,EmpresaLogistica.Nombre,CUIT,Direccion,FechaRegistro,EmpresaLogistica.Estado,PlanId,Planes.Nombre as PlanNombre" +
+            using (var cmd = new SqlCommand("SELECT EmpresaLogistica.Id,EmpresaLogistica.Nombre,CUIT,Direccion,FechaRegistro,EmpresaLogistica.Estado,PlanId,Planes.Nombre as PlanNombre ," +
+                " (SELECT TOP 1 u.Nombre + ', ' + u.Apellido FROM UsuarioEmpresaLogistica u WHERE u.EmpresaLogisticaId = EmpresaLogistica.Id AND u.Rol = 'Administrador' AND u.Estado = 'Activo' ORDER BY u.Id) AS AdministradorNombre " +
                 " FROM EmpresaLogistica " +
                 " INNER JOIN Planes ON Planes.Id=Empresalogistica.PlanId ", con))
             {
@@ -39,6 +40,7 @@ namespace RecycleSmartDAL
                             Estados = Enum.Parse<TipoEstado.Estados>(leer.GetString(5), true),
                             PlanId = leer.GetInt32(6),
                             PlanNombre = leer.GetString(7),
+                            AdminNombre= leer.IsDBNull(leer.GetOrdinal("AdministradorNombre"))? null: leer.GetString(leer.GetOrdinal("AdministradorNombre")),
                         });
                     }
                 }
