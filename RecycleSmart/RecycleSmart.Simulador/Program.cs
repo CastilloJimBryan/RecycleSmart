@@ -6,15 +6,17 @@ using MQTTnet.Client;
 // ===== Configuración: poné tus MAC y una tarjeta asignada =====
 var sensores = new List<Sensor>
 {
-    new Sensor { Mac = "AA:BB:CC:DD:AA:12", Nivel = 10 },
-    new Sensor { Mac = "BB:CC:AA:01:00:DD", Nivel = 20 },
-    new Sensor { Mac = "DD:DD:AA:11:FF:EF", Nivel = 5 },
-    new Sensor { Mac = "FF:12:DD:A1:B2:EE", Nivel = 5 },
-    new Sensor { Mac = "FF:EE:AA:CC:21:11", Nivel = 2 },
+    new Sensor { Mac = "AA:BB:CC:DD:AA:12", Nivel = 10 }, //AC12F1B1kkk
+    new Sensor { Mac = "BB:CC:AA:01:00:DD", Nivel = 20 }, //12345678
+    new Sensor { Mac = "DD:DD:AA:11:FF:EF", Nivel = 5 },//2585268A
+    new Sensor { Mac = "FF:12:DD:A1:B2:EE", Nivel = 5 },//56489211
+    new Sensor { Mac = "FF:EE:AA:CC:21:11", Nivel = 2 },//58589211
+    new Sensor { Mac = "DD:DD:AA:11:FF:EE", Nivel = 2 },//2585268A
+
 
     // new Sensor { Mac = "AA:BB:CC:DD:AA:13", Nivel = 50 },
 };
-string[] tarjetas = { "12345678", "AC12F1B1", "56489211" };   // permitida, horario, vencida, desconocida
+string[] tarjetas = { "12345678", "AC12F1B1", "56489211", "2585268A", "58589211" };   // permitida, horario, vencida, desconocida
 int tarjetaActual = 0;
 //string uidTarjeta = "12345678";
 int segundosEntreLecturas = 5;
