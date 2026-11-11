@@ -61,7 +61,19 @@ namespace RecycleSmartBLL
             if (usuarioempresa.Estados == TipoEstado.Estados.Baja) { throw new Exception("El usuario se encuentra de baja y no se puede realizar cambios"); }
             return usuarioempresa;
         }
-
+        public bool tieneAdmin(int empresaid)
+        {
+            return _usuarioEmpresaLogisticaDAL.AdministradoresActivos(empresaid, 0) > 0;
+        }
+        public int CrarAdmin(UsuarioEmpresaLogistica ue,string?clave)
+        {
+            if(tieneAdmin(ue.EmpresaLogisticaId))
+            {
+                throw new Exception("Ya tiene un administrador Activo");
+            }
+            ue.Rol = Roles.Administrador;
+            return AgregarUsuarioEmpresa(ue, clave);
+        }
         public void ModificarUsuarioEmpresa(UsuarioEmpresaLogistica ue, int actualId)
         {
             var actual = ObtenerNoDadodeBaja(ue.Id, ue.EmpresaLogisticaId);

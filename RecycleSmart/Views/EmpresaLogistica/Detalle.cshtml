@@ -1,5 +1,21 @@
-﻿@model EmpresaLogistica
+﻿@model RecycleSmart.Models.EmpresaDetalleViewModel
 
 @{
+    var e = Model.Empresa;
+    var estado = e.Estados.ToString();
+    ViewData["Title"] = $"Empresa{e.Nombre}";
 
+    var usos = new[]
+    {
+        (Titulo:"Instituciones",Usado:Model.Uso?.Instituciones??0,Max:Model.Uso?.MaxInstituciones??0),
+        (Titulo:"Contenedores",Usado:Model.Uso?.Contenedores??0,Max:Model.Uso?.MaxContenedores??0),
+    };
 }
+<div>
+    <a>Volver al Listado</a>
+    <div>
+        <h2>@e.Nombre</h2>
+        <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
+    </div>
+</div>
+<partial name="_Mensajes"/>

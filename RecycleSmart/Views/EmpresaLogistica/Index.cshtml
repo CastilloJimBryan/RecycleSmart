@@ -28,7 +28,8 @@ else
                         <th>Fecha Registro</th>
                         <th>Plan</th>
                         <th>Estado</th>
-                        <th class="text-end">Accion</th>
+                        <th>Administrador</th>
+                        <th>Detalle</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,34 +45,11 @@ else
                             <td>
                                 <span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span>
                             </td>
-                            <td class="text-end">
-                                @if(estado!= "Baja")
-                                {
-                                    <a asp-action="Editar" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
-                                    <form asp-action="CambiarEstado" method="post" class="d-inline">
-
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        @if(estado=="Activo")
-                                            {
-                                               <button name="estado" value="Suspendido"
-                                                    class="btn btn-sm btn-outline-warning">Suspender
-                                               </button> 
-                                            }
-                                            else
-                                            {
-                                                <button name="estado" value="Activo"
-                                                    class="btn btn-sm btn-outline-success">Reactivar</button>
-                                            }
-                                        <button name="estado" value="Baja" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('¿Dar de baja a @item.Nombre? Esta acción no se puede deshacer.');">
-                                            Dar de baja
-                                        </button>
-                                     </form>
-                                }
-                                else
-                                {
-                                    <small class="text-muted">Sin acciones</small>
-                                }
+                            <td>
+                                sin admin
+                            </td>
+                            <td>
+                            <a asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-sm btn-theme-success">Ver</a>
                             </td>
                         </tr>
                     }
