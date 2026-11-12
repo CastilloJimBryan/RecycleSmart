@@ -34,12 +34,12 @@ else
     
     else
     {
-        <div class="d-flex justify-content-end mb-2 ">
+        <div class="d-flex mb-2 ">
             @if (User.TieneRol(Roles.Gestion))
             {
                 @if (puedegestionar)
                 {
-                    <a asp-action="RegistrarUsuario" asp-route-institucionid="@instiId" class="btn btn-success ">Registrar Usuario</a>
+                    <a asp-action="RegistrarUsuario" asp-route-institucionid="@instiId" class="btn btn-success btn-sm">Registrar Usuario</a>
                 }
             }
         </div>
