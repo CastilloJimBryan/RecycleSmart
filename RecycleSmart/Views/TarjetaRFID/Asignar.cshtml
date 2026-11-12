@@ -69,8 +69,8 @@
                 <div class="text-muted"> La Fecha de Vencimiento debe ser posterior a la fecha de hoy</div>
             </div>
                 <div class="d-flex mt-3 justify-content-between">
-                <button type="submit" disabled="@(contenedores.Count==0)" class="btn btn-success">Asignar</button>
-                <a asp-controller="UsuarioInstitucion" asp-action="Index" asp-route-institucionId="@usuario?.InstitucionId" class="btn btn-outline-danger">Cancelar</a>
+                <button type="submit" disabled="@(contenedores.Count == 0)" class="btn btn-success btn-sm"> <i class="bx bx-plus""></i> Asignar</button>
+                <a asp-controller="UsuarioInstitucion" asp-action="Index" asp-route-institucionId="@usuario?.InstitucionId" class="btn btn-outline-danger btn-sm"> <i class="bx bx-x"></i> Cancelar</a>
             </div>
         </form>
     </div>

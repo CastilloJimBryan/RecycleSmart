@@ -158,12 +158,12 @@
                                            <form asp-controller="Trazabilidad" asp-action="SolicitarRecoleccion" method="post" class="d-inline" onsubmit="this.querySelector('button').disabled=true;">
                                                 <input type="hidden" name="id" value="@lote.LoteId" />
                                                 <input type="hidden" name="observaciones" value="Solicitada desde el Dashboard por alerta de nivel"/>
-                                                <button type="submit" class="btn btn-outline-primary btn-sm">Solicitar Recoleccion</button>
+                                                <button type="submit" class="btn btn-outline-primary btn-sm"> <i class="bx bx-notification"></i> Solicitar Recoleccion</button>
                                            </form>
                                         }
                                         else if(lote.Estado==TipoEstado.EstadoLote.RecoleccionSolicitada)
                                         {
-                                            <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@lote.LoteId" class="btn btn-outline-dark btn-sm">Recoleccion Solicitada</a>
+                                            <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@lote.LoteId" class="btn btn-outline-dark btn-sm"> <i class="bx bx-message-edit"></i> Recoleccion Solicitada</a>
                                         }
                                     }
                                     @if(puedeGestionar&&items.EstadoAlerta==TipoEstado.EstadoAlerta.Activa)
@@ -171,21 +171,21 @@
                                         <form asp-controller="Alertas" asp-action="Tomar" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="@items.Id"/>
                                             <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                                            <button type="submit" class="btn btn-sm btn-theme-success">Tomar</button>
+                                            <button type="submit" class="btn btn-sm btn-theme-success"> <i class="bx bx-edit-alt"></i> Tomar</button>
                                         </form>
                                     }
                                     @if(puedeGestionar)
                                     {
-                                        <a asp-controller="Alertas" asp-action="Resolver" asp-route-id="@items.Id" class="btn btn-outline-success btn-sm">Resolver</a>
+                                        <a asp-controller="Alertas" asp-action="Resolver" asp-route-id="@items.Id" class="btn btn-outline-success btn-sm"> <i class="bx bx-note"></i> Resolver</a>
                                     }
                                     @if(items.TipoAlerta==TipoEstado.TipoAlerta.AccesoNoAutorizado && VerAcceso)
                                     {
                                 
-                                        <a asp-controller="Acceso" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-secondary btn-sm">Ver Accesos</a>
+                                        <a asp-controller="Acceso" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-secondary btn-sm"> <i class="bx bx-show"></i> Ver Accesos</a>
                                     }
                                     else if(items.TipoAlerta!=TipoEstado.TipoAlerta.AccesoNoAutorizado)
                                     {   
-                                        <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-dark btn-sm">Ver Contenedores</a>
+                                        <a asp-controller="Contenedor" asp-action="Index" asp-route-institucionid="@items.InstitucionId" class="btn btn-outline-dark btn-sm"> <i class="bx bx-show"></i> Ver Contenedores</a>
                                     }
                                 </div>
                             </div>
@@ -217,7 +217,7 @@
                         <span id="litros-pico"></span>
                         @if(User.TieneRol(Roles.Control))
                         {
-                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Acceso" asp-action="Index" asp-route-intitucionid="@Model.InstitucionId">Ver Log de Accesos</a>
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Acceso" asp-action="Index" asp-route-intitucionid="@Model.InstitucionId"> <i class="bx bx-show"></i> Ver Log de Accesos</a>
                         }
                     </div>
                 </div>

@@ -26,6 +26,25 @@
 
 <partial name="_Mensajes" />
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+    @if (User.IsInRole(Roles.Administrador))
+    {
+
+        if (limiteAlcanzado)
+        {
+            <button class="btn btn-success" disabled title="Alcanzó el límite de su plan">
+                <i class='bx bx-plus'></i> Registrar institución
+            </button>
+        }
+        else
+        {
+            <a asp-action="Registrar" class="btn btn-success btn-sm">
+                <i class='bx bx-plus'></i> Registrar institución
+            </a>
+        }
+    }
+</div>
+
 @if (Model.Count == 0)
 {
     <div class="alert alert-info">Todavía no hay instituciones registradas.</div>
@@ -79,22 +98,5 @@ else
         </div>
     </div>
 }
-<div class="d-flex justify-content-between align-items-center mt-3">
-    @if (User.IsInRole(Roles.Administrador))
-    {
 
-        if (limiteAlcanzado)
-        {
-            <button class="btn btn-success" disabled title="Alcanzó el límite de su plan">
-                <i class='bx bx-plus'></i> Registrar institución
-            </button>
-        }
-        else
-        {
-            <a asp-action="Registrar" class="btn btn-success">
-                Registrar institución
-            </a>
-        }
-    }
-</div>
 

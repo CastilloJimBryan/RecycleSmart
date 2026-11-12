@@ -83,11 +83,11 @@ else
             {
                 if (limiteAlcanzado)
                 {
-                    <button class="btn btn-success" disabled title="Alcanzo el Limite del Plan">Registrar Contenedor</button>
+                    <button class="btn btn-success btn-sm" disabled title="Alcanzo el Limite del Plan"><i class='bx bx-plus'></i> Registrar Contenedor</button>
                 }
                 else
                 {
-                    <a asp-controller="Contenedor" asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success">Registrar Contenedor</a>
+                    <a asp-controller="Contenedor" asp-action="Registrar" asp-route-institucionId="@instiId" class="btn btn-success btn-sm"><i class='bx bx-plus'></i> Registrar Contenedor</a>
                 }
             }
         </div>
@@ -134,7 +134,7 @@ else
                                     else if(PuedeGestionaar&&estado!="Baja")
                                     {
                                         <a class="btn btn-outline-dark btn-sm" asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@item.Id">
-                                            Vincular
+                                                <i class='bx bx-link-alt'></i> Vincular
                                         </a>
                                     }
                                     else

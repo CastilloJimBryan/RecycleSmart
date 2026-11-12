@@ -87,5 +87,10 @@ namespace RecycleSmart.Controllers
                 RedirectToAction("Index", "Dashboard"):
                 RedirectToAction("Index", "PanelCentral");
         }
+
+        public IActionResult RecuperarClave()
+        {
+            return View();
+        }
     }
 }

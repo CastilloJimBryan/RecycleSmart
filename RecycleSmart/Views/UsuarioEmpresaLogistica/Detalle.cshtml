@@ -10,8 +10,8 @@
 }
 
 <div>
-    <a asp-action="Index" class="btn btn-theme-success mb-3">
-        <i class="bx bx-arrow-back "></i>
+    <a asp-action="Index" class="btn btn-theme-success mb-3 btn-sm">
+        <i class="bx bx-arrow-from-right "></i>
         Volver al Listado
     </a>
 </div>
@@ -49,9 +49,8 @@
             }
             else
             {
-                <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-outline-dark">
-                    <i class="bx bx-edit"></i>  
-                    Editar
+                <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-outline-dark btn-sm">
+                <i class="bx bx-pencil"></i> Editar
                 </a>
                 @if(!esUsuarioActual)
                 {
@@ -59,15 +58,15 @@
                         <input  type="hidden" name="id" value="@Model.Id"/>
                             @if (estado == "Activo")
                             {
-                                <button name="estado" value="Suspendido" class="btn btn-outline-warning">Suspender</button>
+                                <button name="estado" value="Suspendido" class="btn btn-outline-warning btn-sm"><i class="bx bx-pause"></i> Suspender</button>
                             }
                             else
                             {
                                 <button name="estado" value="Activo" class="btn btn-outline-success">Reactivar</button>
                             }
-                               <button name="estado" value="Baja" class="btn btn-outline-danger" onclick="return confirm('¿Dar de baja a @Model.Nombre @Model.Apellido? Esta acción no se puede deshacer.');">
-                                Dar de Baja
-                                 </button>
+                               <button name="estado" value="Baja" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Dar de baja a @Model.Nombre @Model.Apellido? Esta acción no se puede deshacer.');">
+                               <i class="bx bx-x"></i> Dar de Baja
+                               </button>
                     </form>
                 }
             }

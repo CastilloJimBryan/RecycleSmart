@@ -28,8 +28,8 @@
 <partial name="_Mensajes" />
 
 <div class="mb-4">
-    <a   class="btn btn-theme-success" asp-action="Index" asp-route-institucionId="@c.InstitucionId">
-        <i class="bx bx-arrow-back btn-sm"></i> Volver al Listado
+    <a   class="btn btn-theme-success btn-sm" asp-action="Index" asp-route-institucionId="@c.InstitucionId">
+        <i class="bx bx-arrow-from-right btn-sm"></i> Volver al Listado
     </a>
 </div>
 <div class="card shadow-sm mb-3">
@@ -43,14 +43,14 @@
             @if (esAdmin && !DadodeBaja)
             {
                 <div class="d-flex gap-2">
-                    <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-outline-dark btn-sm">Editar</a>
+                    <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-sm btn-outline-dark "> <i class="bx bx-edit-alt"></i> Editar</a>
                     @if (tieneAlertas || tieneLotes)
                     {
-                        <button class="btn btn-outline-danger" disabled title="@(tieneAlertas?"Tiene Alertas abiertas":"Tiene Lotes sin Cerrar"):No se Puede Dar de Baja">Dar de baja</button>
+                        <button class="btn btn-outline-danger btn-sm" disabled title="@(tieneAlertas ? "Tiene Alertas abiertas" : "Tiene Lotes sin Cerrar"):No se Puede Dar de Baja"> <i class="bx bx-x"></i> Dar de Baja</button>
                     }
                     else
                     {
-                        <a asp-action="Baja" asp-route-id="@c.Id" class="btn btn-outline-danger btn-sm">Dar de baja</a>
+                        <a asp-action="Baja" asp-route-id="@c.Id" class="btn btn-outline-danger btn-sm"><i class="bx bx-x"></i> Dar de baja</a>
                     }
                 </div>
             }
@@ -104,7 +104,7 @@
                             <p class="text-muted small">Sin dispositivo vinculado.</p>
                             if (esAdmin && !DadodeBaja)  
                             {
-                                <a asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@c.Id" class="btn btn-outline-dark btn-sm">Vincular</a>
+                                <a asp-controller="DispositivoIoT" asp-action="RegistrarDispositivo" asp-route-contenedorId="@c.Id" class="btn btn-outline-dark btn-sm"> <i class="bx bx-link"></i> Vincular</a>
                             }
                         }
                         else
@@ -183,7 +183,7 @@
                         @if (User.TieneRol(Roles.Control) && !DadodeBaja)
                         {
                             <a asp-controller="Umbral" asp-action="RegistrarUmbral" asp-route-contenedorid="@c.Id" class="btn btn-outline-dark btn-sm">
-                                @(User.TieneRol(Roles.Gestion) ? (sinUmbral ? "Configurar" : "Editar") : "Ver")
+                                <i class="bx bx-pencil"></i> @(User.TieneRol(Roles.Gestion) ? (sinUmbral ? "Configurar" : "Editar") : "Ver")
                             </a>
                         }
                     </div>
@@ -212,7 +212,7 @@
                 </div>
                 @if (PuedeGestionar)
                 {
-                    <a asp-controller="Alerta" asp-action="Resolver" asp-route-id="@a.Id" class="btn btn-outline-success btn-sm">Resolver</a>
+                    <a asp-controller="Alerta" asp-action="Resolver" asp-route-id="@a.Id" class="btn btn-outline-success btn-sm"> <i class="bx bx-note"></i> Resolver</a>
                 }
             </div>
         }
@@ -239,7 +239,7 @@
                     <span class="badge @EstadosColor.EstadoBadge(item.EstadoLote.ToString())">@item.EstadoLote</span>
                     <span class="text-muted ms-1 small">Desde @item.FechaGeneracion.ToString("dd/MM/yyyy HH:mm") - @item.VolumenTotal.ToString("0.0") L</span>
                 </div>
-                <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-sm btn-theme-success">Ver Lote</a>
+                <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@item.Id" class="btn btn-sm btn-theme-success"> <i class="bx bx-show"></i> Ver Lote</a>
             </div>
         }
         @if(tieneLotes && User.IsInRole(Roles.Administrador))
