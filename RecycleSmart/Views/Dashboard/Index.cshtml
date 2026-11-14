@@ -287,7 +287,7 @@
             const resp = await fetch(`/Dashboard/Resumen?institucionId=${institucionId}`);
             if (!resp.ok) return;
             const r = await resp.json();
-            document.getElementById("kpi-criticos").textContent = r.contenedoresCriticos;
+            document.getElementById("kpi-criticos").textContent = r.contenedorCriticos;
             document.getElementById("kpi-alertas").textContent = r.alertasAbiertas;
             document.getElementById("kpi-offline").textContent = r.sensoresOffline;
             document.getElementById("kpi-acceso").textContent = r.accesosHoy;
@@ -424,7 +424,7 @@
         actualizarIndicador();
 
         conexionMonitoreo.on('NuevaLectura', () => {
-            ultimaLectura.textContent = 'Última lectura ' + new Date().toLocaleTimeString('es-AR');
+            ultimaLectura.textContent = 'Última lectura ' + new Date().toLocaleTimeString('es-AR',{hourCycle:'h23'});
         });
     </script>
 
