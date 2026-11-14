@@ -8,7 +8,7 @@ window.conexionMonitoreo = new signalR.HubConnectionBuilder()
 function esc(texto) {
     const d = document.createElement("div");
     d.textContent = texto ?? "";
-    return d.innerHTML;
+    return d.innerHTML; 
 }
 
 // Contador del sidebar
@@ -43,3 +43,5 @@ conexionMonitoreo.on("NuevaAlerta", a => {
 });
 
 conexionMonitoreo.start().catch(err => console.error("SignalR:", err));
+
+

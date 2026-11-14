@@ -3,13 +3,14 @@
 
 @{
     ViewData["Title"] = "Dashboard";
+  
     string posicion(DateTime f) => (f.TimeOfDay.TotalMinutes / 1440 * 100).ToString("0.##", CultureInfo.InvariantCulture);
 
     string textopropio(string t) => t switch
     {
-        "Critico" => "Critico",
+        "Crítico" => "Crítico",
         "Advertencia" => "Advertencia",
-        "SinConexion" => "Sin Conexion",
+        "SinConexión" => "Sin Conexión",
         _ => "Resuelta"
     };
 
@@ -36,10 +37,17 @@
 }
 
 <div id="dashboard" data-institucion="@Model.InstitucionId" data-abiertas="@Model.AlertasAbiertaXEmpresa">
-    <span class="text-capitalize text-muted">@hoy</span>
+    <div>
+    <span class="text-muted">@hoy</span>
+    </div>
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
-            <h2 class="mb-0">Dashboard</h2>
+            <h2 class="mb-0">Dashboard</h2> 
+            <span id="indicador-vivo" class="indicador-vivo conectando">
+                <span class="punto"></span>
+                <span class="texto">Conectando....</span>
+            </span>
+            <small id="ultima-actualizacion" class="text-muted">Esperando Lectura</small>
             <div class="d-flex flex-wrap align-items-center gap-3 small text-muted mt-1">
                 <span class="d-flex align-items-center gap-1">
                     <span class="progress" style="width:60px;height:6px">
@@ -58,7 +66,7 @@
         <form asp-action="Index" method="get">
             <label class="form-label small text-muted mb-1" for="institucionId">Institucion</label>
             <select class="form-select" id="institucionId" name="institucionId" onchange="this.form.submit()">
-                <option value="0">Todas Las Instituciones (@Model.InstitucionClientes.Count) </option>
+                <option value="0">Todas las instituciones (@Model.InstitucionClientes.Count) </option>
                 @foreach (var item in Model.InstitucionClientes)
                     {
                         <option value="@item.Id" selected="@(item.Id==Model.InstitucionId)">@item.Nombre</option>
@@ -218,6 +226,7 @@
                         @if(User.TieneRol(Roles.Control))
                         {
                             <a class="btn btn-sm btn-outline-secondary" asp-controller="Acceso" asp-action="Index" asp-route-intitucionid="@Model.InstitucionId"> <i class="bx bx-show"></i> Ver Log de Accesos</a>
+
                         }
                     </div>
                 </div>
@@ -385,5 +394,38 @@
         });
         // Al cargar, se muestra el último evento del día
         if (puntos.length > 0) detalle.textContent = puntos[puntos.length - 1].dataset.texto;
+
+
+    ///indicador vivo
+        const indicador = document.getElementById('indicador-vivo');
+        const ultimaLectura = document.getElementById('ultima-actualizacion');
+
+        function mostrarEstado(clase, texto) {
+            indicador.className = 'indicador-vivo ' + clase;
+            indicador.querySelector('.texto').textContent = texto;
+        }
+
+        function actualizarIndicador() {
+            switch (conexionMonitoreo.state) {
+                case signalR.HubConnectionState.Connected:
+                    mostrarEstado('vivo', 'En vivo'); break;
+                case signalR.HubConnectionState.Connecting:
+                case signalR.HubConnectionState.Reconnecting:
+                    mostrarEstado('conectando', 'Reconectando…'); break;
+                default:
+                    mostrarEstado('caido', 'Sin conexión');
+            }
+        }
+
+        conexionMonitoreo.onreconnecting(actualizarIndicador);
+        conexionMonitoreo.onreconnected(actualizarIndicador);
+        conexionMonitoreo.onclose(actualizarIndicador);
+        setInterval(actualizarIndicador, 2000); ///revision de estado
+        actualizarIndicador();
+
+        conexionMonitoreo.on('NuevaLectura', () => {
+            ultimaLectura.textContent = 'Última lectura ' + new Date().toLocaleTimeString('es-AR');
+        });
     </script>
+
 }

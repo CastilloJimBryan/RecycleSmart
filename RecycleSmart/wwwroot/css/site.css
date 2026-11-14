@@ -482,3 +482,55 @@ body {
         flex-shrink: 0;
     }
 }
+
+/*indicador*/
+
+.indicador-vivo {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .2rem .65rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+    .indicador-vivo .punto {
+        width: .55rem;
+        height: .55rem;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .indicador-vivo.vivo {
+        color: #146c43;
+        background: #d1e7dd;
+    }
+
+        .indicador-vivo.vivo .punto {
+            animation: latido 1.5s infinite;
+        }
+
+    .indicador-vivo.conectando {
+        color: #997404;
+        background: #fff3cd;
+    }
+
+    .indicador-vivo.caido {
+        color: #b02a37;
+        background: #f8d7da;
+    }
+
+@keyframes latido {
+    0% {
+        box-shadow: 0 0 0 0 rgba(25,135,84,.6);
+    }
+
+    70% {
+        box-shadow: 0 0 0 .45rem rgba(25,135,84,0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(25,135,84,0);
+    }
+}
