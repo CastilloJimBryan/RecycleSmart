@@ -38,16 +38,14 @@
 
 <div id="dashboard" data-institucion="@Model.InstitucionId" data-abiertas="@Model.AlertasAbiertaXEmpresa">
     <div>
-    <span class="text-muted">@hoy</span>
+        <span class="text-muted">@hoy</span>
+        <div class="d-flex justify-content-between">
+           
+        </div>
     </div>
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
             <h2 class="mb-0">Dashboard</h2> 
-            <span id="indicador-vivo" class="indicador-vivo conectando">
-                <span class="punto"></span>
-                <span class="texto">Conectando....</span>
-            </span>
-            <small id="ultima-actualizacion" class="text-muted">Esperando Lectura</small>
             <div class="d-flex flex-wrap align-items-center gap-3 small text-muted mt-1">
                 <span class="d-flex align-items-center gap-1">
                     <span class="progress" style="width:60px;height:6px">
@@ -62,6 +60,13 @@
                     @uso(p.Contenedores,p.MaxContenedores) Contenedores
                 </span>
             </div>
+        </div>
+        <div>
+            <span id="indicador-vivo" class="indicador-vivo conectando">
+                <span class="punto"></span>
+                <span class="texto">Conectando....</span>
+            </span>
+            <small id="ultima-actualizacion" class="text-muted">Esperando Lectura</small>
         </div>
         <form asp-action="Index" method="get">
             <label class="form-label small text-muted mb-1" for="institucionId">Institucion</label>
@@ -411,7 +416,7 @@
                     mostrarEstado('vivo', 'En vivo'); break;
                 case signalR.HubConnectionState.Connecting:
                 case signalR.HubConnectionState.Reconnecting:
-                    mostrarEstado('conectando', 'Reconectando…'); break;
+                    mostrarEstado('Conectando', 'Reconectando…'); break;
                 default:
                     mostrarEstado('caido', 'Sin conexión');
             }
