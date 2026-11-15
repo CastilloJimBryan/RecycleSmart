@@ -88,7 +88,7 @@
                                                 <div class="progress-bar @color" style="@($"width:{p.Porcentaje}%")"></div>
                                             </div>
                                             <div class="small @(p.Vencido?"text-danger fw-semibold":"text-muted")">
-                                                @p.Etapa: @(p.Vencido ? "Vencido el" : "Vence el")@p.Limite?.ToString("dd/MM HH:mm")
+                                                @p.Etapa: @(p.Vencido ? "Vencido el" : "Vence el") @p.Limite?.ToString("dd/MM HH:mm")
                                             </div>
                                         }
                                         else
