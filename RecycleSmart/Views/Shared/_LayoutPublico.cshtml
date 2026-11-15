@@ -1,7 +1,44 @@
-﻿<h2>soy un publico</h2>
+﻿@{
+    var controllerActual = ViewContext.RouteData.Values["Controller"]?.ToString();
+    bool enlogin = controllerActual == "Login";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
+    <title>@ViewData["Title"] - RecycleSmart</title>
+</head>
+<body class="d-flex flex-column min-vh-100">
 
-<div class="p-4">
-    <main>
+    <header class="topbar justify-content-between py-2">
+        <div class="sidebar-logo">
+        <a asp-controller="Home" asp-action="Index" class="text-white text-decoration-none fw-bold fs-5">
+            Recycle Smart
+            <p style="color:#85BC38";>IoT Compliance</p>
+        </a>
+        </div>
+        @if (!enlogin)
+        {
+            <a asp-controller="Login" asp-action="Index" class="btn btn-sm btn-light">
+                <i class="bx bx-log-in"></i> Ingresar
+            </a>
+        }
+    </header>
+
+    <main class="flex-grow-1 p-4">
         @RenderBody()
     </main>
-</div>
+
+    <footer class="footer small text-muted">
+        Recycle Smart © @DateTime.Now.Year
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

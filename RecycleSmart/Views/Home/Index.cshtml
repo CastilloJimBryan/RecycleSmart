@@ -1,8 +1,10 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
+    Layout = "_LayoutPublico";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center py-5">
+    <h1 class="fw-semibold">Recycle Smart</h1>
+    <p class="lead text-muted">Monitoreo IoT, control de accesos y trazabilidad de residuos patogénicos </p>
+    <a asp-controller="Login" asp-action="Index" class="btn btn-success">Ingresar a la plataforma</a>
 </div>
