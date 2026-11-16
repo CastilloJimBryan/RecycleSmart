@@ -72,7 +72,7 @@ namespace RecycleSmartBLL
         }
 
         // Qué plazo corre ahora y cuánto se consumió (para la barra)
-        public static (string Etapa, DateTime? Limite, int Porcentaje, bool Vencido) PlazoActual(Lote l)
+        public static (string Etapa, DateTime? Limite, int Porcentaje, bool Vencido) PlazoActual(Lote l,bool conTope=true)
         {
             DateTime desde, limite;
             string etapa;
@@ -86,7 +86,7 @@ namespace RecycleSmartBLL
             else if (l.EstadoLote == TipoEstado.EstadoLote.Recolectado && l.FechaLimiteTratamiento != null)
             {
                 etapa = "Tratamiento";
-                limite = l.FechaLimiteTratamiento.Value;
+                limite = l.FechaLimiteTratamiento.Value; 
                 desde = limite.AddHours(-HorasTratamiento);
             }
             else
@@ -96,7 +96,8 @@ namespace RecycleSmartBLL
 
             double total = (limite - desde).TotalMinutes;
             double usado = (DateTime.Now - desde).TotalMinutes;
-            int porcentaje = (int)Math.Clamp(usado / total * 100, 0, 100);
+            double valor=usado/total*100;
+            int porcentaje = (int)(conTope? Math.Clamp(valor,0,100): Math.Max(valor,0));
             return (etapa, limite, porcentaje, DateTime.Now > limite);
         }
 

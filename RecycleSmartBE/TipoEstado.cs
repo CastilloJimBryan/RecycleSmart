@@ -24,5 +24,7 @@
 
         public enum TipoHito { Generacion,SolicitudRecoleccion,Recoleccion,Tratamiento,DisposicionFinal}
         public enum MetodoTratamiento { Autoclave,Incineracion,Microondas,Otro}
+
+        public enum EstadoPlazo { EnPlazo,Atencion,PorVencer,Vencido}
     }
 }

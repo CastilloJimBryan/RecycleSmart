@@ -1,0 +1,229 @@
+﻿@model RecycleSmart.Models.ComplianceViewModel
+
+@{
+    ViewData["Title"] = "Compliance";
+    string textoPlazo(TipoEstado.EstadoPlazo p) => p switch
+    {
+        TipoEstado.EstadoPlazo.EnPlazo => "En Plazo",
+        TipoEstado.EstadoPlazo.Atencion => "Atencion",
+        TipoEstado.EstadoPlazo.PorVencer => "Por Vencer",
+        _ => "Vencido",
+    };
+
+
+
+    string colorCumplimiento = Model.PorcentajeCumplimiento >= 95 ? "text-success" : Model.PorcentajeCumplimiento >= 80 ? "text-warning" : "text-dark";
+}
+    <style>
+        .bg-vencido {
+            background-color: #6a1b1a !important;
+            color: #fff;
+        }
+
+        .kpi-compliance {
+            border-top-width: 4px !important;
+        }
+    </style>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+        <div>
+            <h2 class="mb-0">Compliance</h2>
+            <div class="text-muted small">Cumplimiento de los plazos legales de cada lote</div>
+        </div>
+        <form asp-action="Index" method="get" class="d-flex flex-wrap gap-2">
+            <div>
+                <label class="form-label small text-muted mb-1" for="institucionid">Instituciones</label>
+                <select class="form-select" id="institucionid" name="institucionid" onchange="this.form.submit()">
+                    <option value="0">Todas las Instituciones</option>
+                    @foreach (var item in Model.ListadoInstituciones)
+                        {
+                            <option value="@item.Id" selected="@(item.Id==Model.InstitucionId)">@item.Nombre</option>
+                        }
+                </select>
+            </div>
+            <div>
+                <label class="form-label small text-muted mb-1" for="dias">Periodo</label>
+                <select class="form-select" id="dias" name="dias" onchange="this.form.submit()">
+                    <option value="0" selected="@(Model.Dias==0)">Todo</option>
+                    <option value="30" selected="@(Model.Dias==30)" >Ultimo 30 dias</option>
+                    <option value="90" selected="@(Model.Dias==90)" >Ultimo 90 dias</option>
+                    <option value="365" selected="@(Model.Dias == 365)">Ultimo Año</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge rounded-pill bg-success px-3 py-2">Ley 24.051</span>
+        <span class="badge rounded-pill text-bg-light border px-3 py-2 text-muted">Res. 349/94</span>
+        <span class="badge rounded-pill text-bg-light border px-3 py-2 text-muted">OPDS</span>
+        <span class="badge rounded-pill text-bg-light border px-3 py-2 text-muted">ISO 14001</span>
+    </div>
+
+    <ul class="nav nav-pills mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="btn-panel" data-bs-toggle="pill" data-bs-target="#tab-panel" type="button" role="tab" >Panel de Compliance</button>
+            </li>
+            <li class="nav-item" role="presentation">
+            <button class="nav-link" id="btn-kpis" data-bs-toggle="pill" data-bs-target="#tab-kpis" type="button" role="tab">KPIs de Cumplimiento</button>
+            </li>
+            <li class="nav-item" role="presentation">
+            <button class="nav-link" id="btn-resumen" data-bs-toggle="pill" data-bs-target="#tab-resumen" type="button" role="tab">Resumen Global</button>
+            </li>
+        </ul>
+     <div class="tab-content">
+        <div class="tab-pane fade show active" id="tab-panel" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @if(Model.LotesAbiertos.Count==0)
+                    {
+                        <div class="text-muted text-center py-3">No hay lotes con plazos en Curso</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Lote</th>
+                                        <th>Institucion</th>
+                                        <th>Contenedor</th>
+                                        <th>Plazo Controlado</th>
+                                        <th>Vence</th>
+                                        <th>% del Plazo</th>
+                                        <th>Estado</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.LotesAbiertos)
+                                    {
+                                        <tr class="@(item.EstadoPlazo==TipoEstado.EstadoPlazo.Vencido ? "table-danger":"")">
+                                            <td class="text-nowrap"><code>@item.Codigo</code></td>
+                                            <td>@item.InstitucionNombre</td>
+                                            <td>@item.ContenedorNombre</td>
+                                            <td>@item.EtapaControlada</td>
+                                            <td class="text-nowrap">@item.FechaLimite.ToString("dd/MM HH:mm")</td>
+                                            <td style="min-width:140px">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1 " style="height:8px">
+                                                        <div class="progress-bar @EstadosColor.EstadoBadge(item.EstadoPlazo.ToString())" style="@($"width:{Math.Min(100,item.PorcentajePlazo)}%")"></div>
+                                                    </div>
+                                                    <span class="fw-semibold">@item.PorcentajePlazo%</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge @EstadosColor.EstadoBadge(item.EstadoPlazo.ToString())">@textoPlazo(item.EstadoPlazo)</span>
+                                            </td>
+                                            <td>
+                                                <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@item.LoteId" class="btn btn-theme-success btn-sm"> <i class="bx bx-show"></i> Ver Lote</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+       </div>
+    
+
+     <div class="tab-pane fade" id="tab-kpis" role="tabpanel">
+        <div class="row row-cols-2 row-cols-lg-4 g-3 mb-3">
+            <div class="col">
+                <div class="card h-100 shadow-sm kpi-compliance border-success text-center">
+                    <div class="card-body">
+                        <div class="fs-1 fw-semibold text-success">@Model.EnPlazo</div>
+                        <div class="text-muted">En Plazo</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm kpi-compliance border-warning text-center">
+                    <div class="card-body">
+                        <div class="fs-1 fw-semibold">@Model.Atencion</div>
+                        <div class="text-muted" >Atencion</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 shadow-sm kpi-compliance border-danger text-center">
+                    <div class="card-body">
+                        <div class="fs-1 fw-semibold text-danger">@Model.PorVencer</div>
+                        <div class="text-muted">Por Vencer</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                    <div class="card h-100 shadow-sm kpi-compliance text-center" style="border-color:#6a1b1a">
+                    <div class="card-body">
+                            <div class="fs-1 fw-semibold" style="color:#6a1b1a">@Model.Vencido</div>
+                        <div class="text-muted">Vencido</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-muted small mb-2">
+            En Plazo: menos del 75% del tiempo usado - Atencion 75% a 90% - Por vencer : mas del 90% - Vencido : Paso la fecha limite.
+        </div>
+        @if(Model.Vencido>0)
+        {
+            <button type="button" class="btn btn-outline-dark btn-sm" onclick="bootstrap.Tab.getOrCreateInstance(document.getElementById('btn-panel')).show()">
+                Ver Lotes Vencidos
+            </button>
+        }
+    </div>
+
+    <div class="tab-pane fade" id="tab-resumen" role="tabpanel">
+        <div class=" row g-3">
+            <div class="col-lg-4">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Cumplimiento en el Periodo</div>
+                            @if(Model.Cerrado==0)
+                            {
+                                <div class="fs-5 text-muted py-4 ">Sin lotes cerrados en el periodo</div>
+                            }
+                            else
+                            {
+                                <div class="display-4 fw-semibold @colorCumplimiento">@Model.PorcentajeCumplimiento%</div>
+                                <div class="text-muted small mb-3">@Model.Conforme de @Model.Cerrado lotes cerrados conforme</div>
+                            }
+                            <button type="button" class="btn btn-success" disabled title="EnProceso">Generar Reporte de Auditoria</button>
+                    </div>
+                </div>
+            </div>
+              <div class="col-lg-8">
+
+                @foreach (var insti in Model.InstitucionesEnRiesgo)
+                {
+                    <div class="alert alert-warning py-2"><strong>@insti</strong> Supero el 20% del lotes no conformes en el periodo . se recomienda generar reporte de auditoria</div>
+                }
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="text-uppercase text-muted small fw-semibold mb-3">Lotes No Conforme</h5>
+                        @if(Model.NoConforme.Count==0)
+                        {
+                            <div class="text-success fw-semibold">No hay lotes No Conforme en este periodo</div>
+                        }
+                        @foreach (var item in Model.NoConforme)
+                        {
+                            <div class="border rounded p-3 mb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong><code>@item.Codigo</code>. No Conforme</strong>
+                                    <a asp-controller="Trazabilidad" asp-action="Detalle" asp-route-id="@item.LoteId" class="btn btn-theme-success btn-sm"><i class="bx bx-show"></i> Ver Lote</a>
+                                </div>
+                                <div class="d-flex justify-content-between small"><span class="text-muted">Institucion</span> <span>@item.InstitucionNombre</span></div>
+                                <div class="d-flex justify-content-between small"><span class="text-muted">Etapa Vencida</span> <span>@item.HitoVencido</span></div>
+                            <div class="d-flex justify-content-between small"><span class="text-muted">Dias de Excedencia</span><span class="text-danger fw-semibold">@item.DiasExcedidos @(item.DiasExcedidos==1?"Dia":"Dias")</span> </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+             </div>
+
+        </div>
+    </div>
+    </div>
+
