@@ -551,3 +551,7 @@ body {
         background-color: #198754;
         color: #fff;
     }
+
+.bg-dark-red {
+    background-color: #8b0000 !important;
+}   

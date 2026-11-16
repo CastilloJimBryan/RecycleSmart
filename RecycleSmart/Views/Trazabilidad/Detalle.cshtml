@@ -34,13 +34,14 @@
 <partial name="_Mensajes"/>
 
 <div>
-    <a asp-action="Index" class ="btn btn-theme-success btn-sm mb-2">Volver</a>
+    <a asp-action="Index" class="btn btn-theme-success btn-sm mb-2"> <i class="bx bx-arrow-from-right"></i> Volver</a>
 </div>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-3 justify-content-sm-between">
-    <h2 class="fs-4 mb-0"><code class="fs-4">@Model.Codigo</code></h2>
-    <span class="badge @colorestado">@Model.EstadoLote</span>
+    <div class="d-flex align-items-center gap-2  justify-content-between">
+        <h2 class="fs-4 mb-0"><code class="fs-4">@Model.Codigo</code></h2>
+        <span class="badge @colorestado">@Model.EstadoLote</span>
+    </div>
     <div>
-
         @if (User.TieneRol(Roles.Control))
         {
                 <a asp-controller="Compliance" asp-action="Index" asp-route-institucionid="@Model.InstitucionId" class="btn btn-outline-dark btn-sm"> <i class="bx bx-show"></i> Ver Compliance</a>

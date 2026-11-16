@@ -11,9 +11,11 @@
                 "Suspendido" or "Offline" or "Tratado" => "bg-secondary",
                 "RecoleccionSolicitada" => "bg-info text-dark",
                 "EnCurso"=>"bg-primary",
-                "Error" or "Denegado" or "NoConforme" or "Vencida" or "Baja" or"PorVencer" or "Vencido"=> "bg-danger",
+                "Error" or "Denegado" or "NoConforme" or "Vencida" or "Baja" or"PorVencer" => "bg-danger",
+                "Vencido"=> "bg-dark-red text-white",
                 _ => "bg-light text-dark"
             };
         }
+
     }
 }

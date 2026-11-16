@@ -1,5 +1,133 @@
-﻿
+﻿@model RecycleSmart.Models.PanelCentralViewModel
 @{
-    ViewData["Title"] = "Panel Central";
+    ViewData["Title"] = "Panel central";
+    var hoy = DateTime.Now.ToString("dddd d 'de' MMMM", new System.Globalization.CultureInfo("es-AR"));
+    hoy = char.ToUpper(hoy[0]) + hoy.Substring(1);
+    int maxPlan = Model.PorPlan.Count == 0 ? 1 : Model.PorPlan.Max(p => p.Cantidad);
 }
-<h2>Soy el Panel Central</h2>
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <div class="text-muted">@hoy</div>
+        <h2 class="mb-0">Panel central</h2>
+    </div>
+    <a asp-controller="EmpresaLogistica" asp-action="Registrar" class="btn btn-success btn-sm"><i class="bx bx-plus"></i> Registrar nueva empresa</a>
+</div>
+
+<!-- Indicadores -->
+<div class="row row-cols-2 row-cols-lg-5 g-3 mb-4">
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-success)">
+            <div class="card-body"><div class="fs-2 fw-semibold">@Model.EmpresasActivas</div><div class="text-muted small">Empresas activas</div></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-warning)">
+            <div class="card-body"><div class="fs-2 fw-semibold">@Model.EmpresasSuspendidas</div><div class="text-muted small">Empresas suspendidas</div></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-primary)">
+            <div class="card-body"><div class="fs-2 fw-semibold">@Model.Instituciones</div><div class="text-muted small">Instituciones cliente</div></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-secondary)">
+            <div class="card-body"><div class="fs-2 fw-semibold">@Model.Contenedores</div><div class="text-muted small">Contenedores activos</div></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-danger)">
+            <div class="card-body"><div class="fs-2 fw-semibold text-danger">@Model.AlertasCriticas</div><div class="text-muted small">Alertas críticas abiertas</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Empresas y uso del plan -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="text-uppercase text-muted small fw-semibold mb-3">Empresas y uso del plan</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr><th>Empresa</th><th>Plan</th><th>Instituciones</th><th>Contenedores</th><th>Estado</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var e in Model.Empresas)
+                            {
+                                var estado = e.Estado.ToString();
+                                string colorBarra = e.PorcentajeContenedores >= 90 ? "bg-danger" : e.PorcentajeContenedores >= 70 ? "bg-warning" : "bg-success";
+                                <tr>
+                                    <td class="fw-semibold">@e.Nombre</td>
+                                    <td>@e.NombrePlan</td>
+                                    <td class="text-nowrap">@e.Instituciones / @(e.MaxInstituciones == 0 ? "ilimitado" : e.MaxInstituciones.ToString())</td>
+                                    <td style="min-width:150px">
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if (e.MaxContenedores > 0)
+                                            {
+                                                <div class="progress flex-grow-1" style="height:8px">
+                                                    <div class="progress-bar @colorBarra" style="@($"width:{e.PorcentajeContenedores}%")"></div>
+                                                </div>
+                                            }
+                                            <span class="small text-nowrap">@e.Contenedores / @(e.MaxContenedores == 0 ? "ilimitado" : e.MaxContenedores.ToString())</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span></td>
+                                    <td><a asp-controller="EmpresaLogistica" asp-action="Detalle" asp-route-id="@e.Id" class="btn btn-theme-success btn-sm"><i class="bx bx-show"></i> Ver detalle</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 d-flex flex-column gap-3">
+        <!-- Requieren atención -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="text-uppercase text-muted small fw-semibold mb-3">Requieren atención</h5>
+                @if (Model.SinAdministrador.Count == 0 && Model.CercaDelLimite.Count == 0)
+                {
+                    <div class="text-success fw-semibold">Todo en orden.</div>
+                }
+                @foreach (var e in Model.SinAdministrador)
+                {
+                    <div class="alert alert-warning py-2 mb-2">
+                        <div class="fw-semibold">@e.Nombre</div>
+                        <div class="small">Sin administrador: nadie de la empresa puede ingresar.</div>
+                        <a asp-controller="EmpresaLogistica" asp-action="CrearAdministrador" asp-route-id="@e.Id" class="small fw-semibold btn btn-sm btn-outline-dark">Crear administrador</a>
+                    </div>
+                }
+                @foreach (var e in Model.CercaDelLimite)
+                {
+                    <div class="alert alert-warning py-2 mb-2">
+                        <div class="fw-semibold">@e.Nombre</div>
+                        <div class="small">Está cerca del límite de su plan @e.NombrePlan.</div>
+                        <a asp-controller="EmpresaLogistica" asp-action="Detalle" asp-route-id="@e.Id" class="small fw-semibold btn btn-sm btn-outline-secondary"> <i class="bx bx-show"></i> Ver detalle</a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Empresas por plan -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="text-uppercase text-muted small fw-semibold mb-3">Empresas por plan</h5>
+                @foreach (var p in Model.PorPlan)
+                {
+                    <div class="d-flex align-items-center gap-2 mb-2 small">
+                        <span style="width:90px">@p.Plan</span>
+                        <div class="progress flex-grow-1" style="height:10px">
+                            <div class="progress-bar bg-success" style="@($"width:{p.Cantidad * 100 / maxPlan}%")"></div>
+                        </div>
+                        <span class="fw-semibold" style="width:20px;text-align:right">@p.Cantidad</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

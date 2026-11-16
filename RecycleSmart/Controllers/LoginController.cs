@@ -48,8 +48,7 @@ namespace RecycleSmart.Controllers
                 if(resultado?.usuarioRecycleSmart is UsuarioRecycleSmart usuarioRecycleSmart)
                 {
                     await ManejosSesiones.IniciarSesionRecycleSmart(HttpContext, usuarioRecycleSmart);
-                    //return Volver(returnUrl, "PanelCentral");
-                    return Volver(returnUrl, "EmpresaLogistica");
+                    return Volver(returnUrl, "PanelCentral");
                 }
 
                 ModelState.AddModelError("", "Error con el Usuario o Clave");

@@ -25,8 +25,8 @@
             <aside id="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-logo">
-                        @*<a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica?"Dashboard":"PanelCentral")" asp-action="Index">Recycle Smart</a>*@
-                        <a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica?"Dashboard":"EmpresaLogistica")" asp-action="Index">Recycle Smart</a>
+                       <a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica?"Dashboard":"PanelCentral")" asp-action="Index">Recycle Smart</a>
+                        @* <a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica?"Dashboard":"EmpresaLogistica")" asp-action="Index">Recycle Smart</a>*@
                         <p style="color: #85BC38;">IoT Compliance</p>
                     </div>
                     <button class="toggle-btn border-0" type="button">
@@ -167,12 +167,12 @@
                     }
                     else
                     {
-                       @* <li class="sidebar-item">
+                        <li class="sidebar-item">
                             <a asp-controller="PanelCentral" asp-action="Index" class="sidebar-link @Activo("PanelCentral")">
                                 <i class='bx bxs-dashboard'>
                                 </i><span>Panel Central</span>
                             </a>
-                        </li>*@
+                        </li>
                         <li class="sidebar-item">
                             <a asp-controller="EmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("EmpresaLogistica")">
                                 <i class='bx bxs-truck'>
