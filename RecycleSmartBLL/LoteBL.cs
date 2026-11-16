@@ -55,6 +55,19 @@ namespace RecycleSmartBLL
                 return (false, $"El sello de cierre del lote no coincide con sus hitos");
 
             }
+            var generacion = lote.Hitos.FirstOrDefault(h => h.TipoHito == TipoEstado.TipoHito.Generacion);
+            if(generacion!=null && Integridad.Truncar(lote.FechaGeneracion) != Integridad.Truncar(generacion.Fecha))
+            {
+                return (false, "La Fecha de Generacion del Lote no coincide con su hio de generacion");
+            }
+            if(lote.EstadoLote==TipoEstado.EstadoLote.Cerrado)
+            {
+                bool conformeReal = !lote.Hitos.Any(h => h.DentroDelPlazo == false);
+                if(lote.Conforme!=conformeReal)
+                {
+                    return (false, "El resultado de conformidad no coincide con los plazos registrados en sus hitos");
+                }
+            }
             return (true, $"Integro: se verificaroon {lote.Hitos.Count} hitos y la cadena esta completa");
         }
 
