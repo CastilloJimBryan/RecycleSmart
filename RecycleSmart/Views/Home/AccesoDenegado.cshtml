@@ -1,11 +1,13 @@
 ﻿@{
     ViewData["Title"] = "Acceso Denegado";
     Layout = "_Layout";
+    var tipoCuenta = Servicio.ManejosSesiones.ObtenerTipoCuenta(User);
 }
 
 <div class="text-center py-5">
-    <h2>No tenés permiso para esta sección</h2>
-    <p class="text-muted">Tu rol no permite acceder a esta pantalla. Si creés que es un error, consultá con el administrador de tu empresa.</p>
+    <h2>No Tiene permiso para esta sección</h2>
+    <p class="text-muted">Consulte al administrador</p>
     <button type="button" class="btn btn-outline-dark" onclick="history.back()">Volver</button>
-    <a class="btn btn-success" asp-controller="Dashboard" asp-action="Index">Volver al inicio</a>
+    <a a class="btn btn-success" asp-controller="@(tipoCuenta==TipoDeCuenta.EmpresaLogistica?"Dashboard":"PanelCentral")" asp-action="Index">Volver al inicio</a>
+    @*<a asp-controller="@(tipoCuenta == TipoDeCuenta.EmpresaLogistica ? "Dashboard" : "PanelCentral")" asp-action="Index">Volver al Inicio</a>*@
 </div>

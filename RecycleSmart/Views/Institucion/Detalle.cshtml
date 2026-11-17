@@ -53,20 +53,20 @@
                 @if (estado == "Activo")
                 {
                     <button name="estado" value="Suspendido" class="btn btn-outline-warning">
-                        <i class='bx bx-pause-circle'></i> Suspender
+                        <i class='bx bx-pause'></i> Suspender
                     </button>
                 }
                 else
                 {
                     <button name="estado" value="Activo" class="btn btn-outline-success">
-                        <i class='bx bx-play-circle'></i> Reactivar
+                        <i class='bx bx-play'></i> Reactivar
                     </button>
                 }
 
             </form>
                 <button name="estado" value="Baja" class="btn btn-outline-danger"
                         onclick="return confirm('¿Dar de baja a @Model.Nombre? Esta acción no se puede deshacer.');">
-                    <i class='bx bx-trash'></i> Dar de baja
+                    <i class='bx bx-x'></i> Dar de baja
                 </button>
         }
     </div>

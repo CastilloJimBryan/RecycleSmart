@@ -62,7 +62,9 @@
                             }
                             else
                             {
-                                <button name="estado" value="Activo" class="btn btn-outline-success">Reactivar</button>
+                            <button name="estado" value="Activo" class="btn btn-outline-success btn-sm">
+                            <i class="bx bx-play"></i> Reactivar
+                            </button>
                             }
                                <button name="estado" value="Baja" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Dar de baja a @Model.Nombre @Model.Apellido? Esta acción no se puede deshacer.');">
                                <i class="bx bx-x"></i> Dar de Baja

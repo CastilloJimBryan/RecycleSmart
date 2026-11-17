@@ -1,6 +1,6 @@
 ﻿@model RecycleSmart.Models.PanelCentralViewModel
 @{
-    ViewData["Title"] = "Panel central";
+    ViewData["Title"] = "Panel Central";
     var hoy = DateTime.Now.ToString("dddd d 'de' MMMM", new System.Globalization.CultureInfo("es-AR"));
     hoy = char.ToUpper(hoy[0]) + hoy.Substring(1);
     int maxPlan = Model.PorPlan.Count == 0 ? 1 : Model.PorPlan.Max(p => p.Cantidad);
@@ -9,7 +9,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
     <div>
         <div class="text-muted">@hoy</div>
-        <h2 class="mb-0">Panel central</h2>
+        <h2 class="mb-0">Panel Central</h2>
     </div>
     <a asp-controller="EmpresaLogistica" asp-action="Registrar" class="btn btn-success btn-sm"><i class="bx bx-plus"></i> Registrar nueva empresa</a>
 </div>
@@ -45,13 +45,13 @@
 
 <div class="row g-3">
     <!-- Empresas y uso del plan -->
-    <div class="col-lg-8">
+    <div class="col-lg-9">
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <h5 class="text-uppercase text-muted small fw-semibold mb-3">Empresas y uso del plan</h5>
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead>
+                    <table class="table table-striped align-middle mb-0">
+                        <thead class="table-success">
                             <tr><th>Empresa</th><th>Plan</th><th>Instituciones</th><th>Contenedores</th><th>Estado</th><th></th></tr>
                         </thead>
                         <tbody>
@@ -75,7 +75,9 @@
                                         </div>
                                     </td>
                                     <td><span class="badge @EstadosColor.EstadoBadge(estado)">@estado</span></td>
-                                    <td><a asp-controller="EmpresaLogistica" asp-action="Detalle" asp-route-id="@e.Id" class="btn btn-theme-success btn-sm"><i class="bx bx-show"></i> Ver detalle</a></td>
+                                    <td>
+                                        <a asp-controller="EmpresaLogistica" asp-action="Detalle" asp-route-id="@e.Id" class="btn btn-theme-success btn-sm"><i class="bx bx-show"></i> Ver Detalle</a>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -85,7 +87,7 @@
         </div>
     </div>
 
-    <div class="col-lg-4 d-flex flex-column gap-3">
+    <div class="col-lg-3 d-flex flex-column gap-3">
         <!-- Requieren atención -->
         <div class="card shadow-sm">
             <div class="card-body">
