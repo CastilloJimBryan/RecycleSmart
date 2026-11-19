@@ -209,5 +209,38 @@ namespace RecycleSmartDAL
             }
             return lista;
         }
+
+        public List<DispositivoConProblemas>ListadoDispositivoOfflinexEmpresa(int empresaId)
+        {
+            List<DispositivoConProblemas> listar = new List<DispositivoConProblemas>();
+            using (var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand(" SELECT DispositivoIoT.Id ,DispositivoIoT.MacAddress , Contenedor.Nombre AS ContenedorNombre , InstitucionCliente.Nombre As InstitucionNombre, " +
+                " (SELECT MAX(Telemetria.FechaHora) FROM Telemetria WHERE Telemetria.ContenedorId=Contenedor.Id) AS UltimaLectura " +
+                " FROM DispositivoIoT" +
+                " INNER JOIN Contenedor ON Contenedor.Id=DispositivoIoT.ContenedorId" +
+                " INNER JOIN InstitucionCliente ON InstitucionCliente.Id=Contenedor.InstitucionId" +
+                " WHERE InstitucionCliente.EmpresaLogisticaId=@EmpresaId AND DispositivoIoT.EstadoDispositivo='offline' AND Contenedor.Estado<>'Baja' ORDER BY UltimaLectura ", con))
+            {
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
+
+                con.Open();
+
+                using (var leer = cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                    {
+                        listar.Add(new DispositivoConProblemas { 
+                           Id=leer.GetInt32(leer.GetOrdinal("Id")),
+                           MacAddress=leer.GetString(leer.GetOrdinal("MacAddress")),
+                           ContenedorNombre=leer.GetString(leer.GetOrdinal("ContenedorNombre")),
+                           InstitucionNombre=leer.GetString(leer.GetOrdinal("InstitucionNombre")),
+                           UltimaLectura=leer.IsDBNull(leer.GetOrdinal("UltimaLectura"))?null:leer.GetDateTime(leer.GetOrdinal("UltimaLectura"))
+
+                        });
+                    }
+                }
+            }
+            return listar;
+        }
     }
 }

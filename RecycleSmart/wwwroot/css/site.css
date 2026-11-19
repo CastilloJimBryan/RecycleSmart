@@ -96,7 +96,7 @@ html {
     --color-sidebar: #1e3d1f;
     --color-sidebar-texto: #ffffff;
     --color-acento: #85BC38;
-    --ancho-sidebar: 260px;
+    --ancho-sidebar: 280px;
 }
 
 @media (min-width: 768px) {

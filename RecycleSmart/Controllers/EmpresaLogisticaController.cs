@@ -21,6 +21,7 @@ namespace RecycleSmart.Controllers
         private readonly ContenedorBL _contenedorBL;
         private readonly InstitucionClienteBLL _institucionclienteBL;
         private readonly PlanDAL _planBLL;
+        private readonly DispositivoIoTBL _dispositivoIoTBL;
 
         public EmpresaLogisticaController(IConfiguration configuracion)
         {
@@ -29,6 +30,7 @@ namespace RecycleSmart.Controllers
             _planBLL = new PlanDAL(conectar);
             _usuarioempresaLogisticabl = new UsuarioEmpresaLogisticaBL(conectar);
             _contenedorBL = new ContenedorBL(conectar);
+            _dispositivoIoTBL=new DispositivoIoTBL(conectar);
             _institucionclienteBL = new InstitucionClienteBLL(conectar);
         }
 
@@ -142,6 +144,7 @@ namespace RecycleSmart.Controllers
                 Empresa = empresa,
                 Usuarios = _usuarioempresaLogisticabl.ListarUsuarioxEmpresa(id),
                 TieneAdministrador = _usuarioempresaLogisticabl.tieneAdmin(id),
+                DispositivosOffline=_dispositivoIoTBL.ListarDispositivoProblemas(id),
                 Uso = new UsoPlan
                 {
                     PlanNombre = empresa.PlanNombre,

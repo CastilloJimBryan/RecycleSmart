@@ -15,9 +15,11 @@
 </head>
 <body>
     @{
-        var tipoCuenta = Servicio.ManejosSesiones.ObtenerTipoCuenta(User);
-        var controllerActual = ViewContext.RouteData.Values["Controller"]?.ToString();
-        string Activo(string c) => controllerActual == c ? "activo" : "";
+            var tipoCuenta = Servicio.ManejosSesiones.ObtenerTipoCuenta(User);
+            var controllerActual = ViewContext.RouteData.Values["Controller"]?.ToString();
+            var accionActual = ViewContext.RouteData.Values["Action"]?.ToString();
+            string ActivoAccion(string c, string a) => controllerActual == c && accionActual == a ? "activo" : "";
+            string Activo(string c) => controllerActual == c ? "activo" : "";
     } 
     <div class="wrapper">
         @if (User.Identity?.IsAuthenticated == true)
@@ -36,7 +38,10 @@
                 <ul class="sidebar-nav">
                     @if (tipoCuenta==TipoDeCuenta.EmpresaLogistica)
                     {
-
+                        bool enUsuarioEmpresaLogistica = controllerActual == "UsuarioEmpresaLogistica";
+                        bool enSuscripcion = controllerActual == "Suscripcion";
+                        bool enUsuarioInstitucion = controllerActual == "UsuarioInstitucion";
+                        bool enlogAcceso = controllerActual == "Acceso";
                         <li class="sidebar-item">
                             <a asp-controller="Dashboard" asp-action="Index" class="sidebar-link @Activo("Dashboard")">
                                 <i class='bx bxs-dashboard'></i>
@@ -45,13 +50,13 @@
                         </li>
                         @if(esAdmin)
                         {
-                                
+                      
                             <li class="sidebar-item">
-                                <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#miempresa" aria-expanded="false" aria-controls="miempresa">
+                                <a href="#" class="sidebar-link collapsed has-dropdown" @(enUsuarioEmpresaLogistica || enSuscripcion ? "":"collapsed") data-bs-toggle="collapse" data-bs-target="#miempresa" aria-expanded="@(enUsuarioEmpresaLogistica || enSuscripcion ?"true":"false")" aria-controls="miempresa">
                                     <i class='bx bx-building-house'></i>
                                     <span>Mi Empresa</span>
                                 </a>
-                            <ul id="miempresa" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <ul id="miempresa" class="sidebar-dropdown list-unstyled collapse @(enUsuarioEmpresaLogistica || enSuscripcion ? "show":"")" data-bs-parent="#sidebar">
                                 <li class="sidebar-item">
                                     <a asp-controller="UsuarioEmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("UsuarioEmpresaLogistica")">
                                         <i class='bx bx-user'></i>
@@ -96,11 +101,11 @@
                         @if(verControl)
                         {   
                             <li class="sidebar-item">
-                                <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse" data-bs-target="#rfid" aria-expanded="false" aria-controls="rfid">
+                                    <a href="#" class="sidebar-link collapsed has-dropdown" @(enUsuarioInstitucion || enlogAcceso ? "" : "collapsed") data-bs-toggle="collapse" data-bs-target="#rfid" aria-expanded="@(enUsuarioInstitucion || enlogAcceso ? "true" : "false")" aria-controls="rfid">
                                     <i class='bx bx-rfid'></i>
                                     <span>RFID</span>
                                 </a>
-                                <ul id="rfid" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <ul id="rfid" class="sidebar-dropdown list-unstyled collapse @(enUsuarioInstitucion || enlogAcceso ? "show" : "")" data-bs-parent="#sidebar">
                                     <li class="sidebar-item">
                                         <a asp-controller="UsuarioInstitucion" asp-action="Index" class="sidebar-link @Activo("UsuarioInstitucion")">
                                             <i class='bx bx-id-card'></i>
@@ -108,7 +113,7 @@
                                         </a>
                                     </li>
                                     <li class="sidebar-item">
-                                        <a asp-controller="Acceso" asp-action="Index" class="sidebar-link @Activo("Evento")">
+                                        <a asp-controller="Acceso" asp-action="Index" class="sidebar-link @Activo("Acceso")">
                                             <i class='bx bx-log-in-circle'></i>
                                             <span>Log de Accesos</span>
                                         </a>
@@ -162,11 +167,12 @@
                                     <span>Compliance</span>
                                 </a>
                             </li>
-                        }
+                            }
 
-                    }
-                    else
-                    {
+                        }
+                        else
+                        {
+                            bool enEmpresa = controllerActual == "EmpresaLogistica";
                         <li class="sidebar-item">
                             <a asp-controller="PanelCentral" asp-action="Index" class="sidebar-link @Activo("PanelCentral")">
                                 <i class='bx bxs-dashboard'>
@@ -174,10 +180,34 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a asp-controller="EmpresaLogistica" asp-action="Index" class="sidebar-link @Activo("EmpresaLogistica")">
+                            <a href="#" class="sidebar-link has-dropdown @(enEmpresa ? "":"collapsed")" data-bs-toggle="collapse" data-bs-target="#empresas" 
+                            aria-expanded="@(enEmpresa?"true":"false")" aria-controls="empresas">
                                 <i class='bx bxs-truck'>
                                 </i>
                                 <span>Empresas Logisticas</span>
+                            </a>
+                            <ul id="empresas" class="sidebar-dropdown list-unstyled collapse @(enEmpresa? "show":"")" data-bs-parent="#sidebar">
+                                <li class="sidebar-item">
+                                    <a asp-controller="EmpresaLogistica" asp-action="Registrar" class="sidebar-link @ActivoAccion("EmpresaLogistica", "Registrar")"> <i class='bx bx-buildings'></i><span>Registrar Empresa</span></a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a asp-controller="EmpresaLogistica" asp-action="Index" class="sidebar-link @(enEmpresa && accionActual != "Registrar" ? "activo" : "")"><i class='bx bx-building'></i><span>Gestionar Empresa</span></a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link">
+                                <i class="bx bx-book-content"></i><span>Normativa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link">
+                                <i class="bx bx-receipt"></i><span>Facturacion</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link">
+                                <i class="bx bx-support"></i><span>Soporte IoT</span>
                             </a>
                         </li>
                     }

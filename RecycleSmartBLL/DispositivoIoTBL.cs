@@ -20,6 +20,11 @@ namespace RecycleSmartBLL
         }
 
 
+        public List<DispositivoConProblemas>ListarDispositivoProblemas(int empresaid)
+        {
+            return _dispositivoIoTDAL.ListadoDispositivoOfflinexEmpresa(empresaid);
+        }
+
         public Dictionary<int, DispositivoIoT> DispositivosXInstitucion(int institucionid, int empresaid)
         {
             return _dispositivoIoTDAL.ListarDispositivoXInstitucion(institucionid, empresaid).ToDictionary(d => d.ContenedorId);

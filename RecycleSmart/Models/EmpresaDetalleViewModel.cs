@@ -8,5 +8,6 @@ namespace RecycleSmart.Models
         public UsoPlan? Uso { get; set; }
         public List<UsuarioEmpresaLogistica> Usuarios { get; set; } = new();
         public bool TieneAdministrador { get; set; }
+        public List<DispositivoConProblemas> DispositivosOffline { get; set; } = new();
     }
 }
