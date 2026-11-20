@@ -26,5 +26,7 @@
         public enum MetodoTratamiento { Autoclave,Incineracion,Microondas,Otro}
 
         public enum EstadoPlazo { EnPlazo,Atencion,PorVencer,Vencido}
+
+        public enum EstadoFactura { Pagada,Pendiente}
     }
 }

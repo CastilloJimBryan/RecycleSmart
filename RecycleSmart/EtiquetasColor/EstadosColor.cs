@@ -6,7 +6,7 @@
         {
             return estado switch
             {
-                "Activo" or "Sincronizado" or "Autorizado" or "Cerrado" or "EnPlazo"=> "bg-success",
+                "Activo" or "Sincronizado" or "Autorizado" or "Cerrado" or "EnPlazo" or "Pagada"=> "bg-success",
                 "Suspendido" or"Pendiente" or "Recolectado" or"Atencion" => "bg-warning text-dark",
                  "Offline" or "Tratado" => "bg-secondary",
                 "RecoleccionSolicitada" => "bg-info text-dark",

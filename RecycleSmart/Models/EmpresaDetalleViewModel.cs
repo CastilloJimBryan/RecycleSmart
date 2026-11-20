@@ -10,6 +10,7 @@ namespace RecycleSmart.Models
         public bool TieneAdministrador { get; set; }
         public List<DispositivoConProblemas> DispositivosOffline { get; set; } = new();
         public List<AuditoriaEmpresa> Auditoria { get; set; } = new();
-       
+        public List<Factura> Facturas { get; set; } = new();
+
     }
 }

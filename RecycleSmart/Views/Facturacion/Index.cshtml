@@ -1,0 +1,139 @@
+﻿@model List<RecycleSmartBE.Factura>
+@{
+    ViewData["Title"] = "Facturación";
+    var ar = new System.Globalization.CultureInfo("es-AR");
+    string Usd(decimal monto) => "US$ " + monto.ToString("N2", ar);
+    var hoy = DateTime.Now;
+
+    string EstadoTexto(RecycleSmartBE.Factura f) =>
+        f.EstadoFactura == TipoEstado.EstadoFactura.Pagada ? "Pagada"
+        : f.Vencida ? $"Vencida ({f.DiasVencida} {(f.DiasVencida == 1 ? "día" : "días")})"
+        : "Pendiente";
+
+    string EstadoColor(RecycleSmartBE.Factura f) =>
+        f.EstadoFactura == TipoEstado.EstadoFactura.Pagada ? "bg-success"
+        : f.MoraGrave ? "bg-danger"
+        : f.Vencida ? "bg-warning text-dark"
+        : "bg-secondary";
+
+    decimal pendiente = Model.Where(f => f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente).Sum(f => f.Monto);
+    decimal cobrado = Model.Where(f => f.EstadoFactura == TipoEstado.EstadoFactura.Pagada).Sum(f => f.Monto);
+    int enMora = Model.Count(f => f.MoraGrave);
+}
+<partial name="_Mensajes"/>
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+        <h2 class="mb-0">Facturación</h2>
+        <div class="text-muted small">Facturas mensuales de las empresas</div>
+    </div>
+
+    <form asp-action="Emitir" method="post" class="d-flex flex-wrap align-items-end gap-2"
+          onsubmit="return confirm('¿Emitir la facturación del período elegido para todas las empresas activas?');">
+        <div>
+            <label class="form-label small text-muted mb-1" for="mes">Mes</label>
+            <select class="form-select" id="mes" name="mes">
+                @for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m" selected="@(m == hoy.Month)">@ar.DateTimeFormat.GetMonthName(m)</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label small text-muted mb-1" for="anio">Año</label>
+            <select class="form-select" id="anio" name="anio">
+                <option value="@hoy.Year" selected>@hoy.Year</option>
+                <option value="@(hoy.Year - 1)">@(hoy.Year - 1)</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="bx bx-receipt"></i> Emitir facturación del mes</button>
+    </form>
+</div>
+
+<!-- Resumen -->
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-3">
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-secondary)">
+            <div class="card-body"><div class="fs-3 fw-semibold">@pendiente.ToString("C", ar)</div><div class="text-muted small">Pendiente de cobro</div></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-success)">
+            <div class="card-body"><div class="fs-3 fw-semibold">@cobrado.ToString("C", ar)</div><div class="text-muted small">Cobrado</div></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-danger)">
+            <div class="card-body"><div class="fs-3 fw-semibold text-danger">@enMora</div><div class="text-muted small">Facturas con más de @RecycleSmartBE.Factura.DiasdeMora días de vencidas</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<form asp-action="Index" method="get" class="d-flex flex-wrap gap-2 mb-3">
+    <select class="form-select w-auto" name="empresaId" onchange="this.form.submit()">
+        <option value="0">Todas las empresas</option>
+        @foreach (var e in ViewBag.Empresa)
+        {
+            <option value="@e.Id" selected="@(e.Id == ViewBag.EmpresaId)">@e.Nombre</option>
+        }
+    </select>
+    <select class="form-select w-auto" name="estado" onchange="this.form.submit()">
+        <option value="">Todos los estados</option>
+        <option value="Pendiente" selected="@(ViewBag.Estado == "Pendiente")">Pendiente</option>
+        <option value="Vencida" selected="@(ViewBag.Estado == "Vencida")">Vencida</option>
+        <option value="Pagada" selected="@(ViewBag.Estado == "Pagada")">Pagada</option>
+    </select>
+</form>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        @if (Model.Count == 0)
+        {
+            <div class="text-muted text-center py-3">No hay facturas para mostrar.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Empresa</th>
+                            <th>Período</th>
+                            <th class="text-end">Monto</th>
+                            <th>Vencimiento</th>
+                            <th>Estado</th>
+                            <th>Pago</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var f in Model)
+                        {
+                            <tr class="@(f.MoraGrave ? "table-danger" : "")">
+                                <td><code>@f.Numero</code></td>
+                                <td>@f.EmpresaNombre</td>
+                                <td>@f.Periodo</td>
+                                <td class="text-end text-nowrap">@f.Monto.ToString("C", ar)</td>
+                                <td class="text-nowrap">@f.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                                <td><span class="badge @EstadoColor(f)">@EstadoTexto(f)</span></td>
+                                <td class="text-nowrap">@(f.FechaPago?.ToString("dd/MM/yyyy") ?? "—")</td>
+                                <td>
+                                    @if (f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente)
+                                    {
+                                        <form asp-action="RegistrarPago" method="post" class="d-inline"
+                                              onsubmit="return confirm('¿Registrar el pago de la factura @f.Numero?');">
+                                            <input type="hidden" name="id" value="@f.Id" />
+                                            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                            <button type="submit" class="btn btn-theme-success btn-sm"><i class="bx bx-wallet"></i> Registrar pago</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

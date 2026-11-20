@@ -10,7 +10,6 @@
         (Titulo:"Instituciones",Usado:Model.Uso?.Instituciones??0,Max:Model.Uso?.MaxInstituciones??0),
         (Titulo:"Contenedores",Usado:Model.Uso?.Contenedores??0,Max:Model.Uso?.MaxContenedores??0),
     };
-
     string Hace(DateTime? f)
     {
         if(f==null)
@@ -20,6 +19,17 @@
         var d = DateTime.Now - f.Value;
         return d.TotalMinutes < 60 ? $"Hace {(int)d.TotalMinutes} min " : d.TotalHours < 24 ? $"Hace {(int)d.TotalHours} h " : $"Hace {(int)d.TotalDays} dias";
     }
+
+
+    var ar = new System.Globalization.CultureInfo("es-AR");
+    string Usd(decimal monto) => "US$ " + monto.ToString("N2", ar);
+    bool enMora = Model.Facturas.Any(f => f.MoraGrave);
+    var peorFactura = Model.Facturas.Where(f => f.MoraGrave).OrderByDescending(f => f.DiasVencida).FirstOrDefault();
+
+    string EstadoTexto(RecycleSmartBE.Factura f) =>
+        f.EstadoFactura == TipoEstado.EstadoFactura.Pagada ? "Pagada"
+        : f.Vencida ? $"Vencida ({f.DiasVencida} {(f.DiasVencida == 1 ? "día" : "días")})"
+        : "Pendiente";
 }
 <partial name="_Mensajes"/>
 <div class="mb-4">
@@ -163,6 +173,61 @@
         }
     </div>
 </div>
+
+<div class="card mb-3">
+    <div class="card-header fw-bold">Facturación</div>
+    <div class="card-body p-0">
+        @if (Model.Facturas.Count == 0)
+        {
+            <p class="text-muted p-3 mb-0">La empresa todavía no tiene facturas emitidas.</p>
+        }
+        else
+        {
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr><th>Número</th><th>Período</th><th class="text-end">Monto</th><th>Vencimiento</th><th>Estado</th><th>Pago</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var f in Model.Facturas)
+                    {
+                        <tr class="@(f.MoraGrave ? "table-danger" : "")">
+                            <td><code>@f.Numero</code></td>
+                            <td>@f.Periodo</td>
+                            <td class="text-end">@f.Monto.ToString("C", ar)</td>
+                            <td>@f.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                            <td><span class="badge @EstadosColor.EstadoBadge(f.EstadoFactura.ToString())">@EstadoTexto(f)</span></td>
+                            <td>@(f.FechaPago?.ToString("dd/MM/yyyy") ?? "—")</td>
+                            <td>
+                                @if (f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente)
+                                {
+                                    <form asp-controller="Facturacion" asp-action="RegistrarPago" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@f.Id" />
+                                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                        <button type="submit" class="btn btn-theme-success btn-sm"><i class="bx bx-wallet"></i> Registrar pago</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@if (enMora && e.Estados == TipoEstado.Estados.Activo && peorFactura != null)
+{
+    <div class="alert alert-danger d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span>
+            <strong>Pago vencido:</strong> la factura @peorFactura.Numero tiene @peorFactura.DiasVencida días de vencida.
+            Se sugiere suspender la empresa.
+        </span>
+        <button type="button" class="btn btn-danger btn-sm"
+                onclick="document.getElementById('nota').value='Suspensión por falta de pago: factura @peorFactura.Numero vencida hace @peorFactura.DiasVencida días.'; document.getElementById('nota').focus();">
+            Preparar suspensión
+        </button>
+    </div>
+}
 
 @if(e.Estados!=TipoEstado.Estados.Baja)
 {  
