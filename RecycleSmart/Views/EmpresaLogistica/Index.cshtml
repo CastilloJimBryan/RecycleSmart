@@ -3,14 +3,9 @@
 @{
     ViewData["Title"] = "Empresas Logisticas";
 }
-<div class="align-items-center mb-3">
-<h2>Listado de Empresas Logisticas</h2>
-    <div>
-        <a asp-action="Registrar" class="btn btn-success btn-sm"><i class="bx bx-plus"></i> Registrar Nueva Empresa </a>
-    </div>
-</div>
-
 <partial name="_Mensajes"/>
+
+<h2 class="mb-3">Listado de Empresas Logisticas</h2>
 
 @if(Model.Count==0)
 {

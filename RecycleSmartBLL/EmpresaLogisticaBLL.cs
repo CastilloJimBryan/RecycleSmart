@@ -56,23 +56,38 @@ namespace RecycleSmartBLL
         {
             return _empresaLogisticaDAL.BuscarXId(id);
         }
-        public void CambiarEstado(int id,TipoEstado.Estados nuevo)
+        public const int largonota = 15;
+        public void CambiarEstado(int empresaid,TipoEstado.Estados nuevo,string?nota,int usuarioId)
         {
-            if (_empresaLogisticaDAL.BuscarXId(id) is not EmpresaLogistica actual)
+            nota = nota?.Trim() ?? "";
+            if(nota.Length<=largonota)
             {
-                throw new Exception("La Empresa no Existe");
+                throw new Exception($"La nota debe tener al menos {largonota} caracteres ");
             }
-            if (actual.Estados == TipoEstado.Estados.Baja)
+            var empresa = BuscarXId(empresaid) ?? throw new Exception("La Empresa no Existe");
+            var actual = empresa.Estados;
+           
+            if (actual== TipoEstado.Estados.Baja)
             {
                 throw new Exception("No se Puede Editar una Empresa de Baja");
             }
-            if(actual.Estados==nuevo)
+            if(actual==nuevo)
             {
-                throw new Exception(@"La empresa ya esta en Estado: {nuevo}");
+                throw new Exception($"La empresa ya esta en Estado: {nuevo}");
             }
+            string accion = nuevo switch
+            {
+                TipoEstado.Estados.Suspendido => "Suspendido",
+                TipoEstado.Estados.Activo => "Activo",
+                TipoEstado.Estados.Baja => "Baja",
+                _ => throw new Exception("Estado no Valido")
+            };
 
-            _empresaLogisticaDAL.CambiarEstado(id, nuevo.ToString());
+            _empresaLogisticaDAL.CambiarEstadoConAuditoria(empresaid, nuevo,accion,nota,usuarioId);
         }
-
+        public List<AuditoriaEmpresa> ListadoAuditoriaEmpresa(int empresaid)
+        {
+            return _empresaLogisticaDAL.ListarAuditoriaEmpresa(empresaid);
+        }
     }
 }

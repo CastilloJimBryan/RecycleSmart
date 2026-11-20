@@ -114,18 +114,83 @@ namespace RecycleSmartDAL
                 cmd.ExecuteNonQuery();
             }
         }
-
-        public void CambiarEstado(int Id,string estado)
+        public void CambiarEstadoConAuditoria(int empresaId,TipoEstado.Estados nuevo,string accion,string nota,int usuarioId)
         {
-            using (var con = new SqlConnection(_conectar))
-            using (var cmd = new SqlCommand("UPDATE EmpresaLogistica SET Estado=@Estado" +
-                " WHERE Id=@Id", con))
+            using(var cone=new SqlConnection(_conectar))
             {
-                cmd.Parameters.AddWithValue("@Id", Id);
-                cmd.Parameters.AddWithValue("@Estado", estado);
-                con.Open();
-                cmd.ExecuteNonQuery();
+                cone.Open();
+                using(var trans = cone.BeginTransaction())
+                {
+                    try
+                    {
+                        string anterior;
+                        using (var cmd = new SqlCommand("SELECT Estado FROM EmpresaLogistica WITH (UPDLOCK) WHERE Id=@EmpresaId", cone, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
+                            anterior = cmd.ExecuteScalar() as string ?? throw new Exception("Empresa No Existe");
+                        }
+                        using(var cmd=new SqlCommand("UPDATE EmpresaLogistica SET Estado=@Estado" +
+                            " WHERE Id=@EmpresaId ", cone, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
+                            cmd.Parameters.AddWithValue("@Estado", nuevo.ToString());
+                            cmd.ExecuteNonQuery();
+                        }
+                        using(var cmd=new SqlCommand(@"INSERT INTO AuditoriaEmpresa (EstadoAnterior,Accion,EstadoNuevo,Nota,EmpresaLogisticaId,UsuarioRecycleSmartId,Fecha) " +
+                            " VALUES (@EstadoAnterior,@Accion,@EstadoNuevo,@Nota,@EmpresaId,@UsuarioId,@Fecha)",cone, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@EstadoAnterior", anterior);
+                            cmd.Parameters.AddWithValue("@Accion", accion);
+                            cmd.Parameters.AddWithValue("@EstadoNuevo", nuevo.ToString());
+                            cmd.Parameters.AddWithValue("@Nota", nota);
+                            cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
+                            cmd.Parameters.AddWithValue("@UsuarioId", usuarioId);
+                            cmd.Parameters.AddWithValue("@Fecha", DateTime.Now);
+                            cmd.ExecuteNonQuery();
+
+                        }
+                        trans.Commit();
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
             }
+        }
+
+        public List<AuditoriaEmpresa> ListarAuditoriaEmpresa(int empresaId)
+        {
+            List<AuditoriaEmpresa> listado = new List<AuditoriaEmpresa>();
+            using (var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand(" SELECT AuditoriaEmpresa.Id,AuditoriaEmpresa.EstadoNuevo,AuditoriaEmpresa.EstadoAnterior,AuditoriaEmpresa.Accion,AuditoriaEmpresa.Nota, " +
+                " AuditoriaEmpresa.Fecha, UsuarioRecycleSmart.Nombre + ' ' + UsuarioRecycleSmart.Apellido AS UsuarioNombre " +
+                " FROM AuditoriaEmpresa" +
+                " INNER JOIN UsuarioRecycleSmart ON UsuarioRecycleSmart.Id=AuditoriaEmpresa.UsuarioRecycleSmartId" +
+                " WHERE AuditoriaEmpresa.EmpresaLogisticaId=@EmpresaId  ORDER BY AuditoriaEmpresa.Fecha DESC ", con))
+            {
+                cmd.Parameters.AddWithValue("@EmpresaId", empresaId);
+                con.Open();
+                using (var leer = cmd.ExecuteReader())
+                {
+                    while (leer.Read())
+                    {
+                        listado.Add(new AuditoriaEmpresa
+                        {
+                            Id = leer.GetInt32(leer.GetOrdinal("Id")),
+                            EstadoAnterior = leer.GetString(leer.GetOrdinal("EstadoAnterior")),
+                            Accion= leer.GetString(leer.GetOrdinal("Accion")),
+                            EstadoNuevo = leer.GetString(leer.GetOrdinal("EstadoNuevo")),
+                            Nota = leer.GetString(leer.GetOrdinal("Nota")),
+                            Fecha = leer.GetDateTime(leer.GetOrdinal("Fecha")),
+                            EmpresaLogisticaId = empresaId,
+                            UsuarioNombre = leer.GetString(leer.GetOrdinal("UsuarioNombre")),
+                        });
+                    }
+                }
+            }
+            return listado;
         }
 
         public bool ExisteCuit(string cuit,int IdExcluir=0)

@@ -112,7 +112,7 @@ namespace RecycleSmart.Controllers
 
         [ValidateAntiForgeryToken]
 
-        public IActionResult CambiarEstado(int id,string? estado)
+        public IActionResult CambiarEstado(int id,string? estado,string? nota)
         {
             
             try
@@ -121,8 +121,9 @@ namespace RecycleSmart.Controllers
                 {
                     throw new Exception("Estado no Valido!");
                 }
-                _empresaLogisticaBLL.CambiarEstado(id, nuevo);
-                TempData["Mensaje"] = $"Estado Cambiado a {nuevo}";
+                int usuarioid = ManejosSesiones.ObtenerUsuarioId(User);
+                _empresaLogisticaBLL.CambiarEstado(id, nuevo,nota,usuarioid);
+                TempData["Mensaje"] = $"Estado Cambiado a {nuevo} , Cambio registrado";
             }
             catch(Exception ex)
             {
@@ -145,6 +146,7 @@ namespace RecycleSmart.Controllers
                 Usuarios = _usuarioempresaLogisticabl.ListarUsuarioxEmpresa(id),
                 TieneAdministrador = _usuarioempresaLogisticabl.tieneAdmin(id),
                 DispositivosOffline=_dispositivoIoTBL.ListarDispositivoProblemas(id),
+                Auditoria=_empresaLogisticaBLL.ListadoAuditoriaEmpresa(id),
                 Uso = new UsoPlan
                 {
                     PlanNombre = empresa.PlanNombre,
