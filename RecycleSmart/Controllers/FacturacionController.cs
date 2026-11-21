@@ -26,7 +26,7 @@ namespace RecycleSmart.Controllers
             var facturas=_facuraBL.ListarFacturaXEmpresa(empresaId);
             facturas = estado switch
             {
-                "Pendiente" => facturas.Where(f => f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente && f.Vencida).ToList(),
+                "Pendiente" => facturas.Where(f => f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente && !f.Vencida).ToList(),
                 "Vencida" => facturas.Where(f=>f.Vencida).ToList(),
                 "Pagada" => facturas.Where(f => f.EstadoFactura == TipoEstado.EstadoFactura.Pagada).ToList(),
                 _=>facturas

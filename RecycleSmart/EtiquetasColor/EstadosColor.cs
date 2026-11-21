@@ -7,11 +7,11 @@
             return estado switch
             {
                 "Activo" or "Sincronizado" or "Autorizado" or "Cerrado" or "EnPlazo" or "Pagada"=> "bg-success",
-                "Suspendido" or"Pendiente" or "Recolectado" or"Atencion" => "bg-warning text-dark",
-                 "Offline" or "Tratado" => "bg-secondary",
+                "Suspendido" or"Pendiente" or "Recolectado" or"Atencion" or "Vencida" => "bg-warning text-dark",
+                "Offline" or "Tratado" => "bg-secondary",
                 "RecoleccionSolicitada" => "bg-info text-dark",
                 "EnCurso"=>"bg-primary",
-                "Error" or "Denegado" or "NoConforme" or "Vencida" or "Baja" or"PorVencer" => "bg-danger",
+                "Error" or "Denegado" or "NoConforme" or "Vencida" or "Baja" or"PorVencer" or "MoraGrave" => "bg-danger",
                 "Vencido"=> "bg-dark-red text-white",
                 _ => "bg-light text-dark"
             };

@@ -36,7 +36,7 @@ namespace RecycleSmartDAL
         public int RegistrarPago(int facturaid)
         {
             using(var conect=new SqlConnection(_conectar))
-            using(var cmd=new SqlCommand("UPDATE Factura SET EstadoFactura = 'Pagado',FechaPago=GETDATE() " +
+            using(var cmd=new SqlCommand("UPDATE Factura SET EstadoFactura = 'Pagada',FechaPago=GETDATE() " +
                 " WHERE EstadoFactura='Pendiente' AND Id=@Id ",conect))
             {
                 cmd.Parameters.AddWithValue("@Id", facturaid);
@@ -73,6 +73,7 @@ namespace RecycleSmartDAL
                             FechaVencimiento = leer.GetDateTime(leer.GetOrdinal("FechaVencimiento")),
                             FechaPago =leer.IsDBNull(leer.GetOrdinal("FechaPago"))?null: leer.GetDateTime(leer.GetOrdinal("FechaPago")),
                             EstadoFactura = Enum.Parse<TipoEstado.EstadoFactura>(leer.GetString(leer.GetOrdinal("EstadoFactura")),true),
+                            EmpresaLogisticaId = leer.GetInt32(leer.GetOrdinal("EmpresaLogisticaId"))
 
                         });
                     }

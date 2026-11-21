@@ -183,9 +183,17 @@
         }
         else
         {
-            <table class="table mb-0 align-middle">
+            <table class="table table-striped align-middle">
                 <thead>
-                    <tr><th>Número</th><th>Período</th><th class="text-end">Monto</th><th>Vencimiento</th><th>Estado</th><th>Pago</th><th></th></tr>
+                    <tr>
+                        <th>Número</th>
+                        <th>Período</th>
+                        <th>Monto</th>
+                        <th>Vencimiento</th>
+                        <th>Estado</th>
+                        <th>Pago</th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
                     @foreach (var f in Model.Facturas)
@@ -193,11 +201,11 @@
                         <tr class="@(f.MoraGrave ? "table-danger" : "")">
                             <td><code>@f.Numero</code></td>
                             <td>@f.Periodo</td>
-                            <td class="text-end">@f.Monto.ToString("C", ar)</td>
+                            <td>@Usd(f.Monto)</td>
                             <td>@f.FechaVencimiento.ToString("dd/MM/yyyy")</td>
                             <td><span class="badge @EstadosColor.EstadoBadge(f.EstadoFactura.ToString())">@EstadoTexto(f)</span></td>
                             <td>@(f.FechaPago?.ToString("dd/MM/yyyy") ?? "—")</td>
-                            <td>
+                            <td class="text-center">
                                 @if (f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente)
                                 {
                                     <form asp-controller="Facturacion" asp-action="RegistrarPago" method="post" class="d-inline">

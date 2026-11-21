@@ -10,11 +10,7 @@
         : f.Vencida ? $"Vencida ({f.DiasVencida} {(f.DiasVencida == 1 ? "día" : "días")})"
         : "Pendiente";
 
-    string EstadoColor(RecycleSmartBE.Factura f) =>
-        f.EstadoFactura == TipoEstado.EstadoFactura.Pagada ? "bg-success"
-        : f.MoraGrave ? "bg-danger"
-        : f.Vencida ? "bg-warning text-dark"
-        : "bg-secondary";
+
 
     decimal pendiente = Model.Where(f => f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente).Sum(f => f.Monto);
     decimal cobrado = Model.Where(f => f.EstadoFactura == TipoEstado.EstadoFactura.Pagada).Sum(f => f.Monto);
@@ -53,12 +49,12 @@
 <div class="row row-cols-1 row-cols-md-3 g-3 mb-3">
     <div class="col">
         <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-secondary)">
-            <div class="card-body"><div class="fs-3 fw-semibold">@pendiente.ToString("C", ar)</div><div class="text-muted small">Pendiente de cobro</div></div>
+            <div class="card-body"><div class="fs-3 fw-semibold">@Usd(pendiente)</div><div class="text-muted small">Pendiente de cobro</div></div>
         </div>
     </div>
     <div class="col">
         <div class="card h-100 shadow-sm text-center" style="border-top:4px solid var(--bs-success)">
-            <div class="card-body"><div class="fs-3 fw-semibold">@cobrado.ToString("C", ar)</div><div class="text-muted small">Cobrado</div></div>
+            <div class="card-body"><div class="fs-3 fw-semibold">@Usd(cobrado)</div><div class="text-muted small">Cobrado</div></div>
         </div>
     </div>
     <div class="col">
@@ -100,7 +96,7 @@
                             <th>Número</th>
                             <th>Empresa</th>
                             <th>Período</th>
-                            <th class="text-end">Monto</th>
+                            <th>Monto</th>
                             <th>Vencimiento</th>
                             <th>Estado</th>
                             <th>Pago</th>
@@ -114,18 +110,18 @@
                                 <td><code>@f.Numero</code></td>
                                 <td>@f.EmpresaNombre</td>
                                 <td>@f.Periodo</td>
-                                <td class="text-end text-nowrap">@f.Monto.ToString("C", ar)</td>
+                                <td class="text-nowrap">@Usd(f.Monto)</td>
                                 <td class="text-nowrap">@f.FechaVencimiento.ToString("dd/MM/yyyy")</td>
-                                <td><span class="badge @EstadoColor(f)">@EstadoTexto(f)</span></td>
+                                <td><span class="badge @EstadosColor.EstadoBadge(f.EstadoFactura.ToString())">@EstadoTexto(f)</span></td>
                                 <td class="text-nowrap">@(f.FechaPago?.ToString("dd/MM/yyyy") ?? "—")</td>
-                                <td>
+                                <td class="text-center">
                                     @if (f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente)
                                     {
                                         <form asp-action="RegistrarPago" method="post" class="d-inline"
                                               onsubmit="return confirm('¿Registrar el pago de la factura @f.Numero?');">
                                             <input type="hidden" name="id" value="@f.Id" />
                                             <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                                            <button type="submit" class="btn btn-theme-success btn-sm"><i class="bx bx-wallet"></i> Registrar pago</button>
+                                            <button type="submit" class="btn btn-theme-success btn-sm"><i class="bx bx-wallet"></i>Registrar pago</button>
                                         </form>
                                     }
                                 </td>

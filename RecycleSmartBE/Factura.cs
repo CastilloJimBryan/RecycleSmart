@@ -18,7 +18,7 @@ namespace RecycleSmartBE
         public DateTime FechaVencimiento {  get; set; }
         public DateTime? FechaPago { get; set; }
         public TipoEstado.EstadoFactura EstadoFactura { get; set; }
-
+        public int EmpresaLogisticaId { get; set; }
 
         public string Periodo => $"{Mes:D2}/{Anio}";
         public bool Vencida => EstadoFactura == TipoEstado.EstadoFactura.Pendiente && DateTime.Now > FechaVencimiento;
