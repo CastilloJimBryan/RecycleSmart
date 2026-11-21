@@ -20,7 +20,7 @@ namespace RecycleSmartDAL
             using(var con=new SqlConnection(_conectar))
             using (var cmd = new SqlCommand("SELECT Id,Nombre,MaxInstituciones,MaxContenedores,PrecioMensual,CostoInstalacion,Estado " +
                 " FROM Planes " +
-                " WHERE Estado='Activo'",con))
+                " WHERE Estado='Activo' ORDER BY PrecioMensual",con))
             {
                 con.Open();
                 using (var reader = cmd.ExecuteReader())
