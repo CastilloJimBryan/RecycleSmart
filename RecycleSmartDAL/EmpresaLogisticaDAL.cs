@@ -206,5 +206,16 @@ namespace RecycleSmartDAL
                 return  (int)cmd.ExecuteScalar()>0;
             }
         }
+
+        public void CambiarPlan(int empresaid,int planid)
+        {
+            using(var con = new SqlConnection(_conectar))
+            using (var cmd = new SqlCommand("UPDATE EmpresaLogistica SET PlanId=@PlanId " +
+                "WHERE Id=@Id", con))
+            {
+                cmd.Parameters.AddWithValue("@Id",empresaid);
+                cmd.Parameters.AddWithValue("@PlanId",planid);
+            }
+        }
     }
 }
