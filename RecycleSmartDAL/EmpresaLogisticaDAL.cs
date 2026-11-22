@@ -215,6 +215,8 @@ namespace RecycleSmartDAL
             {
                 cmd.Parameters.AddWithValue("@Id",empresaid);
                 cmd.Parameters.AddWithValue("@PlanId",planid);
+                con.Open();
+                cmd.ExecuteNonQuery();
             }
         }
     }

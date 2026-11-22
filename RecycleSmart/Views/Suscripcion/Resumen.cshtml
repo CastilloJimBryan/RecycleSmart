@@ -1,5 +1,52 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model RecycleSmart.Models.ResumenCambioViewModel
 @{
+    ViewData["Title"] = "Resumen del cambio";
+    var ar = new System.Globalization.CultureInfo("es-AR");
+    string Usd(decimal m) => "US$ " + m.ToString("N2", ar);
+    string Limites(RecycleSmartBE.Plan p) =>
+        $"{(p.MaxInstituciones == 0 ? "Instituciones ilimitadas" : p.MaxInstituciones + " instituciones")} · " +
+        $"{(p.MaxContenedores == 0 ? "contenedores ilimitados" : p.MaxContenedores + " contenedores")}";
+
+    string diferencia = Model.Diferencia > 0 ? $"+ {Usd(Model.Diferencia)}"
+                      : Model.Diferencia < 0 ? $"− {Usd(-Model.Diferencia)} (ahorro mensual)"
+                      : "Sin cambio de precio";
 }
+
+<div class="mb-3">
+    <h2 class="mb-0">Revisá el cambio de plan</h2>
+</div>
+
+<div class="card shadow-sm" style="max-width:760px">
+    <div class="card-body">
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="border rounded p-3 h-100">
+                    <div class="text-muted small text-uppercase">Plan actual</div>
+                    <div class="fs-4 fw-bold">@Model.PlanActual.Nombre</div>
+                    <div class="small text-muted">@Limites(Model.PlanActual)</div>
+                    <div class="fs-5 fw-semibold mt-2">@Usd(Model.PlanActual.PrecioMensual) / mes</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="border border-2 border-success rounded p-3 h-100" style="background:#f3faf6">
+                    <div class="text-success small text-uppercase">Plan nuevo</div>
+                    <div class="fs-4 fw-bold text-success">@Model.PlanNuevo.Nombre</div>
+                    <div class="small text-muted">@Limites(Model.PlanNuevo)</div>
+                    <div class="fs-5 fw-semibold mt-2">@Usd(Model.PlanNuevo.PrecioMensual) / mes</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between border-bottom pb-2 mb-2"><span class="text-muted">Diferencia mensual</span><span class="fw-semibold">@diferencia</span></div>
+        <div class="d-flex justify-content-between border-bottom pb-2 mb-2"><span class="text-muted">Nuevos límites</span><span class="fw-semibold">Se activan al confirmar</span></div>
+        <div class="d-flex justify-content-between mb-4"><span class="text-muted">Nuevo precio</span><span class="fw-semibold">Desde la factura de @Model.RigeDesde.ToString("MM/yyyy")</span></div>
+
+        <form asp-action="Confirmar" method="post"onsubmit="this.querySelector('button').disabled=true;">
+            <input type="hidden" name="planId" value="@Model.PlanNuevo.Id" />
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-success btn-sm"> <i class="bx bx-dollar-circle"></i> Confirmar cambio</button>
+                <a asp-action="Planes" class="btn btn-outline-danger btn-sm"> <i class="bx bx-x"></i>Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

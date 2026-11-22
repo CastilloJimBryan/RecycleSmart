@@ -1,8 +1,115 @@
-﻿@model RecycleSmart.Models.SuscripcionViewModel;
+﻿@model RecycleSmart.Models.SuscripcionViewModel
 @{
     ViewData["Title"] = "Suscripcion";
+
+    var p = Model.PlanActual;
+    var ar = new System.Globalization.CultureInfo("es-AR");
+    string usd (decimal m)=>"US$ " + m.ToString("N2",ar); 
+    int Porc(int usado, int max) => max == 0 ? 0 : Math.Min(100, usado * 100 / max);
+    string Max(int max) => max == 0 ? "ilimitado" : max.ToString();
+
+    bool enMora = Model.Facturas.Any(f => f.MoraGrave);
+    bool vencida = Model.Facturas.Any(f => f.Vencida);
+    string estadoCuenta = enMora ? "En mora" : vencida ? "Factura vencida" : "Al día";
+    string colorCuenta = enMora ? "bg-danger" : vencida ? "bg-warning text-dark" : "bg-success";
 }
 <partial name="_Mensajes"/>
 <div class="mb-3">
-    <h2>Suscripcion y Plan</h2>
+    <h2 class="mb-0">Suscripcion y Plan</h2>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100" style="border-top:4px solid var(--bs-success)">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                    <div>
+                        <div class="text-muted small text-uppercase">Plan Actual</div>
+                        <div class="fs-2 fw-bold text-success">@p.Nombre</div>
+                        <div class="fs-5 fw-semibold">@usd(p.PrecioMensual) <span class="fs-6 fw-normal text-muted">- Mensual</span></div>
+                    </div>
+                    <a asp-action="Planes" class="btn btn-success btn-sm"> <i class="bx bx-shuffle"></i> Cambiar Plan</a>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Instituciones</span>
+                        <span class="fw-semibold">@Model.Instituciones de @Max(@p.MaxInstituciones)</span>
+                    </div>
+                    @if(p.MaxInstituciones>0)
+                    {
+                        <div class="progress" style="height:10px">
+                            <div class="progress-bar bg-success" style="@($"width:{Porc(Model.Instituciones,p.MaxInstituciones)}%")"></div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Contenedores</span>
+                        <span class="fw-semibold">@Model.Contenedores de @Max(@p.MaxContenedores)</span>
+                    </div>
+                    @if(p.MaxContenedores>0)
+                    {
+                        <div class="progress" style="height:10px">
+                            <div class="progress-bar bg-success" style="@($"width:{Porc(Model.Contenedores,p.MaxContenedores)}%")"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100" style="border-top:4px solid var(--bs-success)">
+            <div class="card-body small">
+                 <div class="text-muted text-uppercase mb-3">Estado de Cuenta</div>
+                 <div class="d-flex justify-content-between mb-2"><span class="text-muted">Estado</span> <span class="badge @EstadosColor.EstadoBadge(estadoCuenta)">@estadoCuenta</span></div>
+                 <div class="d-flex justify-content-between mb-2"><span class="text-muted">Proxima Factura</span> <span>@Model.ProximaFacturacion.ToString("dd/MM/yyyy")</span></div>
+                    @if (Model.UltimaFactura != null)
+                    {
+                        <div class="d-flex justify-content-between mb-2"><span class="text-muted">Ultima Factura</span> <span>@Model.UltimaFactura.Numero</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span class="text-muted">Vence</span> <span>@Model.UltimaFactura.FechaVencimiento.ToString("dd/MM/yyyy")</span></div>
+                    }
+                    <div class="text-muted border-top pt-2 mt-2">
+                        Los Pagos lo registra RecycleSmart
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="text-uppercase text-muted small fw-semibold mb-3 ">Historial de Facturas</h5>
+        @if(Model.Facturas.Count==0)
+            {
+                <div class="text-muted">Todabia no hay registros de facturas emitidas.</div>
+            }
+            else{
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <theard>
+                            <tr>
+                                <th>Numero</th>
+                                <th>Periodo</th>
+                                <th>Monto</th>
+                                <th>Vencimiento</th>
+                                <th>Pago</th>
+                                <th>Estado</th>
+                            </tr>
+                        </theard>
+                        <tbody>
+                            @foreach (var item in Model.Facturas)
+                            {
+                                <tr>
+                                    <td><code>@item.Numero</code></td>
+                                    <td>@item.Periodo</td>
+                                    <td>@usd(item.Monto)</td>
+                                    <td>@item.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                                    <td>@(item.FechaPago?.ToString("dd/MM/yyyy")??"-")</td>
+                                    <td><span class="badge @EstadosColor.EstadoBadge(item.EstadoFactura.ToString())">@item.EstadoFactura</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
 </div>
