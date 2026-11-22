@@ -44,7 +44,7 @@
         <form asp-action="Confirmar" method="post"onsubmit="this.querySelector('button').disabled=true;">
             <input type="hidden" name="planId" value="@Model.PlanNuevo.Id" />
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-outline-success btn-sm"> <i class="bx bx-dollar-circle"></i> Confirmar cambio</button>
+                <button type="submit" class="btn btn-outline-success btn-sm"> <i class="bx bx-dollar-circle"></i> Confirmar</button>
                 <a asp-action="Planes" class="btn btn-outline-danger btn-sm"> <i class="bx bx-x"></i>Cancelar</a>
             </div>
         </form>
