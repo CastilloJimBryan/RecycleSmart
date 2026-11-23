@@ -90,8 +90,8 @@
                                 <th>Numero</th>
                                 <th>Periodo</th>
                                 <th>Monto</th>
-                                <th>Vencimiento</th>
-                                <th>Pago</th>
+                                <th>Fecha de Vencimiento</th>
+                                <th>Fecha de Pago</th>
                                 <th>Estado</th>
                             </tr>
                         </theard>
@@ -101,10 +101,12 @@
                                 <tr>
                                     <td><code>@item.Numero</code></td>
                                     <td>@item.Periodo</td>
-                                    <td>@usd(item.Monto)</td>
-                                    <td>@item.FechaVencimiento.ToString("dd/MM/yyyy")</td>
-                                    <td>@(item.FechaPago?.ToString("dd/MM/yyyy")??"-")</td>
-                                    <td><span class="badge @EstadosColor.EstadoBadge(item.EstadoFactura.ToString())">@item.EstadoFactura</span></td>
+                                    <td class="text-nowrap">@usd(item.Monto)</td>
+                                    <td class="text-nowrap">@item.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-nowrap">@(item.FechaPago?.ToString("dd/MM/yyyy")??"-")</td>
+                                    <td>
+                                        <span class="badge @EstadosColor.EstadoBadge(item.EstadoFactura.ToString())">@item.EstadoFactura</span>
+                                    </td>
                                 </tr>
                             }
                         </tbody>

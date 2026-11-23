@@ -97,9 +97,9 @@
                             <th>Empresa</th>
                             <th>Período</th>
                             <th>Monto</th>
-                            <th>Vencimiento</th>
+                            <th>Fecha de Vencimiento</th>
+                            <th>Fecha de Pago</th>
                             <th>Estado</th>
-                            <th>Pago</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -112,8 +112,8 @@
                                 <td>@f.Periodo</td>
                                 <td class="text-nowrap">@Usd(f.Monto)</td>
                                 <td class="text-nowrap">@f.FechaVencimiento.ToString("dd/MM/yyyy")</td>
-                                <td><span class="badge @EstadosColor.EstadoBadge(f.EstadoFactura.ToString())">@EstadoTexto(f)</span></td>
                                 <td class="text-nowrap">@(f.FechaPago?.ToString("dd/MM/yyyy") ?? "—")</td>
+                                <td><span class="badge @EstadosColor.EstadoBadge(f.EstadoFactura.ToString())">@EstadoTexto(f)</span></td>
                                 <td class="text-center">
                                     @if (f.EstadoFactura == TipoEstado.EstadoFactura.Pendiente)
                                     {
