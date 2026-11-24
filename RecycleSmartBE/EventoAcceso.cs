@@ -7,9 +7,6 @@ namespace RecycleSmartBE
     public class EventoAcceso
     {
         public long Id { get; set; }
-        public int ContenedorId { get; set; }
-        public int? TarjetaRfidId { get; set; }
-        public int? UsuarioInstitucionId { get; set; }
         public string UIDLeido { get; set; } = "";
         public TipoEstado.MotivoAcceso Motivo { get; set; }
         public TipoEstado.EstadoAcceso EstadoAcceso { get; set; }
@@ -26,6 +23,9 @@ namespace RecycleSmartBE
         public bool Permitido => EstadoAcceso == TipoEstado.EstadoAcceso.Permitido;
 
         public List<Alerta> AlertasNuevas { get; set; } = new();
+        public int ContenedorId { get; set; }
+        public int? TarjetaRfidId { get; set; }
+        public int? UsuarioInstitucionId { get; set; }
         public int? LoteId {  get; set; }
     }
 }

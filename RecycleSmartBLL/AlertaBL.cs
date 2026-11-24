@@ -67,7 +67,7 @@ namespace RecycleSmartBLL
                     EstadoAlerta = TipoEstado.EstadoAlerta.Activa,
                     ValorDetectado = valor,
                     ValorUmbral = valorumbral,
-                    Mensaje = mensaje,
+                    Descripcion = mensaje,
                     FechaCreacion = DateTime.Now,
                     ContenedorId=contenedorId
                 };
@@ -82,7 +82,7 @@ namespace RecycleSmartBLL
                 activa.TipoSeveridad = TipoEstado.Severidad.Critico;
                 activa.ValorDetectado = valor;
                 activa.ValorUmbral= valorumbral;
-                activa.Mensaje = mensaje;
+                activa.Descripcion = mensaje;
                 _alertaDAL.EscalarAlerta(activa);
                 novedades.Add(activa);
             }

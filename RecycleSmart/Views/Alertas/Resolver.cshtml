@@ -14,7 +14,7 @@
         <div class="mb-3">
             <span class="badge @(critica ? "bg-danger" : "bg-warning text-dark")">@Model.TipoSeveridad</span>
             <strong class="ms-1">@Model.InstitucionNombre · @Model.ContenedorNombre</strong>
-            <div>@Model.Mensaje</div>
+            <div>@Model.Descripcion</div>
             <small class="text-muted">
                 Detectada @Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
                 @if (Model.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion)

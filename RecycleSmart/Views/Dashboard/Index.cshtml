@@ -156,7 +156,7 @@
                                         <span class="badge @(critico?"bg-danger":"bg-warning text-dark")">@items.TipoAlerta - @items.TipoSeveridad</span>
                                     </div>
                                     <div class="text-muted small">
-                                        @items.Mensaje - Abierta Hace @Duracion(items.Duracion)
+                                        @items.Descripcion - Abierta Hace @Duracion(items.Duracion)
                                         @if (items.EstadoAlerta == TipoEstado.EstadoAlerta.EnGestion)
                                         {
                                             <text> En Gestion por @items.UsuarioGestionNombre</text>

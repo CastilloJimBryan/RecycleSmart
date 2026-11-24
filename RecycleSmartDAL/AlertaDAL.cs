@@ -25,7 +25,7 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@EstadoAlerta", a.EstadoAlerta.ToString());
                 cmd.Parameters.AddWithValue("@ValorDetectado", a.ValorDetectado);
                 cmd.Parameters.AddWithValue("@ValorUmbral", a.ValorUmbral);
-                cmd.Parameters.AddWithValue("@Mensaje", a.Mensaje);
+                cmd.Parameters.AddWithValue("@Mensaje", a.Descripcion);
                 cmd.Parameters.AddWithValue("@FechaCreacion", a.FechaCreacion);
                 cmd.Parameters.AddWithValue("@Resuelta", a.ResueltaAutomaticamente);
                 cmd.Parameters.AddWithValue("@ContenedorId", a.ContenedorId);
@@ -53,7 +53,7 @@ namespace RecycleSmartDAL
                         return new Alerta
                         {
                             Id = leer.GetInt32(0),
-                            Mensaje = leer.GetString(1),
+                            Descripcion = leer.GetString(1),
                             FechaCreacion = leer.GetDateTime(2),
                             FechaActualizacion = leer.IsDBNull(3) ? null : leer.GetDateTime(3),
                             FechaResolucion = leer.IsDBNull(4) ? null : leer.GetDateTime(4),
@@ -83,7 +83,7 @@ namespace RecycleSmartDAL
                 cmd.Parameters.AddWithValue("@TipoSeveridad", a.TipoSeveridad.ToString());
                 cmd.Parameters.AddWithValue("@ValorDetectado", a.ValorDetectado);
                 cmd.Parameters.AddWithValue("@ValorUmbral", a.ValorUmbral);
-                cmd.Parameters.AddWithValue("@Mensaje", a.Mensaje);
+                cmd.Parameters.AddWithValue("@Mensaje", a.Descripcion);
                 cmd.Parameters.AddWithValue("@Fecha", DateTime.Now);
                 con.Open();
                 cmd.ExecuteNonQuery();
@@ -127,7 +127,7 @@ namespace RecycleSmartDAL
                             listar.Add(new Alerta
                             {
                                 Id = leer.GetInt32(leer.GetOrdinal("Id")),
-                                Mensaje = leer.GetString(leer.GetOrdinal("Mensaje")),
+                                Descripcion = leer.GetString(leer.GetOrdinal("Mensaje")),
                                 FechaCreacion = leer.GetDateTime(leer.GetOrdinal("FechaCreacion")),
                                 FechaActualizacion = leer.IsDBNull(leer.GetOrdinal("FechaActualizacion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaActualizacion")),
                                 FechaResolucion = leer.IsDBNull(leer.GetOrdinal("FechaResolucion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaResolucion")),
@@ -173,7 +173,7 @@ namespace RecycleSmartDAL
                             return new Alerta
                             {
                                 Id = leer.GetInt32(leer.GetOrdinal("Id")),
-                                Mensaje = leer.GetString(leer.GetOrdinal("Mensaje")),
+                                Descripcion = leer.GetString(leer.GetOrdinal("Mensaje")),
                                 FechaCreacion = leer.GetDateTime(leer.GetOrdinal("FechaCreacion")),
                                 FechaActualizacion = leer.IsDBNull(leer.GetOrdinal("FechaActualizacion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaActualizacion")),
                                 FechaResolucion = leer.IsDBNull(leer.GetOrdinal("FechaResolucion")) ? null : leer.GetDateTime(leer.GetOrdinal("FechaResolucion")),

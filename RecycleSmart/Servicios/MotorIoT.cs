@@ -143,7 +143,7 @@ namespace RecycleSmart.Servicios
             {
 
                 _log.LogWarning("ALERTA {Severidad} ({Tipo}) en contenedor {Contenedor}: {Mensaje}",
-                                    a.TipoSeveridad, a.TipoAlerta, a.ContenedorId, a.Mensaje);
+                                    a.TipoSeveridad, a.TipoAlerta, a.ContenedorId, a.Descripcion);
                 var completa = _alerta.BuscarxId(a.Id, empresaId);
                 if (completa == null) continue;
                 await _hub.Clients.Group(grupo).SendAsync("NuevaAlerta", new
@@ -151,7 +151,7 @@ namespace RecycleSmart.Servicios
                     id = completa.Id,
                     severidad = completa.TipoSeveridad.ToString(),
                     tipo = completa.TipoAlerta.ToString(),
-                    mensaje = completa.Mensaje,
+                    mensaje = completa.Descripcion,
                     contenedor = completa.ContenedorNombre,
                     institucion = completa.InstitucionNombre
                 });

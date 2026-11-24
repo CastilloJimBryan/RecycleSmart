@@ -7,7 +7,7 @@ namespace RecycleSmartBE
     public class Alerta
     {
         public int Id {  get; set; }
-        public string Mensaje { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaActualizacion {  get; set; }
         public DateTime? FechaResolucion { get; set; }

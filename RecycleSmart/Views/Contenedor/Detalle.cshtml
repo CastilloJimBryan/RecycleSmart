@@ -208,7 +208,7 @@
                  style="@($"border-left:5px solid var(--bs-{(critico ? "danger" : "warning")}) !important")">
                 <div>
                     <span class="badge @(critico ? "bg-danger" : "bg-warning text-dark")">@a.TipoAlerta · @a.TipoSeveridad</span>
-                    <span class="small">@a.Mensaje</span>
+                    <span class="small">@a.Descripcion</span>
                 </div>
                 @if (PuedeGestionar)
                 {
